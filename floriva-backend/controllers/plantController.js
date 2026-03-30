@@ -31,8 +31,10 @@ const seedData = [
 
 exports.getAllPlants = async (req, res) => {
   try {
-    const { category } = req.query;
-    const filter = category ? { category } : {};
+    const { category, city } = req.query;
+    const filter = {};
+    if (category) filter.category = category;
+    if (city) filter.city = city;
     const plants = await Plant.find(filter).sort({ category: 1, name: 1 });
     res.json(plants);
   } catch (err) {

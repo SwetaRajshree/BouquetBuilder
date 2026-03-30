@@ -119,9 +119,12 @@ export default function ShopsPage() {
     setModalLoading(true);
     setShopFlowers([]);
     try {
-      const res = await fetch(`${API}/api/flowers/city/${encodeURIComponent(shop.city)}`);
+      const url = isPlant
+        ? `${API}/api/plants?city=${encodeURIComponent(shop.city)}`
+        : `${API}/api/flowers/city/${encodeURIComponent(shop.city)}`;
+      const res  = await fetch(url);
       const data = await res.json();
-      setShopFlowers(data);
+      setShopFlowers(Array.isArray(data) ? data : []);
     } catch (e) {
       console.error(e);
     } finally {
@@ -336,7 +339,7 @@ export default function ShopsPage() {
             </h3>
             <p className="text-sm text-gray-400 mb-4">📍 {selectedShop.area}, {selectedShop.city}</p>
 
-            {modalLoading && <p className="text-pink-400 text-sm">Loading flowers...</p>}
+            {modalLoading && <p className="text-sm text-gray-400">Loading {isPlant ? 'plants' : 'flowers'}...</p>}
             {!modalLoading && shopFlowers.length === 0 && (
               <p className="text-gray-400 text-sm">{isPlant ? "No plants listed yet for this nursery." : "No flowers available."}</p>
             )}
@@ -344,30 +347,36 @@ export default function ShopsPage() {
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {shopFlowers.map((f) => {
                 const outOfStock = !f.inStock;
+                const price = isPlant ? f.price : f.pricePerStem;
+                const priceLabel = isPlant ? `₹${price}` : `₹${price}/stem`;
                 return (
-                  <div
-                    key={f._id}
+                  <div key={f._id}
                     className={`rounded-xl border p-3 ${
-                      outOfStock ? "bg-red-50 border-red-200" : "bg-pink-50 border-pink-200"
+                      outOfStock ? "bg-red-50 border-red-200"
+                      : isPlant  ? "bg-green-50 border-green-200"
+                      :            "bg-pink-50 border-pink-200"
                     }`}
                   >
                     {f.image && f.image !== "PASTE_LINK_HERE" && (
                       <img src={f.image} alt={f.name} className="w-full h-24 object-cover rounded-lg mb-2" />
                     )}
-                    <p className="font-semibold text-sm text-roseDD mb-1">{f.name}</p>
-                    {f.emotion && <p className="text-xs text-gray-400 mb-1">💫 {f.emotion}</p>}
-                    {f.color && <p className="text-xs text-gray-400 mb-1">🎨 {f.color}</p>}
+                    {!f.image && <div className="text-3xl text-center mb-2">{f.img || (isPlant ? '🌿' : '🌸')}</div>}
+                    <p className={`font-semibold text-sm mb-1 ${isPlant ? 'text-green-700' : 'text-roseDD'}`}>{f.name}</p>
                     {f.category && <p className="text-xs text-gray-400 mb-1">🏷 {f.category}</p>}
-                    <p className="text-xs font-semibold text-roseD mb-1">₹{f.pricePerStem}/stem</p>
+                    {f.color && <p className="text-xs text-gray-400 mb-1">🎨 {f.color}</p>}
+                    {f.nursery && <p className="text-xs text-gray-400 mb-1">🏪 {f.nursery}</p>}
+                    <p className={`text-xs font-semibold mb-1 ${isPlant ? 'text-green-700' : 'text-roseD'}`}>{priceLabel}</p>
                     <span className={`text-xs font-medium ${outOfStock ? "text-red-500" : "text-green-600"}`}>
                       {outOfStock ? "❌ Out of Stock" : "✅ In Stock"}
                     </span>
                     {!outOfStock && (
                       <button
                         onClick={() => handleAddToCart(f)}
-                        className="mt-2 w-full bg-pink-500 hover:bg-pink-600 text-white text-xs py-1.5 rounded-lg transition active:scale-95"
+                        className={`mt-2 w-full text-white text-xs py-1.5 rounded-lg transition active:scale-95 ${
+                          isPlant ? 'bg-green-600 hover:bg-green-700' : 'bg-pink-500 hover:bg-pink-600'
+                        }`}
                       >
-                        {cartItems.find(i => i._id === f._id) ? `In Cart (${cartItems.find(i => i._id === f._id).quantity}) 🛒` : 'Add to Cart 🛒'}
+                        {cartItems.find(i => i._id === f._id) ? `In Cart 🛒` : 'Add to Cart 🛒'}
                       </button>
                     )}
                   </div>
