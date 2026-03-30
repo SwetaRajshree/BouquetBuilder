@@ -6,15 +6,6 @@ const API = import.meta.env.VITE_API_URL;
 
 const categories = ["Flower Plants", "Indoor Plants", "Outdoor Plants", "Succulents", "Air Purifying"];
 
-const nurseries = [
-  { name: "Kolkata Phool Bazar",   location: "Kolkata, WB",  type: "Wholesale Market",   plants: "Roses, Marigold, Mogra, Chrysanthemum, Hibiscus",        emoji: "🌺", savings: "Up to 50% off", color: "#FFF0F0", cat: "Flower Plants"  },
-  { name: "Green Valley Nursery",  location: "Pune, MH",     type: "Direct Nursery",     plants: "Bamboo, Bougainvillea, Lily, Dahlia, Lavender, Orchid",   emoji: "🌿", savings: "Up to 45% off", color: "#F0FAF0", cat: "Flower Plants"  },
-  { name: "Delhi Plant Bazaar",    location: "Delhi, DL",    type: "Wholesale Market",   plants: "Money Plant, Peace Lily, Jasmine, Arrowhead",             emoji: "🪴", savings: "Up to 40% off", color: "#F5FFF0", cat: "Indoor Plants"  },
-  { name: "Roots & Leaves",        location: "Bangalore, KA",type: "Direct Nursery",     plants: "Snake Plant, Aloe Vera, Sunflower, Orchid, Boston Fern",  emoji: "🌱", savings: "Up to 42% off", color: "#F0FFF5", cat: "Indoor Plants"  },
-  { name: "City Greens Wholesale", location: "Mumbai, MH",   type: "Wholesale Market",   plants: "Syngonium, Spider Plant, Tulip, Croton, Areca Palm",      emoji: "🍃", savings: "Up to 38% off", color: "#F2FAF0", cat: "Indoor Plants"  },
-  { name: "Desert Dreams",         location: "Jodhpur, RJ",  type: "Specialist Nursery", plants: "Cactus, Succulents, Lavender, Jade Plant, Aloe",          emoji: "🌵", savings: "Up to 48% off", color: "#FAFAF0", cat: "Succulents"     },
-];
-
 const priceRanges = [
   { label: "Under ₹99",  max: 99 },
   { label: "Under ₹199", max: 199 },
@@ -29,7 +20,6 @@ export default function PlantShop() {
   const [loading, setLoading]             = useState(true);
   const [activeCategory, setActiveCategory] = useState("Flower Plants");
   const [activePriceRange, setActivePriceRange] = useState(null);
-  const [activeSection, setActiveSection] = useState("shop");
   const [wishlist, setWishlist]           = useState(() => {
     try { return JSON.parse(localStorage.getItem("plant_wishlist") || "[]"); }
     catch { return []; }
@@ -176,7 +166,7 @@ export default function PlantShop() {
             </p>
             <div style={{ display:"flex", gap:"12px", flexWrap:"wrap" }}>
               <button onClick={() => { setActiveSection("shop"); setActiveCategory("Flower Plants"); }} style={{ background:"#2D6A27", color:"white", border:"none", padding:"13px 32px", fontSize:"14px", fontWeight:600, borderRadius:"8px", cursor:"pointer" }}>Shop Flower Plants 🌸</button>
-              <button onClick={() => navigate("/shops?mode=plant")} style={{ background:"transparent", color:"#2D6A27", border:"2px solid #2D6A27", padding:"11px 28px", fontSize:"14px", fontWeight:600, borderRadius:"8px", cursor:"pointer" }}>Our Nurseries 🏪</button>
+              <button onClick={() => navigate("/shops")} style={{ background:"transparent", color:"#2D6A27", border:"2px solid #2D6A27", padding:"11px 28px", fontSize:"14px", fontWeight:600, borderRadius:"8px", cursor:"pointer" }}>Our Nurseries 🏪</button>
             </div>
             <div style={{ display:"flex", gap:"32px", marginTop:"32px" }}>
               {[["500+","Varieties"],["50+","Nurseries"],["₹49","From"]].map(([val,label]) => (
@@ -286,46 +276,7 @@ export default function PlantShop() {
         </section>
       )}
 
-      {/* NURSERIES SECTION */}
-      {activeSection === "nurseries" && (
-        <section style={{ padding:"56px 60px", background:"#F7FAF5" }}>
-          <h2 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:"36px", fontWeight:700, textAlign:"center", marginBottom:"8px" }}>🏪 Our Nursery & Wholesale Partners</h2>
-          <p style={{ textAlign:"center", color:"#888", fontSize:"14px", marginBottom:"36px" }}>Zero middlemen, fair prices — direct from verified nurseries across India.</p>
 
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:"20px", maxWidth:"1100px", margin:"0 auto 56px" }}>
-            {nurseries.map(n => (
-              <div key={n.name} className="ps-nursery" style={{ background:n.color }}>
-                <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:"14px" }}>
-                  <span style={{ fontSize:"38px" }}>{n.emoji}</span>
-                  <span style={{ background:"#2D6A27", color:"white", fontSize:"11px", fontWeight:700, padding:"4px 10px", borderRadius:"20px" }}>{n.savings}</span>
-                </div>
-                <h3 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:"20px", fontWeight:700, marginBottom:"4px" }}>{n.name}</h3>
-                <p style={{ fontSize:"12px", color:"#888", marginBottom:"10px" }}>📍 {n.location} · <span style={{ color:"#2D6A27", fontWeight:500 }}>{n.type}</span></p>
-                <p style={{ fontSize:"13px", color:"#555", lineHeight:1.6 }}><strong>Plants:</strong> {n.plants}</p>
-                <button onClick={() => navigate("/shops?mode=plant")}
-                  style={{ marginTop:"14px", background:"white", color:"#2D6A27", border:"1.5px solid #B8D9B3", padding:"8px 18px", borderRadius:"8px", fontSize:"13px", fontWeight:600, cursor:"pointer" }}
-                  onMouseEnter={e => { e.target.style.background="#2D6A27"; e.target.style.color="white"; }}
-                  onMouseLeave={e => { e.target.style.background="white"; e.target.style.color="#2D6A27"; }}>
-                  Browse Their Plants →
-                </button>
-              </div>
-            ))}
-          </div>
-
-          <div style={{ background:"white", borderRadius:"20px", padding:"44px", maxWidth:"1100px", margin:"0 auto", border:"1.5px solid #DCE8D8" }}>
-            <h3 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:"30px", fontWeight:700, textAlign:"center", marginBottom:"36px" }}>How You Save 40–50%</h3>
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:"28px" }}>
-              {[["🌱","Nurseries List Directly","Local nurseries list plants directly — no distributors."],["💰","No Retail Markup","You pay close to wholesale price."],["✅","Quality Inspected","Healthy roots, pest-free, ready for your home."],["🚚","Packed & Delivered","Fresh delivery within 1–3 days."]].map(([icon,title,desc]) => (
-                <div key={title} style={{ textAlign:"center" }}>
-                  <div style={{ width:"54px", height:"54px", background:"#EAF5E6", borderRadius:"50%", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"24px", margin:"0 auto 12px" }}>{icon}</div>
-                  <p style={{ fontWeight:700, fontSize:"14px", marginBottom:"8px" }}>{title}</p>
-                  <p style={{ fontSize:"13px", color:"#777", lineHeight:1.6 }}>{desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* TOAST */}
       {toast && (
