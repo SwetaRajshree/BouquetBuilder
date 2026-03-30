@@ -135,7 +135,7 @@ export default function DigitalCardPage() {
   const buildShareURL = async () => {
     setSaving(true);
     try {
-      const res = await fetch('http://localhost:5000/api/bouquet/share', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/bouquet/share`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ bouquet, recipient, message, sender, cardStyle: cardStyle.id, voiceId, spotifyId: spotifyEmbedId, musicUrl: MUSIC_OPTIONS.find(m => m.id === music)?.url || null }),
@@ -188,7 +188,7 @@ export default function DigitalCardPage() {
         stream.getTracks().forEach(t => t.stop());
         // upload to backend
         try {
-          const res = await fetch('http://localhost:5000/api/voice', {
+          const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/voice`, {
             method: 'POST',
             headers: { 'Content-Type': 'audio/webm' },
             body: blob,

@@ -50,7 +50,7 @@ export default function ViewBouquetPage() {
 
   useEffect(() => {
     if (!id) { setError(true); return; }
-    fetch(`http://localhost:5000/api/bouquet/${id}`)
+    fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/bouquet/${id}`)
       .then(r => r.ok ? r.json() : Promise.reject())
       .then(doc => setData({ b: doc.bouquet, r: doc.recipient, m: doc.message, s: doc.sender, cs: doc.cardStyle, vid: doc.voiceId, sid: doc.spotifyId, mu: doc.musicUrl }))
       .catch(() => setError(true));
@@ -117,7 +117,7 @@ export default function ViewBouquetPage() {
           {data.vid && (
             <div style={{ marginTop:20, textAlign:'center' }}>
               <div style={{ fontSize:11, letterSpacing:3, color:'#7a9060', marginBottom:8, fontFamily:'sans-serif' }}>🎙 VOICE NOTE</div>
-              <audio controls src={`http://localhost:5000/api/voice/${data.vid}`}
+              <audio controls src={`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/voice/${data.vid}`}
                 style={{ width:'100%', borderRadius:12 }}/>
               <div style={{ fontSize:10, color:'#9a8a70', marginTop:6, fontFamily:'sans-serif' }}>This voice note will expire in 7 days</div>
             </div>
