@@ -18,14 +18,13 @@ export default function PlantShop() {
   const { addToCart, removeFromCart, cartItems } = useCartContext();
   const { wishlist, toggle: toggleWishlist, has: inWishlistCheck } = useWishlist();
 
-  const [plants, setPlants]               = useState([]);
-  const [loading, setLoading]             = useState(true);
-  const [activeCategory, setActiveCategory] = useState("Flower Plants");
+  const [plants, setPlants]                     = useState([]);
+  const [loading, setLoading]                   = useState(true);
+  const [activeCategory, setActiveCategory]     = useState("Flower Plants");
   const [activePriceRange, setActivePriceRange] = useState(null);
-  const [showWishlist, setShowWishlist]   = useState(false);
-  const [toast, setToast]                 = useState("");
+  const [showWishlist, setShowWishlist]         = useState(false);
+  const [toast, setToast]                       = useState("");
 
-  // Fetch plants from API
   useEffect(() => {
     setLoading(true);
     fetch(`${API}/api/plants`)
@@ -35,23 +34,12 @@ export default function PlantShop() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Persist wishlist
-  useEffect(() => {
-    localStorage.setItem("plant_wishlist", JSON.stringify(wishlist));
-  }, [wishlist]);
-
-  const toggleWishlist = (id) =>
-    setWishlist(w => w.includes(id) ? w.filter(x => x !== id) : [...w, id]);
-
-  const toggleWishlist = (id) =>
-    setWishlist(w => w.includes(id) ? w.filter(x => x !== id) : [...w, id]);
-
   const handleAddToCart = (plant) => {
     const item = cartItems.find(i => i._id === plant._id);
     if (item) {
       removeFromCart(plant._id);
     } else {
-      addToCart({ _id: plant._id, name: plant.name, price: plant.price, pricePerStem: plant.price, image: plant.img, category: plant.category, color: "", city: "" });
+      addToCart({ _id: plant._id, name: plant.name, price: plant.price, pricePerStem: plant.price, image: plant.image || plant.img, category: plant.category, color: plant.color || "", city: plant.city || "" });
       setToast(plant.name);
       setTimeout(() => setToast(""), 2200);
     }
@@ -66,11 +54,6 @@ export default function PlantShop() {
   });
 
   const wishlistPlants = plants.filter(p => inWishlistCheck(p._id));
-
-  const handleCheckout = () => {
-    if (cartItems.length === 0) { setToast("Add plants to cart first!"); setTimeout(() => setToast(""), 2200); return; }
-    navigate("/cart");
-  };
 
   return (
     <div style={{ fontFamily: "'DM Sans', sans-serif", background: "#F7FAF5", minHeight: "100vh", color: "#1C1C1C" }}>
@@ -91,8 +74,6 @@ export default function PlantShop() {
         .ps-drawer { position:fixed;right:0;top:0;height:100vh;width:340px;background:white;box-shadow:-4px 0 24px rgba(0,0,0,0.14);z-index:1200;padding:24px;overflow-y:auto;transition:transform 0.3s ease; }
         .ps-drawer.closed { transform:translateX(100%); }
         .ps-overlay { position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:1199; }
-        .ps-nursery { border-radius:16px;padding:24px;border:1.5px solid #E0EED8;transition:all 0.3s;cursor:pointer; }
-        .ps-nursery:hover { border-color:#2D6A27;transform:translateY(-4px);box-shadow:0 12px 30px rgba(45,106,39,0.12); }
       `}</style>
 
       {/* WISHLIST DRAWER */}
@@ -130,16 +111,11 @@ export default function PlantShop() {
         )}
       </div>
 
-      {/* SECTION NAV TABS */}
+      {/* STICKY BAR — wishlist only */}
       <div style={{ background:"white", borderBottom:"1px solid #E0EED8", padding:"0 48px", display:"flex", alignItems:"center", justifyContent:"flex-end", position:"sticky", top:"62px", zIndex:90, height:"52px" }}>
-        <div style={{ display:"flex", gap:"10px", alignItems:"center" }}>
-          <button onClick={() => setShowWishlist(true)} style={{ background:"none", border:"none", fontSize:"19px", cursor:"pointer", position:"relative", color:"#4A6A45" }}>
-            ❤️ {wishlist.length > 0 && <span style={{ position:"absolute", top:"-4px", right:"-5px", background:"#E55", color:"white", borderRadius:"50%", width:"15px", height:"15px", fontSize:"9px", display:"flex", alignItems:"center", justifyContent:"center" }}>{wishlist.length}</span>}
-          </button>
-          <button onClick={handleCheckout} style={{ background:"#2D6A27", border:"none", borderRadius:"8px", padding:"6px 14px", cursor:"pointer", display:"flex", alignItems:"center", gap:"6px", color:"white", fontWeight:600, fontSize:"13px" }}>
-            🛒 {cartItems.length > 0 ? `Cart (${cartItems.length})` : "Cart"}
-          </button>
-        </div>
+        <button onClick={() => setShowWishlist(true)} style={{ background:"none", border:"none", fontSize:"19px", cursor:"pointer", position:"relative", color:"#4A6A45" }}>
+          ❤️ {wishlist.length > 0 && <span style={{ position:"absolute", top:"-4px", right:"-5px", background:"#E55", color:"white", borderRadius:"50%", width:"15px", height:"15px", fontSize:"9px", display:"flex", alignItems:"center", justifyContent:"center" }}>{wishlist.length}</span>}
+        </button>
       </div>
 
       {/* HERO */}
@@ -156,8 +132,14 @@ export default function PlantShop() {
               We partner directly with local nurseries & wholesale flower mandis — giving you <strong>healthy plants at 40–50% lower</strong> than any retail store.
             </p>
             <div style={{ display:"flex", gap:"12px", flexWrap:"wrap" }}>
-              <button onClick={() => { setActiveCategory("Flower Plants"); document.getElementById("shop-section").scrollIntoView({ behavior: "smooth" }); }} style={{ background:"#2D6A27", color:"white", border:"none", padding:"13px 32px", fontSize:"14px", fontWeight:600, borderRadius:"8px", cursor:"pointer" }}>Shop Flower Plants 🌸</button>
-              <button onClick={() => navigate("/shops")} style={{ background:"transparent", color:"#2D6A27", border:"2px solid #2D6A27", padding:"11px 28px", fontSize:"14px", fontWeight:600, borderRadius:"8px", cursor:"pointer" }}>Our Nurseries 🏪</button>
+              <button onClick={() => { setActiveCategory("Flower Plants"); document.getElementById("shop-section").scrollIntoView({ behavior:"smooth" }); }}
+                style={{ background:"#2D6A27", color:"white", border:"none", padding:"13px 32px", fontSize:"14px", fontWeight:600, borderRadius:"8px", cursor:"pointer" }}>
+                Shop Flower Plants 🌸
+              </button>
+              <button onClick={() => navigate("/shops")}
+                style={{ background:"transparent", color:"#2D6A27", border:"2px solid #2D6A27", padding:"11px 28px", fontSize:"14px", fontWeight:600, borderRadius:"8px", cursor:"pointer" }}>
+                Our Nurseries 🏪
+              </button>
             </div>
             <div style={{ display:"flex", gap:"32px", marginTop:"32px" }}>
               {[["500+","Varieties"],["50+","Nurseries"],["₹49","From"]].map(([val,label]) => (
@@ -170,8 +152,15 @@ export default function PlantShop() {
           </div>
           <div style={{ display:"flex", flexDirection:"column", gap:"14px" }}>
             <p style={{ fontSize:"13px", fontWeight:600, color:"#6A8A65", letterSpacing:"1px", textTransform:"uppercase", marginBottom:"4px" }}>Popular Varieties</p>
-            {[["🌼","Marigold & African Daisy","Starting ₹49"],["🌹","Roses & Hibiscus","Starting ₹149"],["🌻","Sunflower & Dahlia","Starting ₹100"],["🌴","Coconut & Mango Tree","Starting ₹400"],["🌱","Snake Plant & Lucky Bamboo","Starting ₹100"]].map(([emoji,label,price]) => (
-              <div key={label} onClick={() => setActiveCategory("Flower Plants")}
+            {[
+              ["🌼","Marigold & African Daisy","Starting ₹49",  "Flower Plants"],
+              ["🌹","Roses & Hibiscus",        "Starting ₹149", "Flower Plants"],
+              ["🌻","Sunflower & Dahlia",       "Starting ₹100", "Flower Plants"],
+              ["🌴","Coconut & Mango Tree",     "Starting ₹400", "Outdoor Plants"],
+              ["🌱","Snake Plant & Lucky Bamboo","Starting ₹100","Indoor Plants"],
+            ].map(([emoji,label,price,cat]) => (
+              <div key={label}
+                onClick={() => { setActiveCategory(cat); document.getElementById("shop-section").scrollIntoView({ behavior:"smooth" }); }}
                 style={{ display:"flex", alignItems:"center", gap:"14px", background:"rgba(255,255,255,0.55)", borderRadius:"12px", padding:"12px 20px", cursor:"pointer", border:"1px solid rgba(255,255,255,0.85)", justifyContent:"space-between" }}
                 onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,0.92)"; e.currentTarget.style.transform="translateX(6px)"; }}
                 onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,0.55)"; e.currentTarget.style.transform="translateX(0)"; }}>
@@ -200,76 +189,73 @@ export default function PlantShop() {
 
       {/* SHOP SECTION */}
       <section id="shop-section" style={{ padding:"56px 60px", background:"#F7FAF5" }}>
-          <h2 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:"36px", fontWeight:700, textAlign:"center", marginBottom:"8px" }}>
-            {activeCategory === "Flower Plants" ? "🌸 Flower Plants" : activeCategory}
-          </h2>
-          <p style={{ textAlign:"center", color:"#888", fontSize:"14px", marginBottom:"36px" }}>
-            {activeCategory === "Flower Plants" ? "Roses, Lilies, Tulips, Marigold, Jasmine & more — sourced from flower mandis" : "Sourced directly from nurseries & wholesale markets across India"}
-          </p>
+        <h2 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:"36px", fontWeight:700, textAlign:"center", marginBottom:"8px" }}>
+          {activeCategory === "Flower Plants" ? "🌸 Flower Plants" : activeCategory}
+        </h2>
+        <p style={{ textAlign:"center", color:"#888", fontSize:"14px", marginBottom:"36px" }}>
+          {activeCategory === "Flower Plants" ? "Roses, Marigold, Hibiscus, Sunflower & more — sourced from local nurseries" : "Sourced directly from nurseries & wholesale markets across India"}
+        </p>
 
-          {/* Category tabs */}
-          <div style={{ display:"flex", justifyContent:"center", borderBottom:"1px solid #DCE8D8", marginBottom:"20px", overflowX:"auto" }}>
-            {categories.map(cat => (
-              <button key={cat} className={`ps-tab ${activeCategory === cat ? "active" : ""}`} onClick={() => setActiveCategory(cat)}>
-                {cat === "Flower Plants" ? "🌸" : cat === "Indoor Plants" ? "🪴" : cat === "Outdoor Plants" ? "🌳" : cat === "Succulents" ? "🌵" : "💨"} {cat}
-              </button>
-            ))}
-          </div>
+        <div style={{ display:"flex", justifyContent:"center", borderBottom:"1px solid #DCE8D8", marginBottom:"20px", overflowX:"auto" }}>
+          {categories.map(cat => (
+            <button key={cat} className={`ps-tab ${activeCategory === cat ? "active" : ""}`} onClick={() => setActiveCategory(cat)}>
+              {cat === "Flower Plants" ? "🌸" : cat === "Indoor Plants" ? "🪴" : cat === "Outdoor Plants" ? "🌳" : cat === "Succulents" ? "🌵" : "💨"} {cat}
+            </button>
+          ))}
+        </div>
 
-          {/* Price filter */}
-          <div style={{ display:"flex", justifyContent:"center", gap:"10px", marginBottom:"36px" }}>
-            {priceRanges.map(pr => (
-              <button key={pr.label} className={`ps-pill ${activePriceRange?.label === pr.label ? "active" : ""}`}
-                onClick={() => setActivePriceRange(activePriceRange?.label === pr.label ? null : pr)}>
-                {pr.label}
-              </button>
-            ))}
-          </div>
+        <div style={{ display:"flex", justifyContent:"center", gap:"10px", marginBottom:"36px" }}>
+          {priceRanges.map(pr => (
+            <button key={pr.label} className={`ps-pill ${activePriceRange?.label === pr.label ? "active" : ""}`}
+              onClick={() => setActivePriceRange(activePriceRange?.label === pr.label ? null : pr)}>
+              {pr.label}
+            </button>
+          ))}
+        </div>
 
-          {loading && <p style={{ textAlign:"center", color:"#aaa", marginTop:"40px" }}>Loading plants... 🌱</p>}
+        {loading && <p style={{ textAlign:"center", color:"#aaa", marginTop:"40px" }}>Loading plants... 🌱</p>}
 
-          {!loading && (
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:"20px", maxWidth:"1100px", margin:"0 auto" }}>
-              {filtered.map(plant => (
-                <div key={plant._id} className="ps-card" style={{ position:"relative" }}>
-                  <button className="ps-wish" onClick={() => toggleWishlist(plant)}>
-                    {inWishlistCheck(plant._id) ? "❤️" : "🤍"}}
-                  </button>
-                  {plant.discount >= 40 && (
-                    <div style={{ position:"absolute", top:"10px", left:"10px", background:"#E55", color:"white", fontSize:"10px", fontWeight:700, padding:"2px 8px", borderRadius:"4px" }}>
-                      🔥 {plant.discount}% OFF
-                    </div>
+        {!loading && (
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:"20px", maxWidth:"1100px", margin:"0 auto" }}>
+            {filtered.map(plant => (
+              <div key={plant._id} className="ps-card" style={{ position:"relative" }}>
+                <button className="ps-wish" onClick={() => toggleWishlist(plant)}>
+                  {inWishlistCheck(plant._id) ? "❤️" : "🤍"}
+                </button>
+                {plant.discount >= 40 && (
+                  <div style={{ position:"absolute", top:"10px", left:"10px", background:"#E55", color:"white", fontSize:"10px", fontWeight:700, padding:"2px 8px", borderRadius:"4px" }}>
+                    🔥 {plant.discount}% OFF
+                  </div>
+                )}
+                <div style={{ background:"linear-gradient(135deg,#F2FAF0,#E6F5E0)", height:"140px", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                  {plant.image ? (
+                    <img src={plant.image} alt={plant.name} style={{ width:"100%", height:"140px", objectFit:"cover" }} />
+                  ) : (
+                    <span style={{ fontSize:"58px" }}>{plant.img}</span>
                   )}
-                  <div style={{ background:"linear-gradient(135deg,#F2FAF0,#E6F5E0)", height:"140px", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                    {plant.image ? (
-                      <img src={plant.image} alt={plant.name} style={{ width:"100%", height:"140px", objectFit:"cover" }} />
-                    ) : (
-                      <span style={{ fontSize:"58px" }}>{plant.img}</span>
-                    )}
-                  </div>
-                  <div style={{ padding:"14px 14px 0" }}>
-                    <p style={{ fontSize:"13.5px", fontWeight:600, color:"#1A1A1A", marginBottom:"5px", lineHeight:1.3 }}>{plant.name}</p>
-                    <p style={{ fontSize:"11px", color:"#99AA99", marginBottom:"10px" }}>🏪 {plant.nursery}</p>
-                    <div style={{ display:"flex", alignItems:"center", gap:"8px", marginBottom:"12px" }}>
-                      <span style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:"22px", fontWeight:700, color:"#2D6A27" }}>₹{plant.price}</span>
-                      <span style={{ fontSize:"12px", color:"#ccc", textDecoration:"line-through" }}>₹{plant.original}</span>
-                      {plant.discount < 40 && <span style={{ fontSize:"11px", color:"#E88", fontWeight:600 }}>{plant.discount}% off</span>}
-                    </div>
-                  </div>
-                  <button className={`ps-add ${inCart(plant._id) ? "in" : "out"}`} onClick={() => handleAddToCart(plant)}>
-                    {inCart(plant._id) ? "✓ Added — Remove" : "+ Add to Cart"}
-                  </button>
                 </div>
-              ))}
-            </div>
-          )}
+                <div style={{ padding:"14px 14px 0" }}>
+                  <p style={{ fontSize:"13.5px", fontWeight:600, color:"#1A1A1A", marginBottom:"5px", lineHeight:1.3 }}>{plant.name}</p>
+                  <p style={{ fontSize:"11px", color:"#99AA99", marginBottom:"10px" }}>🏪 {plant.nursery}</p>
+                  <div style={{ display:"flex", alignItems:"center", gap:"8px", marginBottom:"12px" }}>
+                    <span style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:"22px", fontWeight:700, color:"#2D6A27" }}>₹{plant.price}</span>
+                    {plant.original && <span style={{ fontSize:"12px", color:"#ccc", textDecoration:"line-through" }}>₹{plant.original}</span>}
+                    {plant.discount > 0 && plant.discount < 40 && <span style={{ fontSize:"11px", color:"#E88", fontWeight:600 }}>{plant.discount}% off</span>}
+                  </div>
+                </div>
+                <button className={`ps-add ${inCart(plant._id) ? "in" : "out"}`} onClick={() => handleAddToCart(plant)}>
+                  {inCart(plant._id) ? "✓ Added — Remove" : "+ Add to Cart"}
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
 
-          {!loading && filtered.length === 0 && (
-            <p style={{ textAlign:"center", color:"#aaa", marginTop:"40px" }}>No plants match this filter.</p>
-          )}
-        </section>
+        {!loading && filtered.length === 0 && (
+          <p style={{ textAlign:"center", color:"#aaa", marginTop:"40px" }}>No plants in this category yet.</p>
+        )}
+      </section>
 
-      {/* TOAST */}
       {toast && (
         <div style={{ position:"fixed", bottom:"24px", left:"50%", transform:"translateX(-50%)", background:"#2D6A27", color:"white", padding:"12px 24px", borderRadius:"40px", fontSize:"13px", fontWeight:600, zIndex:9999, boxShadow:"0 4px 20px rgba(0,0,0,0.2)" }}>
           🛒 {toast} added to cart!
