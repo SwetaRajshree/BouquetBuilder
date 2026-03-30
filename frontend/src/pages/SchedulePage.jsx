@@ -139,33 +139,34 @@ export default function SchedulePage() {
               {cartItems.length === 0 ? (
                 <div className="text-center py-4">
                   <p className="text-[.82rem] text-textL mb-3">Your cart is empty</p>
-                  <button onClick={() => navigate('/flowers')}
-                    className="text-[.8rem] text-rose hover:text-roseD underline font-medium">
-                    Browse flowers →
-                  </button>
+                  <button onClick={() => navigate('/flowers')} className="text-[.8rem] text-rose hover:text-roseD underline font-medium">Browse flowers →</button>
                 </div>
               ) : (
-                <div className="max-h-[200px] overflow-y-auto pr-1 mb-2">
-                  {cartItems.map(item => (
-                    <div key={item._id} className="flex items-center gap-3 py-2 border-b border-blush/12">
-                      <div className="w-9 h-9 rounded-lg bg-pink-50 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                        {item.image && item.image !== 'PASTE_LINK_HERE'
-                          ? <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                          : <span className="text-lg">🌸</span>}
+                <>
+                  <div className="max-h-[200px] overflow-y-auto pr-1 mb-2">
+                    {cartItems.map(item => (
+                      <div key={item._id} className="flex items-center gap-3 py-2 border-b border-blush/12">
+                        <div className="w-9 h-9 rounded-lg bg-pink-50 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                          {item.image && item.image !== 'PASTE_LINK_HERE'
+                            ? <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                            : <span className="text-lg">🌸</span>}
+                        </div>
+                        <span className="flex-1 truncate text-[.84rem]">{item.name} ×{item.quantity}</span>
+                        <span className="text-[.84rem] font-semibold text-roseD">₹{((item.basePrice + (item.fillerPrice || 0)) * item.quantity).toLocaleString()}</span>
                       </div>
-                      <span className="flex-1 truncate text-[.84rem]">{item.name} ×{item.quantity}</span>
-                      <span className="text-[.84rem] font-semibold text-roseD">₹{((item.basePrice + (item.fillerPrice || 0)) * item.quantity).toLocaleString()}</span>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                   <div className="flex justify-between py-2 text-[.86rem] border-b border-blush/12">
-                    <span>Subtotal</span>
-                    <span>₹{totalPrice.toLocaleString()}</span>
+                    <span>Subtotal</span><span>₹{totalPrice.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between py-2 text-[.86rem] border-b border-blush/12">
                     <span>Delivery ({timeSlot})</span>
                     <span>{deliveryFee === 0 ? '🎉 FREE' : `₹${deliveryFee}`}</span>
                   </div>
-              </div>
+                  <div className="flex justify-between py-3 font-extrabold text-[1.05rem] text-roseD">
+                    <span>Total</span><span>₹{total.toLocaleString()}</span>
+                  </div>
+                </>
               )}
 
               <div className="bg-cream rounded-sm px-3 py-2.5 text-[.8rem] text-textL leading-relaxed mb-4">
