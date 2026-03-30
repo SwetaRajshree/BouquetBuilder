@@ -170,7 +170,7 @@ export default function PlantShop() {
           </div>
           <div style={{ display:"flex", flexDirection:"column", gap:"14px" }}>
             <p style={{ fontSize:"13px", fontWeight:600, color:"#6A8A65", letterSpacing:"1px", textTransform:"uppercase", marginBottom:"4px" }}>Popular Varieties</p>
-            {[["🌹","Roses & Gerberas","Starting ₹129"],["🌷","Tulips & Lilies","Starting ₹149"],["🌻","Sunflowers & Marigold","Starting ₹49"],["🪷","Jasmine & Lavender","Starting ₹99"],["🌸","Chrysanthemum & Dahlia","Starting ₹69"]].map(([emoji,label,price]) => (
+            {[["🌼","Marigold & African Daisy","Starting ₹49"],["🌹","Roses & Hibiscus","Starting ₹149"],["🌻","Sunflower & Dahlia","Starting ₹100"],["🌴","Coconut & Mango Tree","Starting ₹400"],["🌱","Snake Plant & Lucky Bamboo","Starting ₹100"]].map(([emoji,label,price]) => (
               <div key={label} onClick={() => setActiveCategory("Flower Plants")}
                 style={{ display:"flex", alignItems:"center", gap:"14px", background:"rgba(255,255,255,0.55)", borderRadius:"12px", padding:"12px 20px", cursor:"pointer", border:"1px solid rgba(255,255,255,0.85)", justifyContent:"space-between" }}
                 onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,0.92)"; e.currentTarget.style.transform="translateX(6px)"; }}
