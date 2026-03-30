@@ -74,7 +74,6 @@ export default function PlantShop() {
   return (
     <div style={{ fontFamily: "'DM Sans', sans-serif", background: "#F7FAF5", minHeight: "100vh", color: "#1C1C1C" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,500&family=DM+Sans:wght@300;400;500;600&display=swap');
         .ps-tab { background:none;border:none;padding:10px 20px;cursor:pointer;font-size:14px;color:#888;border-bottom:2.5px solid transparent;transition:all 0.2s;white-space:nowrap; }
         .ps-tab.active { color:#2D6A27;border-bottom-color:#2D6A27;font-weight:600; }
         .ps-tab:hover { color:#2D6A27; }
