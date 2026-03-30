@@ -55,7 +55,10 @@ export default function ShopsPage() {
   const location = useLocation();
   const [shops, setShops] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [mode, setMode] = useState("flower"); // "flower" | "plant"
+  const [mode, setMode] = useState(() => {
+    const params = new URLSearchParams(location.search);
+    return params.get('mode') === 'plant' ? 'plant' : 'flower';
+  });
   const [search, setSearch] = useState(() => {
     const params = new URLSearchParams(location.search);
     return params.get('q') || '';

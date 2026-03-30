@@ -304,7 +304,7 @@ export default function PlantShop() {
                 <h3 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:"20px", fontWeight:700, marginBottom:"4px" }}>{n.name}</h3>
                 <p style={{ fontSize:"12px", color:"#888", marginBottom:"10px" }}>📍 {n.location} · <span style={{ color:"#2D6A27", fontWeight:500 }}>{n.type}</span></p>
                 <p style={{ fontSize:"13px", color:"#555", lineHeight:1.6 }}><strong>Plants:</strong> {n.plants}</p>
-                <button onClick={() => { setActiveSection("shop"); setActiveCategory(n.cat); }}
+                <button onClick={() => navigate("/shops?mode=plant")}
                   style={{ marginTop:"14px", background:"white", color:"#2D6A27", border:"1.5px solid #B8D9B3", padding:"8px 18px", borderRadius:"8px", fontSize:"13px", fontWeight:600, cursor:"pointer" }}
                   onMouseEnter={e => { e.target.style.background="#2D6A27"; e.target.style.color="white"; }}
                   onMouseLeave={e => { e.target.style.background="white"; e.target.style.color="#2D6A27"; }}>
