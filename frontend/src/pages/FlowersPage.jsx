@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useCartContext } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
 
+const API = import.meta.env.VITE_API_URL;
+
 export default function FlowersPage() {
   const navigate = useNavigate();
   const { addToCart, cartItems } = useCartContext();
