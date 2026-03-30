@@ -4,7 +4,7 @@ import { useCartContext } from "../context/CartContext";
 
 const API = import.meta.env.VITE_API_URL;
 
-const categories = ["Flower Plants", "Indoor Plants", "Outdoor Plants", "Succulents", "Air Purifying"];
+const categories = ["Flower Plants", "Indoor Plants", "Outdoor Plants", "Air Purifying"];
 
 const priceRanges = [
   { label: "Under ₹99",  max: 99 },
@@ -249,8 +249,12 @@ export default function PlantShop() {
                       🔥 {plant.discount}% OFF
                     </div>
                   )}
-                  <div style={{ background:"linear-gradient(135deg,#F2FAF0,#E6F5E0)", padding:"36px", textAlign:"center", fontSize:"58px" }}>
-                    {plant.img}
+                  <div style={{ background:"linear-gradient(135deg,#F2FAF0,#E6F5E0)", height:"140px", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                    {plant.image ? (
+                      <img src={plant.image} alt={plant.name} style={{ width:"100%", height:"140px", objectFit:"cover" }} />
+                    ) : (
+                      <span style={{ fontSize:"58px" }}>{plant.img}</span>
+                    )}
                   </div>
                   <div style={{ padding:"14px 14px 0" }}>
                     <p style={{ fontSize:"13.5px", fontWeight:600, color:"#1A1A1A", marginBottom:"5px", lineHeight:1.3 }}>{plant.name}</p>
