@@ -136,7 +136,7 @@ export default function PlantShop() {
                 style={{ background:"#2D6A27", color:"white", border:"none", padding:"13px 32px", fontSize:"14px", fontWeight:600, borderRadius:"8px", cursor:"pointer" }}>
                 Shop Flower Plants 🌸
               </button>
-              <button onClick={() => navigate("/shops")}
+              <button onClick={() => navigate("/shops?mode=plant")}}
                 style={{ background:"transparent", color:"#2D6A27", border:"2px solid #2D6A27", padding:"11px 28px", fontSize:"14px", fontWeight:600, borderRadius:"8px", cursor:"pointer" }}>
                 Our Nurseries 🏪
               </button>
