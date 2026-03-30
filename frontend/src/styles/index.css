@@ -1,0 +1,205 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Leaflet map fix */
+.leaflet-container { z-index: 0; }
+.leaflet-pane { z-index: 0 !important; }
+.leaflet-top, .leaflet-bottom { z-index: 1 !important; }
+
+/* ─── CSS Variables ─── */
+:root {
+  --blush:    #FFB6C1;
+  --blush-l:  #FFE4EA;
+  --lavender: #E6CFFF;
+  --lav-l:    #F3EAFF;
+  --cream:    #FFF8F0;
+  --sage:     #B5CDA3;
+  --sage-d:   #8aab78;
+  --rose:     #C9848A;
+  --rose-d:   #a86870;
+  --rose-dd:  #8a5560;
+  --text:     #3d2c35;
+  --text-m:   #6b5060;
+  --text-l:   #9a7d88;
+  --shadow-s: 0 2px 12px rgba(201,132,138,.12);
+  --shadow-m: 0 6px 28px rgba(201,132,138,.18);
+  --shadow-l: 0 12px 48px rgba(201,132,138,.24);
+}
+
+/* ─── Base resets ─── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: var(--cream);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5 {
+  font-family: 'Playfair Display', serif;
+  line-height: 1.25;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--blush-l); }
+::-webkit-scrollbar-thumb { background: var(--blush); border-radius: 99px; }
+
+/* ─── Page animation ─── */
+.page-enter {
+  animation: pageIn 0.35s ease both;
+}
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Petal fall ─── */
+.petal {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  animation: petalFall linear infinite;
+  opacity: 0.65;
+}
+@keyframes petalFall {
+  0%   { transform: translateY(-80px) rotate(0deg) scale(.9); opacity: 0; }
+  8%   { opacity: .7; }
+  92%  { opacity: .4; }
+  100% { transform: translateY(calc(100vh + 80px)) rotate(800deg) scale(1.1); opacity: 0; }
+}
+
+/* ─── Scooter delivery ride ─── */
+@keyframes scooterRide {
+  0%   { left: -10%; }
+  100% { left: 105%; }
+}
+
+/* ─── Marquee scroll ─── */
+.marquee-track {
+  animation: marqueeScroll 28s linear infinite;
+  width: max-content;
+}
+@keyframes marqueeScroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ─── Petal float (gentle bob) ─── */
+@keyframes petalFloat {
+  0%,100% { transform: translateY(0px) rotate(-4deg); }
+  50%      { transform: translateY(-14px) rotate(4deg); }
+}
+
+/* ─── Flash gradient animation ─── */
+@keyframes gradShift {
+  0%,100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+
+/* ─── Countdown blink ─── */
+@keyframes cdBlink {
+  0%,100% { opacity: 1; }
+  50%      { opacity: 0; }
+}
+
+/* ─── Badge pulse ─── */
+@keyframes pulseBadge {
+  0%,100% { transform: scale(1); }
+  50%      { transform: scale(1.06); }
+}
+
+/* ─── Sale card pulse ─── */
+@keyframes salePulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(255,107,107,.3); }
+  50%      { box-shadow: 0 0 0 8px rgba(255,107,107,0); }
+}
+.sale-pulse { animation: salePulse 2s ease infinite; }
+
+/* ─── Flora avatar glow ─── */
+@keyframes floraGlow {
+  0%,100% { box-shadow: 0 0 0 6px rgba(255,182,193,.25); }
+  50%      { box-shadow: 0 0 0 14px rgba(255,182,193,.1); }
+}
+
+/* ─── Your-location pin pulse ─── */
+@keyframes youPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(201,132,138,.4); }
+  50%      { box-shadow: 0 0 0 16px rgba(201,132,138,0); }
+}
+
+/* ─── Moving delivery pin ─── */
+@keyframes movingPin {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(40px); }
+}
+.moving-pin { animation: movingPin 3s ease infinite alternate; }
+
+/* ─── Bubble entrance ─── */
+@keyframes bubIn {
+  from { opacity: 0; transform: translateY(7px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Modal entrance ─── */
+@keyframes moIn {
+  from { transform: translateY(28px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+@keyframes ovIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ─── Confetti burst ─── */
+@keyframes cBurst {
+  0%   { transform: translate(0,0) scale(1) rotate(0deg); opacity: 1; }
+  100% { transform: translate(var(--dx),var(--dy)) scale(.3) rotate(720deg); opacity: 0; }
+}
+
+/* ─── Bouquet card bloom glow ─── */
+.bouquet-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at 50% 0%, rgba(255,182,193,.18) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity .28s;
+  border-radius: inherit;
+  pointer-events: none;
+}
+.bouquet-card:hover::before { opacity: 1; }
+
+/* ─── Scroll row (hide scrollbar) ─── */
+.scroll-row {
+  display: flex;
+  gap: 1.2rem;
+  overflow-x: auto;
+  padding-bottom: 0.75rem;
+  scrollbar-width: none;
+}
+.scroll-row::-webkit-scrollbar { display: none; }
+
+/* ─── Tab bar scroll ─── */
+.tab-bar { scrollbar-width: none; }
+.tab-bar::-webkit-scrollbar { display: none; }
+
+/* ─── Stepper scroll ─── */
+.stepper-wrap { scrollbar-width: none; }
+.stepper-wrap::-webkit-scrollbar { display: none; }
+
+/* ─── Custom range input ─── */
+input[type="range"] { accent-color: var(--rose); }
+
+/* ─── Select arrow ─── */
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23C9848A' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem !important;
+}
