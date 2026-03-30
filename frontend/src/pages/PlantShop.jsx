@@ -132,7 +132,7 @@ export default function PlantShop() {
               We partner directly with local nurseries & wholesale flower mandis — giving you <strong>healthy plants at 40–50% lower</strong> than any retail store.
             </p>
             <div style={{ display:"flex", gap:"12px", flexWrap:"wrap" }}>
-              <button onClick={() => { setActiveCategory("Flower Plants"); document.getElementById("shop-section").scrollIntoView({ behavior:"smooth" }); }}
+              <button onClick={() => { setActiveCategory("Flower Plants"); setTimeout(() => document.getElementById("shop-section")?.scrollIntoView({ behavior:"smooth" }), 50); }}}
                 style={{ background:"#2D6A27", color:"white", border:"none", padding:"13px 32px", fontSize:"14px", fontWeight:600, borderRadius:"8px", cursor:"pointer" }}>
                 Shop Flower Plants 🌸
               </button>
@@ -160,7 +160,7 @@ export default function PlantShop() {
               ["🌱","Snake Plant & Lucky Bamboo","Starting ₹100","Indoor Plants"],
             ].map(([emoji,label,price,cat]) => (
               <div key={label}
-                onClick={() => { setActiveCategory(cat); document.getElementById("shop-section").scrollIntoView({ behavior:"smooth" }); }}
+                onClick={() => { setActiveCategory(cat); setTimeout(() => document.getElementById("shop-section")?.scrollIntoView({ behavior:"smooth" }), 50); }}
                 style={{ display:"flex", alignItems:"center", gap:"14px", background:"rgba(255,255,255,0.55)", borderRadius:"12px", padding:"12px 20px", cursor:"pointer", border:"1px solid rgba(255,255,255,0.85)", justifyContent:"space-between" }}
                 onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,0.92)"; e.currentTarget.style.transform="translateX(6px)"; }}
                 onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,0.55)"; e.currentTarget.style.transform="translateX(0)"; }}>
