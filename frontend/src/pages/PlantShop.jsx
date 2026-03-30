@@ -149,9 +149,7 @@ export default function PlantShop() {
               {cat === "Flower Plants" ? "🌸" : cat === "Indoor Plants" ? "🪴" : cat === "Outdoor Plants" ? "🌳" : cat === "Succulents" ? "🌵" : "💨"} {cat}
             </button>
           ))}
-          <button className={`ps-tab ${activeSection === "nurseries" ? "active" : ""}`} onClick={() => setActiveSection("nurseries")}>
-            🏪 Nurseries
-          </button>
+
         </div>
         <div style={{ display:"flex", gap:"10px", alignItems:"center" }}>
           <button onClick={() => setShowWishlist(true)} style={{ background:"none", border:"none", fontSize:"19px", cursor:"pointer", position:"relative", color:"#4A6A45" }}>
@@ -178,7 +176,7 @@ export default function PlantShop() {
             </p>
             <div style={{ display:"flex", gap:"12px", flexWrap:"wrap" }}>
               <button onClick={() => { setActiveSection("shop"); setActiveCategory("Flower Plants"); }} style={{ background:"#2D6A27", color:"white", border:"none", padding:"13px 32px", fontSize:"14px", fontWeight:600, borderRadius:"8px", cursor:"pointer" }}>Shop Flower Plants 🌸</button>
-              <button onClick={() => setActiveSection("nurseries")} style={{ background:"transparent", color:"#2D6A27", border:"2px solid #2D6A27", padding:"11px 28px", fontSize:"14px", fontWeight:600, borderRadius:"8px", cursor:"pointer" }}>Our Nurseries 🏪</button>
+              <button onClick={() => navigate("/shops?mode=plant")} style={{ background:"transparent", color:"#2D6A27", border:"2px solid #2D6A27", padding:"11px 28px", fontSize:"14px", fontWeight:600, borderRadius:"8px", cursor:"pointer" }}>Our Nurseries 🏪</button>
             </div>
             <div style={{ display:"flex", gap:"32px", marginTop:"32px" }}>
               {[["500+","Varieties"],["50+","Nurseries"],["₹49","From"]].map(([val,label]) => (
