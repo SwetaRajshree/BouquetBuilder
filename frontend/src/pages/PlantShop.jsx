@@ -77,7 +77,6 @@ export default function PlantShop() {
     <div style={{ fontFamily: "'DM Sans', sans-serif", background: "#F7FAF5", minHeight: "100vh", color: "#1C1C1C" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,500&family=DM+Sans:wght@300;400;500;600&display=swap');
-        * { box-sizing: border-box; margin: 0; padding: 0; }
         .nav-link { background: none; border: none; padding: 7px 14px; font-family: 'DM Sans', sans-serif; font-size: 13.5px; font-weight: 500; color: #4A6A45; cursor: pointer; border-radius: 8px; transition: all 0.2s; white-space: nowrap; }
         .nav-link:hover { background: #E6F4E0; color: #1A4A15; }
         .nav-link.active { background: #2D6A27; color: white; }
