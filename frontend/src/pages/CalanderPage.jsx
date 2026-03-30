@@ -253,7 +253,7 @@ export default function CalendarPage() {
                 )}
 
                 <button
-                  onClick={() => navigate('/schedule')}
+                  onClick={() => navigate('/schedule', { state: { date: `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(selectedDate.day).padStart(2,'0')}` } })}
                   className="w-full bg-gradient-to-br from-rose to-[#e09099] text-white font-semibold py-2.5 rounded-full hover:-translate-y-0.5 hover:shadow-soft-m transition-all text-[.82rem]">
                   📅 Schedule Delivery for This Day
                 </button>

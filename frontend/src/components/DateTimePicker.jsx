@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { MONTHS, DAY_NAMES } from '../data/mockData';
 
-export default function DateTimePicker({ onDateChange, onTimeChange }) {
+export default function DateTimePicker({ onDateChange, onTimeChange, initialDay, initialMonth, initialYear }) {
   const today    = new Date();
-  const [month,  setMonth]  = useState(today.getMonth());
-  const [year,   setYear]   = useState(today.getFullYear());
-  const [selDay, setSelDay] = useState(today.getDate());
+  const [month,  setMonth]  = useState(initialMonth ?? today.getMonth());
+  const [year,   setYear]   = useState(initialYear  ?? today.getFullYear());
+  const [selDay, setSelDay] = useState(initialDay   ?? today.getDate());
   const [slot,   setSlot]   = useState('morning');
 
   const dim = new Date(year, month + 1, 0).getDate();
@@ -54,7 +54,7 @@ export default function DateTimePicker({ onDateChange, onTimeChange }) {
         {Array.from({ length: fd }, (_, i) => <div key={`e${i}`} />)}
         {Array.from({ length: dim }, (_, i) => {
           const d   = i + 1;
-          const isSel   = selDay === d && month === today.getMonth() && year === today.getFullYear();
+          const isSel   = selDay === d;
           const isToday = d === today.getDate() && month === today.getMonth() && year === today.getFullYear();
           return (
             <div
