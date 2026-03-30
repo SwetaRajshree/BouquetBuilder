@@ -145,21 +145,27 @@ export default function SchedulePage() {
                   </button>
                 </div>
               ) : (
-                <>
+                <div className="max-h-[200px] overflow-y-auto pr-1 mb-2">
                   {cartItems.map(item => (
-                    <div key={item._id} className="flex justify-between py-2 text-[.86rem] border-b border-blush/12">
-                      <span className="truncate max-w-[180px]">{item.name} ×{item.quantity}</span>
-                      <span>₹{((item.basePrice + (item.fillerPrice || 0)) * item.quantity).toLocaleString()}</span>
+                    <div key={item._id} className="flex items-center gap-3 py-2 border-b border-blush/12">
+                      <div className="w-9 h-9 rounded-lg bg-pink-50 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                        {item.image && item.image !== 'PASTE_LINK_HERE'
+                          ? <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                          : <span className="text-lg">🌸</span>}
+                      </div>
+                      <span className="flex-1 truncate text-[.84rem]">{item.name} ×{item.quantity}</span>
+                      <span className="text-[.84rem] font-semibold text-roseD">₹{((item.basePrice + (item.fillerPrice || 0)) * item.quantity).toLocaleString()}</span>
                     </div>
                   ))}
                   <div className="flex justify-between py-2 text-[.86rem] border-b border-blush/12">
+                    <span>Subtotal</span>
+                    <span>₹{totalPrice.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between py-2 text-[.86rem] border-b border-blush/12">
                     <span>Delivery ({timeSlot})</span>
-                    <span>{deliveryFee === 0 ? 'FREE' : `₹${deliveryFee}`}</span>
+                    <span>{deliveryFee === 0 ? '🎉 FREE' : `₹${deliveryFee}`}</span>
                   </div>
-                  <div className="flex justify-between py-3 font-extrabold text-[1.05rem] text-roseD mt-1">
-                    <span>Total</span><span>₹{total.toLocaleString()}</span>
-                  </div>
-                </>
+              </div>
               )}
 
               <div className="bg-cream rounded-sm px-3 py-2.5 text-[.8rem] text-textL leading-relaxed mb-4">
