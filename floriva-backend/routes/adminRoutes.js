@@ -6,6 +6,7 @@ const {
   adminGetShops,   adminAddShop,   adminUpdateShop,   adminDeleteShop,
   adminGetOrders,  adminUpdateOrderStatus,
   adminGetUsers,
+  adminGetPlants,  adminAddPlant,  adminUpdatePlant,  adminDeletePlant,
 } = require("../controllers/adminController");
 
 router.use(protect, adminOnly);
@@ -28,5 +29,11 @@ router.put("/orders/:id/status",adminUpdateOrderStatus);
 
 // Users
 router.get("/users",            adminGetUsers);
+
+// Plants
+router.get("/plants",           adminGetPlants);
+router.post("/plants",          adminAddPlant);
+router.put("/plants/:id",       adminUpdatePlant);
+router.delete("/plants/:id",    adminDeletePlant);
 
 module.exports = router;

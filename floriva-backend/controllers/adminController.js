@@ -2,6 +2,7 @@ const Flower = require("../models/Flower");
 const Shop   = require("../models/Shop");
 const Order  = require("../models/Order");
 const User   = require("../models/user");
+const Plant  = require("../models/Plant");
 
 // ── Flowers ──
 exports.adminGetFlowers = async (req, res) => {
@@ -85,5 +86,35 @@ exports.adminGetUsers = async (req, res) => {
   try {
     const users = await User.find().select("-password").sort({ createdAt: -1 });
     res.json(users);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+// ── Plants ──
+exports.adminGetPlants = async (req, res) => {
+  try {
+    const plants = await Plant.find().sort({ createdAt: -1 });
+    res.json(plants);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.adminAddPlant = async (req, res) => {
+  try {
+    const plant = await Plant.create(req.body);
+    res.status(201).json(plant);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.adminUpdatePlant = async (req, res) => {
+  try {
+    const plant = await Plant.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!plant) return res.status(404).json({ message: "Plant not found" });
+    res.json(plant);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+};
+
+exports.adminDeletePlant = async (req, res) => {
+  try {
+    await Plant.findByIdAndDelete(req.params.id);
+    res.json({ message: "Plant deleted" });
   } catch (e) { res.status(500).json({ error: e.message }); }
 };

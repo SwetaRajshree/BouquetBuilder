@@ -110,10 +110,110 @@ function FlowersTab({ token }) {
   );
 }
 
-// ── Shops Tab ──
+// ── Plants Tab ──
+function PlantsTab({ token }) {
+  const PLANT_CATEGORIES = ['Flower Plants','Indoor Plants','Outdoor Plants','Succulents','Air Purifying'];
+  const [plants, setPlants] = useState([]);
+  const [form, setForm] = useState({ name:'', category:'Flower Plants', nursery:'', price:'', original:'', discount:'', img:'🌿', image:'', color:'', city:'Bhubaneswar', inStock:true });
+  const [editing, setEditing] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const load = () => {
+    fetch(`${API}/api/admin/plants`, { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => r.json()).then(data => setPlants(Array.isArray(data) ? data : [])).finally(() => setLoading(false));
+  };
+  useEffect(load, []);
+
+  const save = async (e) => {
+    e.preventDefault();
+    const url    = editing ? `${API}/api/admin/plants/${editing}` : `${API}/api/admin/plants`;
+    const method = editing ? 'PUT' : 'POST';
+    await fetch(url, { method, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ ...form, price: Number(form.price), original: Number(form.original), discount: Number(form.discount) }) });
+    setForm({ name:'', category:'Flower Plants', nursery:'', price:'', original:'', discount:'', img:'🌿', image:'', color:'', city:'Bhubaneswar', inStock:true });
+    setEditing(null);
+    load();
+  };
+
+  const del = async (id) => {
+    await fetch(`${API}/api/admin/plants/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+    load();
+  };
+
+  const startEdit = (p) => {
+    setEditing(p._id);
+    setForm({ name: p.name||'', category: p.category||'Flower Plants', nursery: p.nursery||'', price: p.price||'', original: p.original||'', discount: p.discount||'', img: p.img||'🌿', image: p.image||'', color: p.color||'', city: p.city||'', inStock: p.inStock??true });
+  };
+
+  return (
+    <div className="flex flex-col gap-6">
+      <form onSubmit={save} className="bg-white rounded-2xl border border-green-100 p-5 shadow-soft-s">
+        <h3 className="font-playfair font-bold text-green-700 mb-4">{editing ? '✏️ Edit Plant' : '➕ Add Plant'}</h3>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          {[['name','Name *'],['nursery','Nursery'],['price','Price'],['original','Original Price'],['discount','Discount %'],['img','Emoji'],['image','Image URL'],['color','Color'],['city','City']].map(([k, label]) => (
+            <div key={k} className="flex flex-col gap-1">
+              <label className="text-[.7rem] font-semibold text-gray-400 uppercase">{label}</label>
+              <input value={form[k]} onChange={e => setForm(f => ({ ...f, [k]: e.target.value }))}
+                className="border border-green-100 rounded-xl px-3 py-2 text-sm outline-none focus:border-green-500" />
+            </div>
+          ))}
+          <div className="flex flex-col gap-1">
+            <label className="text-[.7rem] font-semibold text-gray-400 uppercase">Category</label>
+            <select value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
+              className="border border-green-100 rounded-xl px-3 py-2 text-sm outline-none focus:border-green-500">
+              {PLANT_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+          <div className="flex flex-col gap-1">
+            <label className="text-[.7rem] font-semibold text-gray-400 uppercase">In Stock</label>
+            <select value={form.inStock} onChange={e => setForm(f => ({ ...f, inStock: e.target.value === 'true' }))}
+              className="border border-green-100 rounded-xl px-3 py-2 text-sm outline-none focus:border-green-500">
+              <option value="true">Yes</option>
+              <option value="false">No</option>
+            </select>
+          </div>
+        </div>
+        <div className="flex gap-2 mt-4">
+          <button type="submit" className="bg-gradient-to-br from-green-600 to-green-500 text-white text-sm font-semibold px-5 py-2 rounded-full">
+            {editing ? 'Update' : 'Add Plant'} 🌿
+          </button>
+          {editing && <button type="button" onClick={() => { setEditing(null); setForm({ name:'',category:'Flower Plants',nursery:'',price:'',original:'',discount:'',img:'🌿',image:'',color:'',city:'Bhubaneswar',inStock:true }); }}
+            className="text-sm text-gray-400 border border-gray-200 px-4 py-2 rounded-full">Cancel</button>}
+        </div>
+      </form>
+
+      <div className="bg-white rounded-2xl border border-green-100 shadow-soft-s overflow-hidden">
+        <div className="px-5 py-3 border-b border-green-50">
+          <p className="font-semibold text-green-700 text-sm">All Plants ({plants.length})</p>
+        </div>
+        {loading ? <p className="text-center py-8 text-gray-400 text-sm">Loading...</p> : (
+          <div className="divide-y divide-green-50">
+            {plants.map(p => (
+              <div key={p._id} className="flex items-center gap-3 px-5 py-3 hover:bg-green-50/40 transition-all">
+                <div className="w-10 h-10 rounded-xl overflow-hidden bg-green-50 flex items-center justify-center flex-shrink-0">
+                  {p.image ? <img src={p.image} alt={p.name} className="w-full h-full object-cover" /> : <span className="text-xl">{p.img || '🌿'}</span>}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-green-700 truncate">{p.name}</p>
+                  <p className="text-[.72rem] text-gray-400">{p.category} · {p.nursery} · ₹{p.price}</p>
+                </div>
+                <span className={`text-[.65rem] font-bold px-2 py-0.5 rounded-full ${p.inStock ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-500'}`}>
+                  {p.inStock ? 'In Stock' : 'Out'}
+                </span>
+                <button onClick={() => startEdit(p)} className="text-[.7rem] text-green-700 border border-green-200 px-2 py-0.5 rounded-full hover:bg-green-50">Edit</button>
+                <DeleteBtn onDelete={() => del(p._id)} />
+              </div>
+            ))}
+            {plants.length === 0 && <p className="text-center py-8 text-gray-400 text-sm">No plants yet</p>}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 function ShopsTab({ token }) {
   const [shops, setShops] = useState([]);
-  const [form, setForm] = useState({ name: '', area: '', city: '', keywords: '' });
+  const [form, setForm] = useState({ name: '', area: '', city: '', type: 'flower', keywords: '' });
   const [editing, setEditing] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -129,7 +229,7 @@ function ShopsTab({ token }) {
     const method = editing ? 'PUT' : 'POST';
     await fetch(url, { method, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({ ...form, keywords: form.keywords.split(',').map(k => k.trim()).filter(Boolean) }) });
-    setForm({ name: '', area: '', city: '', keywords: '' });
+    setForm({ name: '', area: '', city: '', type: 'flower', keywords: '' });
     setEditing(null);
     load();
   };
@@ -141,7 +241,7 @@ function ShopsTab({ token }) {
 
   const startEdit = (s) => {
     setEditing(s._id);
-    setForm({ name: s.name || '', area: s.area || '', city: s.city || '', keywords: (s.keywords || []).join(', ') });
+    setForm({ name: s.name || '', area: s.area || '', city: s.city || '', type: s.type || 'flower', keywords: (s.keywords || []).join(', ') });
   };
 
   return (
@@ -156,12 +256,20 @@ function ShopsTab({ token }) {
                 className="border border-pink-100 rounded-xl px-3 py-2 text-sm outline-none focus:border-rose" />
             </div>
           ))}
+          <div className="flex flex-col gap-1">
+            <label className="text-[.7rem] font-semibold text-gray-400 uppercase">Type</label>
+            <select value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value }))}
+              className="border border-pink-100 rounded-xl px-3 py-2 text-sm outline-none focus:border-rose">
+              <option value="flower">🌸 Flower Shop</option>
+              <option value="plant">🌿 Plant Nursery</option>
+            </select>
+          </div>
         </div>
         <div className="flex gap-2 mt-4">
           <button type="submit" className="bg-gradient-to-br from-rose to-[#e09099] text-white text-sm font-semibold px-5 py-2 rounded-full">
             {editing ? 'Update' : 'Add Shop'} 🏪
           </button>
-          {editing && <button type="button" onClick={() => { setEditing(null); setForm({ name:'',area:'',city:'',keywords:'' }); }}
+          {editing && <button type="button" onClick={() => { setEditing(null); setForm({ name:'',area:'',city:'',type:'flower',keywords:'' }); }}
             className="text-sm text-gray-400 border border-gray-200 px-4 py-2 rounded-full">Cancel</button>}
         </div>
       </form>
@@ -174,10 +282,10 @@ function ShopsTab({ token }) {
           <div className="divide-y divide-pink-50">
             {shops.map(s => (
               <div key={s._id} className="flex items-center gap-3 px-5 py-3 hover:bg-pink-50/40 transition-all">
-                <span className="text-2xl">🏪</span>
+                <span className="text-2xl">{s.type === 'plant' ? '🌿' : '🏪'}</span>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-roseDD truncate">{s.name}</p>
-                  <p className="text-[.72rem] text-gray-400">{s.area} · {s.city}</p>
+                  <p className="text-[.72rem] text-gray-400">{s.area} · {s.city} · <span className={s.type === 'plant' ? 'text-green-600' : 'text-pink-500'}>{s.type === 'plant' ? '🌿 Nursery' : '🌸 Flower Shop'}</span></p>
                 </div>
                 <button onClick={() => startEdit(s)} className="text-[.7rem] text-roseD border border-pink-200 px-2 py-0.5 rounded-full hover:bg-pink-50">Edit</button>
                 <DeleteBtn onDelete={() => del(s._id)} />
@@ -282,6 +390,7 @@ function UsersTab({ token }) {
 // ── Main Admin Page ──
 const TABS = [
   { key: 'flowers', label: '🌸 Flowers' },
+  { key: 'plants',  label: '🌿 Plants'  },
   { key: 'shops',   label: '🏪 Shops'   },
   { key: 'orders',  label: '📦 Orders'  },
   { key: 'users',   label: '👥 Users'   },
@@ -336,6 +445,7 @@ export default function AdminPage() {
 
         {/* Tab content */}
         {tab === 'flowers' && <FlowersTab token={token} />}
+        {tab === 'plants'  && <PlantsTab  token={token} />}
         {tab === 'shops'   && <ShopsTab   token={token} />}
         {tab === 'orders'  && <OrdersTab  token={token} />}
         {tab === 'users'   && <UsersTab   token={token} />}
