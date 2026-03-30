@@ -132,11 +132,11 @@ export default function PlantShop() {
               We partner directly with local nurseries & wholesale flower mandis — giving you <strong>healthy plants at 40–50% lower</strong> than any retail store.
             </p>
             <div style={{ display:"flex", gap:"12px", flexWrap:"wrap" }}>
-              <button onClick={() => { setActiveCategory("Flower Plants"); setTimeout(() => document.getElementById("shop-section")?.scrollIntoView({ behavior:"smooth" }), 50); }}}
+              <button onClick={() => { setActiveCategory("Flower Plants"); setTimeout(() => document.getElementById("shop-section")?.scrollIntoView({ behavior:"smooth" }), 50); }}
                 style={{ background:"#2D6A27", color:"white", border:"none", padding:"13px 32px", fontSize:"14px", fontWeight:600, borderRadius:"8px", cursor:"pointer" }}>
                 Shop Flower Plants 🌸
               </button>
-              <button onClick={() => navigate("/shops?mode=plant")}}
+              <button onClick={() => navigate("/shops?mode=plant")}
                 style={{ background:"transparent", color:"#2D6A27", border:"2px solid #2D6A27", padding:"11px 28px", fontSize:"14px", fontWeight:600, borderRadius:"8px", cursor:"pointer" }}>
                 Our Nurseries 🏪
               </button>
