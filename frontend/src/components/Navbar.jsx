@@ -8,6 +8,7 @@ const LINKS = [
   { to: '/sale',         label: '🔥 Flash Sale' },
   { to: '/shops',        label: 'Shops' },
   { to: '/flowers',      label: '🌸 Flowers' },
+  { to: '/plants',       label: '🌿 Plants' },
   { to: '/ai',           label: 'Flora AI 🌸' },
   { to: '/calendar',     label: 'My Calendar' },
   { to: '/tracking',     label: '📦 Orders' },
