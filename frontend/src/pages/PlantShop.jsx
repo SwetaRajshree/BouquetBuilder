@@ -134,8 +134,8 @@ export default function PlantShop() {
       <div style={{ background:"white", borderBottom:"1px solid #E0EED8", padding:"0 48px", display:"flex", alignItems:"center", justifyContent:"space-between", position:"sticky", top:"62px", zIndex:90, height:"52px" }}>
         <div style={{ display:"flex", gap:"4px" }}>
           {categories.map(cat => (
-            <button key={cat} className={`ps-tab ${activeSection === "shop" && activeCategory === cat ? "active" : ""}`}
-              onClick={() => { setActiveSection("shop"); setActiveCategory(cat); }}>
+            <button key={cat} className={`ps-tab ${activeCategory === cat ? "active" : ""}`}
+              onClick={() => setActiveCategory(cat)}>
               {cat === "Flower Plants" ? "🌸" : cat === "Indoor Plants" ? "🪴" : cat === "Outdoor Plants" ? "🌳" : cat === "Succulents" ? "🌵" : "💨"} {cat}
             </button>
           ))}
@@ -165,7 +165,7 @@ export default function PlantShop() {
               We partner directly with local nurseries & wholesale flower mandis — giving you <strong>healthy plants at 40–50% lower</strong> than any retail store.
             </p>
             <div style={{ display:"flex", gap:"12px", flexWrap:"wrap" }}>
-              <button onClick={() => { setActiveSection("shop"); setActiveCategory("Flower Plants"); }} style={{ background:"#2D6A27", color:"white", border:"none", padding:"13px 32px", fontSize:"14px", fontWeight:600, borderRadius:"8px", cursor:"pointer" }}>Shop Flower Plants 🌸</button>
+              <button onClick={() => setActiveCategory("Flower Plants")} style={{ background:"#2D6A27", color:"white", border:"none", padding:"13px 32px", fontSize:"14px", fontWeight:600, borderRadius:"8px", cursor:"pointer" }}>Shop Flower Plants 🌸</button>
               <button onClick={() => navigate("/shops")} style={{ background:"transparent", color:"#2D6A27", border:"2px solid #2D6A27", padding:"11px 28px", fontSize:"14px", fontWeight:600, borderRadius:"8px", cursor:"pointer" }}>Our Nurseries 🏪</button>
             </div>
             <div style={{ display:"flex", gap:"32px", marginTop:"32px" }}>
@@ -180,7 +180,7 @@ export default function PlantShop() {
           <div style={{ display:"flex", flexDirection:"column", gap:"14px" }}>
             <p style={{ fontSize:"13px", fontWeight:600, color:"#6A8A65", letterSpacing:"1px", textTransform:"uppercase", marginBottom:"4px" }}>Popular Varieties</p>
             {[["🌹","Roses & Gerberas","Starting ₹129"],["🌷","Tulips & Lilies","Starting ₹149"],["🌻","Sunflowers & Marigold","Starting ₹49"],["🪷","Jasmine & Lavender","Starting ₹99"],["🌸","Chrysanthemum & Dahlia","Starting ₹69"]].map(([emoji,label,price]) => (
-              <div key={label} onClick={() => { setActiveSection("shop"); setActiveCategory("Flower Plants"); }}
+              <div key={label} onClick={() => setActiveCategory("Flower Plants")}
                 style={{ display:"flex", alignItems:"center", gap:"14px", background:"rgba(255,255,255,0.55)", borderRadius:"12px", padding:"12px 20px", cursor:"pointer", border:"1px solid rgba(255,255,255,0.85)", justifyContent:"space-between" }}
                 onMouseEnter={e => { e.currentTarget.style.background="rgba(255,255,255,0.92)"; e.currentTarget.style.transform="translateX(6px)"; }}
                 onMouseLeave={e => { e.currentTarget.style.background="rgba(255,255,255,0.55)"; e.currentTarget.style.transform="translateX(0)"; }}>
@@ -208,8 +208,7 @@ export default function PlantShop() {
       </section>
 
       {/* SHOP SECTION */}
-      {activeSection === "shop" && (
-        <section style={{ padding:"56px 60px", background:"#F7FAF5" }}>
+      <section style={{ padding:"56px 60px", background:"#F7FAF5" }}>
           <h2 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:"36px", fontWeight:700, textAlign:"center", marginBottom:"8px" }}>
             {activeCategory === "Flower Plants" ? "🌸 Flower Plants" : activeCategory}
           </h2>
@@ -274,9 +273,6 @@ export default function PlantShop() {
             <p style={{ textAlign:"center", color:"#aaa", marginTop:"40px" }}>No plants match this filter.</p>
           )}
         </section>
-      )}
-
-
 
       {/* TOAST */}
       {toast && (
