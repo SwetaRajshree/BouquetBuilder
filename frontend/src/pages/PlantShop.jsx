@@ -4,7 +4,7 @@ import { useCartContext } from "../context/CartContext";
 
 const API = import.meta.env.VITE_API_URL;
 
-const categories = ["Flower Plants", "Indoor Plants", "Outdoor Plants", "Air Purifying"];
+const categories = ["Flower Plants", "Indoor Plants", "Outdoor Plants", "Succulents", "Air Purifying"];
 
 const priceRanges = [
   { label: "Under ₹99",  max: 99 },
