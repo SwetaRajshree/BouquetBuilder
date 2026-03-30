@@ -22,7 +22,6 @@ export default function PlantShop() {
   const [loading, setLoading]                   = useState(true);
   const [activeCategory, setActiveCategory]     = useState("Flower Plants");
   const [activePriceRange, setActivePriceRange] = useState(null);
-  const [showWishlist, setShowWishlist]         = useState(false);
   const [toast, setToast]                       = useState("");
 
   useEffect(() => {
@@ -53,8 +52,6 @@ export default function PlantShop() {
     return catMatch && priceMatch;
   });
 
-  const wishlistPlants = plants.filter(p => inWishlistCheck(p._id));
-
   return (
     <div style={{ fontFamily: "'DM Sans', sans-serif", background: "#F7FAF5", minHeight: "100vh", color: "#1C1C1C" }}>
       <style>{`
@@ -76,47 +73,10 @@ export default function PlantShop() {
         .ps-overlay { position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:1199; }
       `}</style>
 
-      {/* WISHLIST DRAWER */}
-      {showWishlist && <div className="ps-overlay" onClick={() => setShowWishlist(false)} />}
-      <div className={`ps-drawer ${showWishlist ? "" : "closed"}`}>
-        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"20px" }}>
-          <h3 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:"24px", fontWeight:700 }}>Wishlist ❤️</h3>
-          <button onClick={() => setShowWishlist(false)} style={{ background:"none", border:"none", fontSize:"22px", cursor:"pointer", color:"#888" }}>✕</button>
-        </div>
-        {wishlistPlants.length === 0 ? (
-          <p style={{ color:"#aaa", textAlign:"center", marginTop:"80px", fontSize:"15px" }}>Your wishlist is empty 🌸<br /><span style={{ fontSize:"13px" }}>Heart plants you love!</span></p>
-        ) : (
-          <>
-            {wishlistPlants.map(p => (
-              <div key={p._id} style={{ display:"flex", gap:"12px", padding:"14px 0", borderBottom:"1px solid #F0F0F0", alignItems:"center" }}>
-                <span style={{ fontSize:"30px" }}>{p.img}</span>
-                <div style={{ flex:1 }}>
-                  <p style={{ fontSize:"13px", fontWeight:600, marginBottom:"3px" }}>{p.name}</p>
-                  <p style={{ fontSize:"11px", color:"#aaa" }}>🏪 {p.nursery}</p>
-                  <p style={{ fontWeight:700, color:"#2D6A27", fontSize:"14px", marginTop:"4px" }}>₹{p.price}</p>
-                </div>
-                <div style={{ display:"flex", flexDirection:"column", gap:"6px", alignItems:"flex-end" }}>
-                  <button onClick={() => handleAddToCart(p)} style={{ background:"#2D6A27", color:"white", border:"none", borderRadius:"6px", padding:"6px 12px", fontSize:"12px", fontWeight:600, cursor:"pointer" }}>
-                    {inCart(p._id) ? "✓ In Cart" : "+ Cart"}
-                  </button>
-                  <button onClick={() => toggleWishlist(p)} style={{ fontSize:"11px", color:"#E55", background:"none", border:"none", cursor:"pointer" }}>Remove</button>
-                </div>
-              </div>
-            ))}
-            <button onClick={() => wishlistPlants.forEach(p => !inCart(p._id) && handleAddToCart(p))}
-              style={{ marginTop:"16px", width:"100%", padding:"12px", background:"#2D6A27", color:"white", border:"none", borderRadius:"8px", fontWeight:600, fontSize:"14px", cursor:"pointer" }}>
-              Add All to Cart 🛒
-            </button>
-          </>
-        )}
-      </div>
+      {/* Wishlist drawer moved to global Navbar */}
 
-      {/* STICKY BAR — wishlist only */}
-      <div style={{ background:"white", borderBottom:"1px solid #E0EED8", padding:"0 48px", display:"flex", alignItems:"center", justifyContent:"flex-end", position:"sticky", top:"62px", zIndex:90, height:"52px" }}>
-        <button onClick={() => setShowWishlist(true)} style={{ background:"none", border:"none", fontSize:"19px", cursor:"pointer", position:"relative", color:"#4A6A45" }}>
-          ❤️ {wishlist.length > 0 && <span style={{ position:"absolute", top:"-4px", right:"-5px", background:"#E55", color:"white", borderRadius:"50%", width:"15px", height:"15px", fontSize:"9px", display:"flex", alignItems:"center", justifyContent:"center" }}>{wishlist.length}</span>}
-        </button>
-      </div>
+      {/* STICKY BAR — removed, wishlist now in global navbar */}
+      <div style={{ background:"white", borderBottom:"1px solid #E0EED8", padding:"0 48px", height:"52px", position:"sticky", top:"62px", zIndex:90 }} />
 
       {/* HERO */}
       <section style={{ background:"linear-gradient(135deg,#EAF5E6 0%,#D8EDD2 55%,#CCE8C4 100%)", padding:"64px 60px" }}>
