@@ -1,27 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCartContext } from "../context/CartContext";
-import { useAuth } from "../context/AuthContext";
-
-const API = import.meta.env.VITE_API_URL;
-
-function useWishlist() {
-  const { user } = useAuth();
-  const key = user ? `floriva_wishlist_${user.id}` : 'floriva_wishlist_guest';
-  const [wishlist, setWishlist] = useState(() => {
-    try { return JSON.parse(localStorage.getItem(key)) || []; } catch { return []; }
-  });
-  const toggle = (flower) => {
-    setWishlist(prev => {
-      const exists = prev.find(w => w._id === flower._id);
-      const next = exists ? prev.filter(w => w._id !== flower._id) : [...prev, flower];
-      localStorage.setItem(key, JSON.stringify(next));
-      return next;
-    });
-  };
-  const has = (id) => wishlist.some(w => w._id === id);
-  return { wishlist, toggle, has };
-}
+import { useWishlist } from "../context/WishlistContext";
 
 export default function FlowersPage() {
   const navigate = useNavigate();

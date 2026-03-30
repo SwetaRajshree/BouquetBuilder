@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCartContext } from "../context/CartContext";
+import { useWishlist } from "../context/WishlistContext";
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -15,15 +16,12 @@ const priceRanges = [
 export default function PlantShop() {
   const navigate = useNavigate();
   const { addToCart, removeFromCart, cartItems } = useCartContext();
+  const { wishlist, toggle: toggleWishlist, has: inWishlistCheck } = useWishlist();
 
   const [plants, setPlants]               = useState([]);
   const [loading, setLoading]             = useState(true);
   const [activeCategory, setActiveCategory] = useState("Flower Plants");
   const [activePriceRange, setActivePriceRange] = useState(null);
-  const [wishlist, setWishlist]           = useState(() => {
-    try { return JSON.parse(localStorage.getItem("plant_wishlist") || "[]"); }
-    catch { return []; }
-  });
   const [showWishlist, setShowWishlist]   = useState(false);
   const [toast, setToast]                 = useState("");
 
@@ -41,6 +39,9 @@ export default function PlantShop() {
   useEffect(() => {
     localStorage.setItem("plant_wishlist", JSON.stringify(wishlist));
   }, [wishlist]);
+
+  const toggleWishlist = (id) =>
+    setWishlist(w => w.includes(id) ? w.filter(x => x !== id) : [...w, id]);
 
   const toggleWishlist = (id) =>
     setWishlist(w => w.includes(id) ? w.filter(x => x !== id) : [...w, id]);
@@ -64,7 +65,7 @@ export default function PlantShop() {
     return catMatch && priceMatch;
   });
 
-  const wishlistPlants = plants.filter(p => wishlist.includes(p._id));
+  const wishlistPlants = plants.filter(p => inWishlistCheck(p._id));
 
   const handleCheckout = () => {
     if (cartItems.length === 0) { setToast("Add plants to cart first!"); setTimeout(() => setToast(""), 2200); return; }
@@ -117,7 +118,7 @@ export default function PlantShop() {
                   <button onClick={() => handleAddToCart(p)} style={{ background:"#2D6A27", color:"white", border:"none", borderRadius:"6px", padding:"6px 12px", fontSize:"12px", fontWeight:600, cursor:"pointer" }}>
                     {inCart(p._id) ? "✓ In Cart" : "+ Cart"}
                   </button>
-                  <button onClick={() => toggleWishlist(p._id)} style={{ fontSize:"11px", color:"#E55", background:"none", border:"none", cursor:"pointer" }}>Remove</button>
+                  <button onClick={() => toggleWishlist(p)} style={{ fontSize:"11px", color:"#E55", background:"none", border:"none", cursor:"pointer" }}>Remove</button>
                 </div>
               </div>
             ))}
@@ -231,8 +232,8 @@ export default function PlantShop() {
             <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:"20px", maxWidth:"1100px", margin:"0 auto" }}>
               {filtered.map(plant => (
                 <div key={plant._id} className="ps-card" style={{ position:"relative" }}>
-                  <button className="ps-wish" onClick={() => toggleWishlist(plant._id)}>
-                    {wishlist.includes(plant._id) ? "❤️" : "🤍"}
+                  <button className="ps-wish" onClick={() => toggleWishlist(plant)}>
+                    {inWishlistCheck(plant._id) ? "❤️" : "🤍"}}
                   </button>
                   {plant.discount >= 40 && (
                     <div style={{ position:"absolute", top:"10px", left:"10px", background:"#E55", color:"white", fontSize:"10px", fontWeight:700, padding:"2px 8px", borderRadius:"4px" }}>
