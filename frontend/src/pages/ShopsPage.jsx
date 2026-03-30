@@ -59,6 +59,11 @@ export default function ShopsPage() {
     const params = new URLSearchParams(location.search);
     return params.get('mode') === 'plant' ? 'plant' : 'flower';
   });
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('mode') === 'plant') setMode('plant');
+  }, [location.search]);
   const [search, setSearch] = useState(() => {
     const params = new URLSearchParams(location.search);
     return params.get('q') || '';
