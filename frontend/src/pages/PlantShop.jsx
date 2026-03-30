@@ -130,16 +130,7 @@ export default function PlantShop() {
       </div>
 
       {/* SECTION NAV TABS */}
-      <div style={{ background:"white", borderBottom:"1px solid #E0EED8", padding:"0 48px", display:"flex", alignItems:"center", justifyContent:"space-between", position:"sticky", top:"62px", zIndex:90, height:"52px" }}>
-        <div style={{ display:"flex", gap:"4px" }}>
-          {categories.map(cat => (
-            <button key={cat} className={`ps-tab ${activeCategory === cat ? "active" : ""}`}
-              onClick={() => setActiveCategory(cat)}>
-              {cat === "Flower Plants" ? "🌸" : cat === "Indoor Plants" ? "🪴" : cat === "Outdoor Plants" ? "🌳" : cat === "Succulents" ? "🌵" : "💨"} {cat}
-            </button>
-          ))}
-
-        </div>
+      <div style={{ background:"white", borderBottom:"1px solid #E0EED8", padding:"0 48px", display:"flex", alignItems:"center", justifyContent:"flex-end", position:"sticky", top:"62px", zIndex:90, height:"52px" }}>
         <div style={{ display:"flex", gap:"10px", alignItems:"center" }}>
           <button onClick={() => setShowWishlist(true)} style={{ background:"none", border:"none", fontSize:"19px", cursor:"pointer", position:"relative", color:"#4A6A45" }}>
             ❤️ {wishlist.length > 0 && <span style={{ position:"absolute", top:"-4px", right:"-5px", background:"#E55", color:"white", borderRadius:"50%", width:"15px", height:"15px", fontSize:"9px", display:"flex", alignItems:"center", justifyContent:"center" }}>{wishlist.length}</span>}
@@ -164,7 +155,7 @@ export default function PlantShop() {
               We partner directly with local nurseries & wholesale flower mandis — giving you <strong>healthy plants at 40–50% lower</strong> than any retail store.
             </p>
             <div style={{ display:"flex", gap:"12px", flexWrap:"wrap" }}>
-              <button onClick={() => setActiveCategory("Flower Plants")} style={{ background:"#2D6A27", color:"white", border:"none", padding:"13px 32px", fontSize:"14px", fontWeight:600, borderRadius:"8px", cursor:"pointer" }}>Shop Flower Plants 🌸</button>
+              <button onClick={() => { setActiveCategory("Flower Plants"); document.getElementById("shop-section").scrollIntoView({ behavior: "smooth" }); }} style={{ background:"#2D6A27", color:"white", border:"none", padding:"13px 32px", fontSize:"14px", fontWeight:600, borderRadius:"8px", cursor:"pointer" }}>Shop Flower Plants 🌸</button>
               <button onClick={() => navigate("/shops")} style={{ background:"transparent", color:"#2D6A27", border:"2px solid #2D6A27", padding:"11px 28px", fontSize:"14px", fontWeight:600, borderRadius:"8px", cursor:"pointer" }}>Our Nurseries 🏪</button>
             </div>
             <div style={{ display:"flex", gap:"32px", marginTop:"32px" }}>
@@ -207,7 +198,7 @@ export default function PlantShop() {
       </section>
 
       {/* SHOP SECTION */}
-      <section style={{ padding:"56px 60px", background:"#F7FAF5" }}>
+      <section id="shop-section" style={{ padding:"56px 60px", background:"#F7FAF5" }}>
           <h2 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:"36px", fontWeight:700, textAlign:"center", marginBottom:"8px" }}>
             {activeCategory === "Flower Plants" ? "🌸 Flower Plants" : activeCategory}
           </h2>
