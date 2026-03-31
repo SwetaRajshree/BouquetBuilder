@@ -63,7 +63,7 @@ export default function ViewBouquetPage() {
   // Show review dialog after 8 seconds
   useEffect(() => {
     if (!data) return;
-    const t = setTimeout(() => setShowReview(true), 8000);
+    const t = setTimeout(() => setShowReview(true), 3000);
     return () => clearTimeout(t);
   }, [data]);
 
@@ -173,7 +173,7 @@ export default function ViewBouquetPage() {
 
       {/* REVIEW DIALOG */}
       {showReview && (
-        <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:9999, display:'flex', alignItems:'center', justifyContent:'center', padding:24 }}>
+        <div style={{ position:'fixed', top:0, left:0, right:0, bottom:0, background:'rgba(0,0,0,0.6)', zIndex:99999, display:'flex', alignItems:'center', justifyContent:'center', padding:24 }}>
           <div style={{ background:'white', borderRadius:24, padding:32, maxWidth:420, width:'100%', boxShadow:'0 20px 60px rgba(0,0,0,0.3)', fontFamily:'sans-serif', position:'relative' }}>
             <button onClick={() => setShowReview(false)}
               style={{ position:'absolute', top:16, right:16, background:'none', border:'none', fontSize:20, cursor:'pointer', color:'#888' }}>✕</button>
