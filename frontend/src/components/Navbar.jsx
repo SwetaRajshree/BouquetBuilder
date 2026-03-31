@@ -14,6 +14,7 @@ const LINKS = [
   { to: '/calendar',     label: 'My Calendar' },
   { to: '/tracking',     label: '📦 Orders' },
   { to: '/story',        label: 'Our Story' },
+  { to: '/plants',       label: '🪴 Plants' },
 ];
 
 export default function Navbar() {
