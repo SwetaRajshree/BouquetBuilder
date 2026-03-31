@@ -47,7 +47,7 @@ export default function ViewBouquetPage() {
   const { id }   = useParams();
   const [data, setData] = useState(null);
   const [error, setError] = useState(false);
-  const [showReview, setShowReview] = useState(false);
+  const [showReview, setShowReview] = useState(true);
   const [reviewDone, setReviewDone] = useState(false);
   const [review, setReview] = useState({ name: '', text: '', rating: 5 });
   const [submitting, setSubmitting] = useState(false);
