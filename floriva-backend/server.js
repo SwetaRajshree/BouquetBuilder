@@ -30,6 +30,7 @@ const bouquetShareRoutes = require("./routes/bouquetShareRoutes");
 const voiceNoteRoutes    = require("./routes/voiceNoteRoutes");
 const fillerRoutes       = require("./routes/fillerRoutes");
 const plantRoutes        = require("./routes/plantRoutes");
+const reviewRoutes       = require("./routes/reviewRoutes");
 
 app.use("/api/auth",       authRoutes);
 app.use("/api/flowers",    flowerRoutes);
@@ -41,6 +42,7 @@ app.use("/api/bouquet",    bouquetShareRoutes);
 app.use("/api/voice",      voiceNoteRoutes);
 app.use("/api/fillers",    fillerRoutes);
 app.use("/api/plants",    plantRoutes);
+app.use("/api/reviews",   reviewRoutes);
 
 // Test Route
 app.get("/", (req, res) => {

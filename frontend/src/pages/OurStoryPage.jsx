@@ -29,10 +29,12 @@ const REGIONAL = [
   { title: 'Odisha Marigold',  desc: 'Farmers living by seasons and faith.',            emoji: '🌻' },
 ];
 
-const TESTIMONIALS = [
-  { name: 'Ananya', text: 'My mom cried when she received the flowers. Best gift I ever gave.' },
-  { name: 'Rahul',  text: 'It made long distance feel a little closer. Thank you BouquetBuilder.' },
-  { name: 'Sneha',  text: 'Knowing farmers are supported made every petal feel more special.' },
+const API = import.meta.env.VITE_API_URL;
+
+const FALLBACK_TESTIMONIALS = [
+  { name: 'Ananya', text: 'My mom cried when she received the flowers. Best gift I ever gave.', rating: 5 },
+  { name: 'Rahul',  text: 'It made long distance feel a little closer. Thank you BouquetBuilder.', rating: 5 },
+  { name: 'Sneha',  text: 'Knowing farmers are supported made every petal feel more special.', rating: 5 },
 ];
 
 const BLOGS = [
@@ -97,6 +99,14 @@ export default function OurStoryPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
+  const [testimonials, setTestimonials] = useState(FALLBACK_TESTIMONIALS);
+
+  useEffect(() => {
+    fetch(`${API}/api/reviews`)
+      .then(r => r.json())
+      .then(data => { if (Array.isArray(data) && data.length > 0) setTestimonials(data); })
+      .catch(() => {});
+  }, []);
 
   const handleSubscribe = (e) => {
     e.preventDefault();
@@ -209,13 +219,19 @@ export default function OurStoryPage() {
             <p className="text-[.9rem] text-textL font-light mb-8 text-center">Stories from people who sent love</p>
           </Reveal>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {TESTIMONIALS.map((t, i) => (
-              <Reveal key={t.name} delay={i * 100}>
+            {testimonials.map((t, i) => (
+              <Reveal key={t._id || t.name} delay={i * 100}>
                 <div className="bg-white rounded-md p-6 shadow-soft-s border border-blush/10 hover:-translate-y-1 hover:shadow-soft-m transition-all">
-                  <div className="text-[1.8rem] mb-3">💬</div>
+                  <div className="flex gap-0.5 mb-3">
+                    {[1,2,3,4,5].map(s => (
+                      <span key={s} style={{ color: s <= (t.rating || 5) ? '#f59e0b' : '#e5e7eb', fontSize:16 }}>★</span>
+                    ))}
+                  </div>
                   <p className="font-playfair italic text-textM text-[.92rem] leading-relaxed mb-4">"{t.text}"</p>
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blush to-lavender flex items-center justify-center text-sm">🌸</div>
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blush to-lavender flex items-center justify-center text-sm font-bold text-roseD">
+                      {t.name?.[0]?.toUpperCase()}
+                    </div>
                     <h4 className="font-semibold text-[.88rem] text-roseDD">{t.name}</h4>
                   </div>
                 </div>
