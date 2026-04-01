@@ -360,7 +360,7 @@ export default function HomePage() {
       <div className="bb-wrap">
         {/* Trail + sparks */}
         <div className="bb-trail">
-          <span className="bb-trail-text">✨ BUILD A BOUQUET ✨</span>
+          <span className="bb-trail-text">✨ SEND SOME LOVE ✨</span>
           {[
             { top:'50%', left:'10%',  color:'#f0d040', delay:'0s'   },
             { top:'20%', left:'25%',  color:'#80f080', delay:'0.3s' },
