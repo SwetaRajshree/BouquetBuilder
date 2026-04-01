@@ -381,8 +381,8 @@ export default function HomePage() {
 
         {/* Button */}
         <div
-          onClick={() => navigate('/digital-bouquet')}
-          title="Build a Digital Bouquet"
+          onClick={() => navigate('/digital-gifting')}
+          title="Send a Digital Gift"
           style={{
             width: 86, height: 86, borderRadius: '50%', flexShrink: 0,
             background: 'linear-gradient(135deg,#c8e8c8,#a8d8a8)',
