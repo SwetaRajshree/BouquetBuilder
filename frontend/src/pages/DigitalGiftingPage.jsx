@@ -1,5 +1,15 @@
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import FallingPetals from '../components/FallingPetals';
+
+const MENU_OPTIONS = [
+  { id: 'digitalbouquet', label: 'Digital Bouquet', icon: '💐' },
+  { id: 'postcard', label: 'Postcard', icon: '💌' },
+  { id: 'cassette', label: 'Cassette', icon: '📼' },
+  { id: 'magazine', label: 'Magazine', icon: '📖' },
+  { id: 'garden', label: 'Garden', icon: '🌻' },
+  { id: 'polaroid', label: 'Polaroid', icon: '📸' },
+];
 
 const GIFTS = [
   {
@@ -42,6 +52,23 @@ const GIFTS = [
 
 export default function DigitalGiftingPage() {
   const navigate = useNavigate();
+  const [activeMenu, setActiveMenu] = useState('digitalbouquet');
+
+  const handleMenuClick = (menuId) => {
+    setActiveMenu(menuId);
+    // Add navigation logic here based on menuId if needed
+    switch(menuId) {
+      case 'digitalbouquet':
+        // Stay on current page or navigate to bouquet builder
+        break;
+      case 'postcard':
+        navigate('/postcard');
+        break;
+      default:
+        // Handle other menu items
+        break;
+    }
+  };
 
   return (
     <div className="page-enter overflow-x-hidden">
@@ -65,6 +92,28 @@ export default function DigitalGiftingPage() {
           >
             Start Gifting 🌸
           </button>
+        </div>
+      </section>
+
+      {/* Menu Bar */}
+      <section className="bg-white border-b border-blush/20 sticky top-[62px] z-40">
+        <div className="max-w-[1200px] mx-auto px-4">
+          <div className="flex items-center justify-center gap-1 py-3 overflow-x-auto">
+            {MENU_OPTIONS.map((option) => (
+              <button
+                key={option.id}
+                onClick={() => handleMenuClick(option.id)}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
+                  activeMenu === option.id
+                    ? 'bg-gradient-to-br from-rose to-[#e09099] text-white shadow-soft-s'
+                    : 'text-textM hover:bg-blush/20 hover:text-roseD'
+                }`}
+              >
+                <span className="text-base">{option.icon}</span>
+                <span>{option.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
       </section>
 
