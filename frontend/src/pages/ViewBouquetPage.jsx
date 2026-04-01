@@ -221,6 +221,7 @@ export default function ViewBouquetPage() {
           BUILD YOUR OWN 🌸
         </button>
       </div>
+    </div>
     </>
   );
 }
