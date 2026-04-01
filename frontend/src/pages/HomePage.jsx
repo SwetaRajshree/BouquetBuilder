@@ -110,11 +110,11 @@ export default function HomePage() {
           <div className="flex justify-center mt-2">
             <button
               onClick={() => navigate('/digital-gifting')}
-              className="group relative overflow-hidden px-10 py-4 rounded-full text-roseDD font-bold text-[1rem] tracking-wide shadow-[0_8px_36px_rgba(255,215,0,.45)] transition-all hover:-translate-y-2 hover:shadow-[0_16px_56px_rgba(255,215,0,.65)] active:scale-95 animate-[butterGlow_3s_ease-in-out_infinite]"
+              className="group relative overflow-hidden px-10 py-4 rounded-full text-white font-bold text-[1rem] tracking-wide shadow-[0_8px_36px_rgba(75,0,130,.45)] transition-all hover:-translate-y-2 hover:shadow-[0_16px_56px_rgba(75,0,130,.65)] active:scale-95 animate-[purpleGlow_3s_ease-in-out_infinite]"
               style={{ 
-                background: 'linear-gradient(135deg, #FFD700, #FFF8DC, #FFEB3B, #FFD700)', 
+                background: 'linear-gradient(135deg, #4B0082, #663399, #8A2BE2, #4B0082)', 
                 backgroundSize: '400% 400%', 
-                animation: 'butterShift 4s ease infinite, butterFloat 6s ease-in-out infinite'
+                animation: 'purpleShift 4s ease infinite, purpleFloat 6s ease-in-out infinite'
               }}
             >
               {/* Enhanced shimmer effect */}
@@ -133,7 +133,7 @@ export default function HomePage() {
               <span className="absolute top-2 left-1/2 text-xs animate-[sparkFloat_2.3s_ease-in-out_0.8s_infinite] opacity-65">🌟</span>
               
               {/* Pulsing border effect */}
-              <span className="absolute inset-0 rounded-full border-2 border-yellow-300 opacity-0 group-hover:opacity-60 animate-[borderPulse_1.5s_ease-in-out_infinite]" />
+              <span className="absolute inset-0 rounded-full border-2 border-purple-300 opacity-0 group-hover:opacity-60 animate-[borderPulse_1.5s_ease-in-out_infinite]" />
               
               <span className="relative z-10 flex items-center gap-2">
                 <span className="text-xl animate-[giftBob_2s_ease-in-out_infinite] group-hover:animate-[giftSpin_0.8s_ease-in-out]">💌</span>
@@ -147,18 +147,18 @@ export default function HomePage() {
               0%{background-position:200% 0} 
               100%{background-position:-200% 0} 
             }
-            @keyframes butterShift {
+            @keyframes purpleShift {
               0%, 100% { background-position: 0% 50%; }
               50% { background-position: 100% 50%; }
             }
-            @keyframes butterFloat {
+            @keyframes purpleFloat {
               0%, 100% { transform: translateY(0px) rotate(0deg); }
               33% { transform: translateY(-3px) rotate(1deg); }
               66% { transform: translateY(2px) rotate(-1deg); }
             }
-            @keyframes butterGlow {
-              0%, 100% { box-shadow: 0 8px 36px rgba(255,215,0,.45), 0 0 20px rgba(255,235,59,.3); }
-              50% { box-shadow: 0 12px 48px rgba(255,215,0,.65), 0 0 30px rgba(255,235,59,.5); }
+            @keyframes purpleGlow {
+              0%, 100% { box-shadow: 0 8px 36px rgba(75,0,130,.45), 0 0 20px rgba(138,43,226,.3); }
+              50% { box-shadow: 0 12px 48px rgba(75,0,130,.65), 0 0 30px rgba(138,43,226,.5); }
             }
             @keyframes sparkFloat {
               0%, 100% { transform: translateY(0px) scale(1) rotate(0deg); opacity: 0.8; }
