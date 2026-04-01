@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import FallingPetals from '../components/FallingPetals';
+import GardenOfFlowers from '../components/GardenOfFlowers';
 
 const MENU_OPTIONS = [
   { id: 'digitalbouquet', label: 'Digital Bouquet', icon: '💐' },
@@ -64,6 +65,9 @@ export default function DigitalGiftingPage() {
       case 'postcard':
         navigate('/postcard');
         break;
+      case 'garden':
+        // Garden component will be shown below
+        break;
       default:
         // Handle other menu items
         break;
@@ -118,32 +122,39 @@ export default function DigitalGiftingPage() {
       </section>
 
       {/* Gift Options */}
-      <section className="bg-white py-16 px-4">
-        <div className="max-w-[1100px] mx-auto">
-          <h2 className="font-playfair font-bold text-[clamp(1.6rem,3vw,2.1rem)] text-roseDD text-center mb-2">Choose Your Gift 🎁</h2>
-          <p className="text-center text-textL text-sm mb-10">Pick the perfect way to express your feelings</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {GIFTS.map((g, i) => (
-              <div key={g.title}
-                className={`bg-gradient-to-br ${g.bg} rounded-2xl p-8 border-2 border-transparent hover:border-blush/40 hover:-translate-y-1.5 hover:shadow-soft-m transition-all cursor-pointer group`}
-                onClick={() => navigate(g.route)}
-                style={{ animationDelay: `${i * 0.1}s` }}
-              >
-                <div className="text-[3.5rem] mb-4 group-hover:scale-110 transition-transform duration-200">{g.icon}</div>
-                <h3 className="font-playfair font-bold text-xl mb-2" style={{ color: g.color }}>{g.title}</h3>
-                <p className="text-textM text-[.88rem] leading-relaxed mb-5">{g.desc}</p>
-                <button
-                  onClick={e => { e.stopPropagation(); navigate(g.route); }}
-                  className="text-white text-sm font-semibold px-6 py-2.5 rounded-full transition-all hover:brightness-110"
-                  style={{ background: g.color }}
+      {activeMenu === 'digitalbouquet' && (
+        <section className="bg-white py-16 px-4">
+          <div className="max-w-[1100px] mx-auto">
+            <h2 className="font-playfair font-bold text-[clamp(1.6rem,3vw,2.1rem)] text-roseDD text-center mb-2">Choose Your Gift 🎁</h2>
+            <p className="text-center text-textL text-sm mb-10">Pick the perfect way to express your feelings</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {GIFTS.map((g, i) => (
+                <div key={g.title}
+                  className={`bg-gradient-to-br ${g.bg} rounded-2xl p-8 border-2 border-transparent hover:border-blush/40 hover:-translate-y-1.5 hover:shadow-soft-m transition-all cursor-pointer group`}
+                  onClick={() => navigate(g.route)}
+                  style={{ animationDelay: `${i * 0.1}s` }}
                 >
-                  {g.btn} →
-                </button>
-              </div>
-            ))}
+                  <div className="text-[3.5rem] mb-4 group-hover:scale-110 transition-transform duration-200">{g.icon}</div>
+                  <h3 className="font-playfair font-bold text-xl mb-2" style={{ color: g.color }}>{g.title}</h3>
+                  <p className="text-textM text-[.88rem] leading-relaxed mb-5">{g.desc}</p>
+                  <button
+                    onClick={e => { e.stopPropagation(); navigate(g.route); }}
+                    className="text-white text-sm font-semibold px-6 py-2.5 rounded-full transition-all hover:brightness-110"
+                    style={{ background: g.color }}
+                  >
+                    {g.btn} →
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
+
+      {/* Garden of Flowers Component */}
+      {activeMenu === 'garden' && (
+        <GardenOfFlowers />
+      )}
 
       {/* How it works */}
       <section className="py-16 px-4 bg-gradient-to-br from-[#fff8f0] to-[#f3eaff]">
