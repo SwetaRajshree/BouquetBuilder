@@ -110,25 +110,78 @@ export default function HomePage() {
           <div className="flex justify-center mt-2">
             <button
               onClick={() => navigate('/digital-gifting')}
-              className="group relative overflow-hidden px-10 py-4 rounded-full text-white font-bold text-[1rem] tracking-wide shadow-[0_8px_36px_rgba(201,132,138,.45)] transition-all hover:-translate-y-1 hover:shadow-[0_12px_48px_rgba(201,132,138,.6)] active:scale-95"
-              style={{ background: 'linear-gradient(135deg, #C9848A, #e09099, #E6CFFF, #C9848A)', backgroundSize: '300% 300%', animation: 'gradShift 4s ease infinite' }}
+              className="group relative overflow-hidden px-10 py-4 rounded-full text-roseDD font-bold text-[1rem] tracking-wide shadow-[0_8px_36px_rgba(255,215,0,.45)] transition-all hover:-translate-y-2 hover:shadow-[0_16px_56px_rgba(255,215,0,.65)] active:scale-95 animate-[butterGlow_3s_ease-in-out_infinite]"
+              style={{ 
+                background: 'linear-gradient(135deg, #FFD700, #FFF8DC, #FFEB3B, #FFD700)', 
+                backgroundSize: '400% 400%', 
+                animation: 'butterShift 4s ease infinite, butterFloat 6s ease-in-out infinite'
+              }}
             >
-              {/* shimmer */}
-              <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                style={{ background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.35) 50%, transparent 60%)', backgroundSize: '200% 100%', animation: 'shimmer 1.2s ease infinite' }} />
-              {/* sparks */}
-              <span className="absolute top-1 left-4 text-xs animate-[sparkPop_1.8s_ease-out_infinite] opacity-70">✨</span>
-              <span className="absolute bottom-1 right-5 text-xs animate-[sparkPop_1.8s_ease-out_0.6s_infinite] opacity-70">💫</span>
-              <span className="absolute top-2 right-8 text-xs animate-[sparkPop_1.8s_ease-out_1.2s_infinite] opacity-60">⭐</span>
+              {/* Enhanced shimmer effect */}
+              <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                style={{ 
+                  background: 'linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.8) 50%, transparent 70%)', 
+                  backgroundSize: '200% 100%', 
+                  animation: 'shimmer 1s ease infinite' 
+                }} />
+              
+              {/* Floating sparkles */}
+              <span className="absolute top-0 left-2 text-xs animate-[sparkFloat_2s_ease-in-out_infinite] opacity-80">✨</span>
+              <span className="absolute top-1 right-3 text-xs animate-[sparkFloat_2.5s_ease-in-out_0.5s_infinite] opacity-70">⭐</span>
+              <span className="absolute bottom-0 left-6 text-xs animate-[sparkFloat_2.2s_ease-in-out_1s_infinite] opacity-75">💫</span>
+              <span className="absolute bottom-1 right-8 text-xs animate-[sparkFloat_1.8s_ease-in-out_1.5s_infinite] opacity-80">✨</span>
+              <span className="absolute top-2 left-1/2 text-xs animate-[sparkFloat_2.3s_ease-in-out_0.8s_infinite] opacity-65">🌟</span>
+              
+              {/* Pulsing border effect */}
+              <span className="absolute inset-0 rounded-full border-2 border-yellow-300 opacity-0 group-hover:opacity-60 animate-[borderPulse_1.5s_ease-in-out_infinite]" />
+              
               <span className="relative z-10 flex items-center gap-2">
-                <span className="text-xl animate-[bouquetBob_2s_ease-in-out_infinite]">💌</span>
+                <span className="text-xl animate-[giftBob_2s_ease-in-out_infinite] group-hover:animate-[giftSpin_0.8s_ease-in-out]">💌</span>
                 Send a Digital Gift
-                <span className="text-xl animate-[bouquetBob_2s_ease-in-out_0.5s_infinite]">🌸</span>
+                <span className="text-xl animate-[giftBob_2s_ease-in-out_0.5s_infinite] group-hover:animate-[flowerSpin_0.8s_ease-in-out_0.2s]">🌸</span>
               </span>
             </button>
           </div>
           <style>{`
-            @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+            @keyframes shimmer { 
+              0%{background-position:200% 0} 
+              100%{background-position:-200% 0} 
+            }
+            @keyframes butterShift {
+              0%, 100% { background-position: 0% 50%; }
+              50% { background-position: 100% 50%; }
+            }
+            @keyframes butterFloat {
+              0%, 100% { transform: translateY(0px) rotate(0deg); }
+              33% { transform: translateY(-3px) rotate(1deg); }
+              66% { transform: translateY(2px) rotate(-1deg); }
+            }
+            @keyframes butterGlow {
+              0%, 100% { box-shadow: 0 8px 36px rgba(255,215,0,.45), 0 0 20px rgba(255,235,59,.3); }
+              50% { box-shadow: 0 12px 48px rgba(255,215,0,.65), 0 0 30px rgba(255,235,59,.5); }
+            }
+            @keyframes sparkFloat {
+              0%, 100% { transform: translateY(0px) scale(1) rotate(0deg); opacity: 0.8; }
+              50% { transform: translateY(-8px) scale(1.2) rotate(180deg); opacity: 1; }
+            }
+            @keyframes borderPulse {
+              0%, 100% { transform: scale(1); opacity: 0; }
+              50% { transform: scale(1.05); opacity: 0.6; }
+            }
+            @keyframes giftBob {
+              0%, 100% { transform: translateY(0px) rotate(0deg); }
+              50% { transform: translateY(-4px) rotate(5deg); }
+            }
+            @keyframes giftSpin {
+              0% { transform: rotate(0deg) scale(1); }
+              50% { transform: rotate(180deg) scale(1.1); }
+              100% { transform: rotate(360deg) scale(1); }
+            }
+            @keyframes flowerSpin {
+              0% { transform: rotate(0deg) scale(1); }
+              50% { transform: rotate(-180deg) scale(1.1); }
+              100% { transform: rotate(-360deg) scale(1); }
+            }
           `}</style>
 
           {/* Quick stats */}
