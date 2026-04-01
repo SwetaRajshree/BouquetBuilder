@@ -29,7 +29,6 @@ import ViewBouquetPage   from './pages/ViewBouquetPage';
 import BouquetCustomizePage from './pages/BouquetCustomizePage';
 import PostcardPage      from './pages/PostcardPage';
 import PlantShop         from './pages/PlantShop';
-import PlantShop         from './pages/PlantShop';
 
 // Scroll to top on route change
 function ScrollToTop() {
@@ -76,7 +75,6 @@ export default function App() {
           <Route path="/bouquet-customize" element={<BouquetCustomizePage />} />
           <Route path="/postcard"           element={<PostcardPage />} />
           <Route path="/plants"             element={<PlantShop />}    />
-          <Route path="/plants"            element={<PlantShop />}            />
           <Route path="/digital-bouquet"   element={<Navigate to="/bouquet-builder" replace />} />
           {/* Fallback */}
           <Route path="*"             element={<HomePage />}         />
