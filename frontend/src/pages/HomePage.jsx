@@ -68,7 +68,6 @@ function FloralDivider() {
 export default function HomePage() {
   const navigate = useNavigate();
   const [shops, setShops] = useState([]);
-  const [query, setQuery] = useState('');
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/api/shops`)
@@ -108,22 +107,29 @@ export default function HomePage() {
           <p className="text-[1.05rem] text-textM mb-8 font-light leading-relaxed">
             Discover local florists, build custom bouquets &<br />deliver happiness to someone special.
           </p>
-          <div className="flex rounded-[99px] overflow-hidden max-w-[480px] mx-auto shadow-[0_8px_36px_rgba(201,132,138,.22)] bg-white">
-            <span className="px-4 text-xl flex items-center">📍</span>
-            <input
-              value={query}
-              onChange={e => setQuery(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && navigate(`/shops${query.trim() ? `?q=${encodeURIComponent(query.trim())}` : ''}`)}
-              className="flex-1 border-none outline-none py-4 text-[.95rem] text-text bg-transparent"
-              placeholder="Find shops near you..."
-            />
+          <div className="flex justify-center mt-2">
             <button
-              onClick={() => navigate(`/shops${query.trim() ? `?q=${encodeURIComponent(query.trim())}` : ''}`)}
-              className="bg-gradient-to-br from-rose to-[#e09099] px-6 text-xl text-white hover:brightness-105 transition-all"
+              onClick={() => navigate('/digital-gifting')}
+              className="group relative overflow-hidden px-10 py-4 rounded-full text-white font-bold text-[1rem] tracking-wide shadow-[0_8px_36px_rgba(201,132,138,.45)] transition-all hover:-translate-y-1 hover:shadow-[0_12px_48px_rgba(201,132,138,.6)] active:scale-95"
+              style={{ background: 'linear-gradient(135deg, #C9848A, #e09099, #E6CFFF, #C9848A)', backgroundSize: '300% 300%', animation: 'gradShift 4s ease infinite' }}
             >
-              🔍
+              {/* shimmer */}
+              <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                style={{ background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.35) 50%, transparent 60%)', backgroundSize: '200% 100%', animation: 'shimmer 1.2s ease infinite' }} />
+              {/* sparks */}
+              <span className="absolute top-1 left-4 text-xs animate-[sparkPop_1.8s_ease-out_infinite] opacity-70">✨</span>
+              <span className="absolute bottom-1 right-5 text-xs animate-[sparkPop_1.8s_ease-out_0.6s_infinite] opacity-70">💫</span>
+              <span className="absolute top-2 right-8 text-xs animate-[sparkPop_1.8s_ease-out_1.2s_infinite] opacity-60">⭐</span>
+              <span className="relative z-10 flex items-center gap-2">
+                <span className="text-xl animate-[bouquetBob_2s_ease-in-out_infinite]">💌</span>
+                Send a Digital Gift
+                <span className="text-xl animate-[bouquetBob_2s_ease-in-out_0.5s_infinite]">🌸</span>
+              </span>
             </button>
           </div>
+          <style>{`
+            @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+          `}</style>
 
           {/* Quick stats */}
           <div className="flex justify-center gap-6 mt-8 flex-wrap">
