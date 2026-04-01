@@ -47,7 +47,7 @@ export default function ViewBouquetPage() {
   const { id }   = useParams();
   const [data, setData] = useState(null);
   const [error, setError] = useState(false);
-  const [showReview, setShowReview] = useState(true);
+  const [showReview, setShowReview] = useState(false);
   const [reviewDone, setReviewDone] = useState(false);
   const [review, setReview] = useState({ name: '', text: '', rating: 5 });
   const [submitting, setSubmitting] = useState(false);
@@ -63,7 +63,7 @@ export default function ViewBouquetPage() {
   // Show review dialog after 8 seconds
   useEffect(() => {
     if (!data) return;
-    const t = setTimeout(() => setShowReview(true), 3000);
+    const t = setTimeout(() => setShowReview(true), 6000);
     return () => clearTimeout(t);
   }, [data]);
 
