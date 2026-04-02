@@ -22,8 +22,23 @@ const FontInjector = () => {
         100% { transform: translateY(-110vh) rotate(360deg) scale(1);    opacity: 0;    }
       }
       @keyframes shutterBlink {
-        0%,90%,100% { opacity: 0 }
-        92%,98%     { opacity: 1 }
+        0%,100%  { opacity: 0 }
+        92%      { opacity: 0 }
+        93%      { opacity: 1 }
+        96%      { opacity: 0 }
+        97%      { opacity: 0.5 }
+        99%      { opacity: 0 }
+      }
+      @keyframes ledGlow {
+        0%,88%   { opacity: 0; transform: scale(1); }
+        89%      { opacity: 0.5; transform: scale(1); box-shadow: 0 0 4px 2px rgba(255,255,220,0.5); }
+        90%      { opacity: 1;   transform: scale(1.5); box-shadow: 0 0 14px 6px rgba(255,255,220,0.9); }
+        91%      { opacity: 1;   transform: scale(2.2); box-shadow: 0 0 28px 12px rgba(255,255,220,1), 0 0 70px 24px rgba(255,255,200,0.6); }
+        92%      { opacity: 1;   transform: scale(3);   box-shadow: 0 0 40px 20px rgba(255,255,220,1), 0 0 120px 40px rgba(255,255,200,0.7); }
+        94%      { opacity: 0.4; transform: scale(1.3); box-shadow: 0 0 8px 4px rgba(255,255,220,0.3); }
+        96%      { opacity: 0.9; transform: scale(1.8); box-shadow: 0 0 20px 10px rgba(255,255,220,0.8); }
+        98%      { opacity: 0.1; transform: scale(1);   box-shadow: none; }
+        100%     { opacity: 0;   transform: scale(1);   box-shadow: none; }
       }
       @keyframes apertureSpin {
         0%   { transform: rotate(0deg)   scale(1);   opacity: 0.1 }
@@ -240,8 +255,22 @@ function PhotographyBackground() {
         ))}
       </div>
 
-      {/* Rare shutter white blink */}
-      <div style={{ position: "absolute", inset: 0, background: "white", animation: "shutterBlink 18s 3s infinite", pointerEvents: "none" }} />
+      {/* LED flash square + full screen burst */}
+      <div style={{
+        position: "absolute", top: 18, left: 18,
+        width: 10, height: 10,
+        borderRadius: 2,
+        background: "#FFFDE0",
+        animation: "ledGlow 18s 3s infinite",
+        zIndex: 10,
+      }} />
+      <div style={{
+        position: "absolute", inset: 0,
+        background: "rgba(255,255,240,0.92)",
+        animation: "shutterBlink 18s 3s infinite",
+        pointerEvents: "none",
+        zIndex: 9,
+      }} />
     </div>
   );
 }
