@@ -1,8 +1,18 @@
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import FallingPetals from '../components/FallingPetals';
-import GardenOfFlowers from '../components/GardenOfFlowers';
-import PolaroidBooth  from '../components/PolaroidBooth';
+
+const GardenOfFlowers = lazy(() => import('../components/GardenOfFlowers'));
+const PolaroidBooth   = lazy(() => import('../components/PolaroidBooth'));
+
+function LoadingSpinner() {
+  return (
+    <div style={{ minHeight: '40vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ fontSize: '2rem', animation: 'spin 1s linear infinite' }}>🌸</div>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </div>
+  );
+}
 
 const MENU_OPTIONS = [
   { id: 'digitalbouquet', label: 'Digital Bouquet', icon: '💐' },
@@ -152,8 +162,8 @@ export default function DigitalGiftingPage() {
         </section>
       )}
 
-      {activeMenu === 'garden' && <GardenOfFlowers />}
-      {activeMenu === 'polaroid' && <PolaroidBooth />}
+      {activeMenu === 'garden'   && <Suspense fallback={<LoadingSpinner />}><GardenOfFlowers /></Suspense>}
+      {activeMenu === 'polaroid' && <Suspense fallback={<LoadingSpinner />}><PolaroidBooth /></Suspense>}
 
       {/* How it works */}
       <section className="py-16 px-4 bg-gradient-to-br from-[#fff8f0] to-[#f3eaff]">
