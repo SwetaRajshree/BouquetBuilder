@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+﻿import { useState, useRef, useCallback, useEffect } from "react";
 
 /* ─────────────────────────────────────────────
    FONTS + KEYFRAMES
@@ -775,8 +775,95 @@ function EditorPage({ layout, onBack }) {
   const fileRef    = useRef(null);
   const activeSlot = useRef(null);
   const dragRef    = useRef(null);
+  const polaroidRef = useRef(null);
+  const [shareUrl,   setShareUrl]   = useState('');
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [sharing,    setSharing]    = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
 
   const showToast = useCallback(msg => { setToast(msg); setTimeout(() => setToast(""), 2600); }, []);
+
+  const handleDownload = () => {
+    const node = polaroidRef.current;
+    if (!node) return;
+    const dpr = Math.max(window.devicePixelRatio || 1, 2);
+    const rect = node.getBoundingClientRect();
+    const canvas = document.createElement('canvas');
+    canvas.width  = rect.width  * dpr;
+    canvas.height = rect.height * dpr;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+    // Draw white background
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, rect.width, rect.height);
+    // Use html2canvas-like approach via dom-to-image fallback: just grab images
+    // Simple approach: draw each image slot onto canvas
+    const imgs = node.querySelectorAll('img');
+    const promises = Array.from(imgs).map(img => {
+      return new Promise(resolve => {
+        const r = img.getBoundingClientRect();
+        const offX = r.left - rect.left;
+        const offY = r.top  - rect.top;
+        const i = new Image();
+        i.crossOrigin = 'anonymous';
+        i.onload = () => { ctx.drawImage(i, offX, offY, r.width, r.height); resolve(); };
+        i.onerror = resolve;
+        i.src = img.src;
+      });
+    });
+    Promise.all(promises).then(() => {
+      const a = document.createElement('a');
+      a.download = 'polaroid.png';
+      a.href = canvas.toDataURL('image/png');
+      a.click();
+      showToast('📷 Polaroid downloaded!');
+    });
+  };
+
+  const handleShare = async () => {
+    setSharing(true);
+    try {
+      // Build a canvas snapshot of the polaroid
+      const node = polaroidRef.current;
+      const dpr = Math.max(window.devicePixelRatio || 1, 2);
+      const rect = node.getBoundingClientRect();
+      const canvas = document.createElement('canvas');
+      canvas.width  = rect.width  * dpr;
+      canvas.height = rect.height * dpr;
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+      const frameData = FRAMES.find(f => f.id === frame) || FRAMES[0];
+      ctx.fillStyle = frameData.bg;
+      ctx.fillRect(0, 0, rect.width, rect.height);
+      const imgs = node.querySelectorAll('img');
+      await Promise.all(Array.from(imgs).map(img => new Promise(resolve => {
+        const r = img.getBoundingClientRect();
+        const i = new Image(); i.crossOrigin = 'anonymous';
+        i.onload = () => { ctx.drawImage(i, r.left - rect.left, r.top - rect.top, r.width, r.height); resolve(); };
+        i.onerror = resolve; i.src = img.src;
+      })));
+      const image = canvas.toDataURL('image/png');
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/gardens/share`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: caption || 'My Polaroid', image, flowerCount: 0 }),
+      });
+      const data = await res.json();
+      if (!data.id) throw new Error('No id');
+      setShareUrl(`${window.location.origin}/shared-garden/${data.id}`);
+      setShowShareModal(true);
+    } catch (err) {
+      showToast('Failed to generate link. Try again.');
+    } finally {
+      setSharing(false);
+    }
+  };
+
+  const copyShareLink = async () => {
+    try { await navigator.clipboard.writeText(shareUrl); }
+    catch { const t = document.createElement('textarea'); t.value = shareUrl; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t); }
+    setShareCopied(true); setTimeout(() => setShareCopied(false), 2000);
+  };
 
   const handleSlotClick = idx => { activeSlot.current = idx; fileRef.current?.click(); };
   const handleFile = e => {
@@ -853,7 +940,7 @@ function EditorPage({ layout, onBack }) {
 
       <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", alignItems: "center", paddingBottom: 48 }}>
         {/* Polaroid preview */}
-        <div style={{ margin: "28px auto 0", position: "relative" }}>
+        <div style={{ margin: "28px auto 0", position: "relative" }} ref={polaroidRef}>
           <Polaroid layout={layout} images={images} filter={filter} frame={frame} scene={scene} caption={caption} showDate={showDate} tilted={tilted} stickers={stickerProps} onSlotClick={handleSlotClick} />
           <button onClick={() => setTilted(t => !t)} title="Rotate"
             style={{ position: "absolute", top: -13, right: -13, width: 28, height: 28, borderRadius: "50%", background: "#C8A96E", border: "none", cursor: "pointer", fontSize: 13, color: "#1C1C1A", zIndex: 40, display: "flex", alignItems: "center", justifyContent: "center" }}>↻</button>
@@ -1000,16 +1087,15 @@ function EditorPage({ layout, onBack }) {
 
         {/* Download + Share */}
         <div style={{ display: "flex", gap: 10, padding: "0 14px", width: "100%", maxWidth: 480, boxSizing: "border-box" }}>
-          <button onClick={() => showToast("Polaroid saved! ✓")}
-            style={{ flex: 1, background: "#EDE8DF", color: "#1C1C1A", border: "none", padding: "15px 0", fontSize: 14, fontFamily: "'DM Sans', sans-serif", fontWeight: 600, borderRadius: 40, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-            ↓ Download
+          <button onClick={handleDownload} style={{ flex: 1, background: "#EDE8DF", color: "#1C1C1A", border: "none", padding: "15px 0", fontSize: 14, fontFamily: "'DM Sans', sans-serif", fontWeight: 600, borderRadius: 40, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+            \u2193 Download
           </button>
-          <button onClick={() => showToast("Link copied!")}
-            style={{ flex: 1, background: "linear-gradient(135deg,#C8A96E,#a08040)", color: "#1C1C1A", border: "none", padding: "15px 0", fontSize: 14, fontFamily: "'DM Sans', sans-serif", fontWeight: 600, borderRadius: 40, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-            ↗ Share
+          <button onClick={handleShare} disabled={sharing} style={{ flex: 1, background: sharing ? "#888" : "linear-gradient(135deg,#C8A96E,#a08040)", color: "#1C1C1A", border: "none", padding: "15px 0", fontSize: 14, fontFamily: "'DM Sans', sans-serif", fontWeight: 600, borderRadius: 40, cursor: sharing ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+            {sharing ? "Saving..." : "\u2197 Share"}
           </button>
         </div>
       </div>
+      {showShareModal && (<div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }} onClick={() => setShowShareModal(false)}><div style={{ background: "#1C1C1A", borderRadius: 20, padding: 28, maxWidth: 420, width: "100%", border: "1px solid rgba(200,169,110,0.25)" }} onClick={e => e.stopPropagation()}><button onClick={() => setShowShareModal(false)} style={{ float: "right", background: "none", border: "none", color: "#EDE8DF", fontSize: "1.3rem", cursor: "pointer" }}>x</button><h3 style={{ color: "#C8A96E", fontSize: "1.3rem", marginBottom: 6 }}>Share Your Polaroid</h3><p style={{ color: "rgba(237,232,223,0.5)", fontSize: "0.82rem", marginBottom: 18 }}>Anyone with this link can view your polaroid</p><div style={{ display: "flex", gap: 8, marginBottom: 20 }}><input readOnly value={shareUrl} style={{ flex: 1, padding: "10px 12px", borderRadius: 10, border: "1px solid rgba(200,169,110,0.2)", background: "rgba(255,255,255,0.05)", color: "#EDE8DF", fontSize: "0.78rem", outline: "none" }} /><button onClick={copyShareLink} style={{ padding: "10px 16px", borderRadius: 10, background: shareCopied ? "#2d6015" : "#C8A96E", color: "#1C1C1A", border: "none", cursor: "pointer", fontWeight: 600 }}>{shareCopied ? "Copied!" : "Copy"}</button></div><div style={{ display: "flex", gap: 10, justifyContent: "center" }}><a href={`https://wa.me/?text=${encodeURIComponent("Check out my Polaroid! " + shareUrl)}`} target="_blank" rel="noreferrer" style={{ padding: "10px 14px", borderRadius: 12, background: "rgba(200,169,110,0.08)", border: "1px solid rgba(200,169,110,0.18)", textDecoration: "none", color: "#EDE8DF", fontSize: "0.75rem", fontWeight: 600 }}>WhatsApp</a><a href={`mailto:?subject=My Polaroid&body=${encodeURIComponent("Check this out: " + shareUrl)}`} target="_blank" rel="noreferrer" style={{ padding: "10px 14px", borderRadius: 12, background: "rgba(200,169,110,0.08)", border: "1px solid rgba(200,169,110,0.18)", textDecoration: "none", color: "#EDE8DF", fontSize: "0.75rem", fontWeight: 600 }}>Email</a></div></div></div>)}
 
       <Toast message={toast} />
     </div>
