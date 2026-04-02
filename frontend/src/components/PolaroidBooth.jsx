@@ -1,4 +1,5 @@
 ﻿import { useState, useRef, useCallback, useEffect } from "react";
+import html2canvas from 'html2canvas';
 
 /* ─────────────────────────────────────────────
    FONTS + KEYFRAMES
@@ -783,65 +784,27 @@ function EditorPage({ layout, onBack }) {
 
   const showToast = useCallback(msg => { setToast(msg); setTimeout(() => setToast(""), 2600); }, []);
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     const node = polaroidRef.current;
     if (!node) return;
-    const dpr = Math.max(window.devicePixelRatio || 1, 2);
-    const rect = node.getBoundingClientRect();
-    const canvas = document.createElement('canvas');
-    canvas.width  = rect.width  * dpr;
-    canvas.height = rect.height * dpr;
-    const ctx = canvas.getContext('2d');
-    ctx.scale(dpr, dpr);
-    // Draw white background
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(0, 0, rect.width, rect.height);
-    // Use html2canvas-like approach via dom-to-image fallback: just grab images
-    // Simple approach: draw each image slot onto canvas
-    const imgs = node.querySelectorAll('img');
-    const promises = Array.from(imgs).map(img => {
-      return new Promise(resolve => {
-        const r = img.getBoundingClientRect();
-        const offX = r.left - rect.left;
-        const offY = r.top  - rect.top;
-        const i = new Image();
-        i.crossOrigin = 'anonymous';
-        i.onload = () => { ctx.drawImage(i, offX, offY, r.width, r.height); resolve(); };
-        i.onerror = resolve;
-        i.src = img.src;
-      });
-    });
-    Promise.all(promises).then(() => {
+    try {
+      const canvas = await html2canvas(node, { useCORS: true, backgroundColor: null, scale: 2 });
       const a = document.createElement('a');
       a.download = 'polaroid.png';
       a.href = canvas.toDataURL('image/png');
       a.click();
       showToast('📷 Polaroid downloaded!');
-    });
+    } catch (err) {
+      showToast('Download failed. Try again.');
+    }
   };
 
   const handleShare = async () => {
+    const node = polaroidRef.current;
+    if (!node) return;
     setSharing(true);
     try {
-      // Build a canvas snapshot of the polaroid
-      const node = polaroidRef.current;
-      const dpr = Math.max(window.devicePixelRatio || 1, 2);
-      const rect = node.getBoundingClientRect();
-      const canvas = document.createElement('canvas');
-      canvas.width  = rect.width  * dpr;
-      canvas.height = rect.height * dpr;
-      const ctx = canvas.getContext('2d');
-      ctx.scale(dpr, dpr);
-      const frameData = FRAMES.find(f => f.id === frame) || FRAMES[0];
-      ctx.fillStyle = frameData.bg;
-      ctx.fillRect(0, 0, rect.width, rect.height);
-      const imgs = node.querySelectorAll('img');
-      await Promise.all(Array.from(imgs).map(img => new Promise(resolve => {
-        const r = img.getBoundingClientRect();
-        const i = new Image(); i.crossOrigin = 'anonymous';
-        i.onload = () => { ctx.drawImage(i, r.left - rect.left, r.top - rect.top, r.width, r.height); resolve(); };
-        i.onerror = resolve; i.src = img.src;
-      })));
+      const canvas = await html2canvas(node, { useCORS: true, backgroundColor: null, scale: 2 });
       const image = canvas.toDataURL('image/png');
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/gardens/share`, {
         method: 'POST',
