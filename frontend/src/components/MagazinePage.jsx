@@ -66,7 +66,7 @@ function SectionTitle({ children }) {
 }
 
 /* ── Main Component ───────────────────────────────────── */
-export default function BloomMagazinePage() {
+export default function MagazinePage() {
   const navigate = useNavigate();
 
   // View state: 'home' | 'editor' | 'print' | 'saved'

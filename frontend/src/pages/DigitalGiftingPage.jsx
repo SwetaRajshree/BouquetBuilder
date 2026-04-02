@@ -168,35 +168,39 @@ export default function DigitalGiftingPage() {
       {activeMenu === 'polaroid' && <Suspense fallback={<LoadingSpinner />}><PolaroidBooth /></Suspense>}
       {activeMenu === 'magazine' && <Suspense fallback={<LoadingSpinner />}><MagazinePage /></Suspense>}
 
-      {/* How it works */}
-      <section className="py-16 px-4 bg-gradient-to-br from-[#fff8f0] to-[#f3eaff]">
-        <div className="max-w-[800px] mx-auto text-center">
-          <h2 className="font-playfair font-bold text-[clamp(1.5rem,3vw,2rem)] text-roseDD mb-10">How Digital Gifting Works 🌸</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              ['🎨', 'Create', 'Pick your gift type and personalise it with flowers, messages, music or voice.'],
-              ['🔗', 'Share', 'Get a unique link to share via WhatsApp, Instagram, email or any platform.'],
-              ['💕', 'They Receive', 'They open a beautiful page with your gift — no app needed, works on any device.'],
-            ].map(([icon, title, desc]) => (
-              <div key={title} className="bg-white rounded-2xl p-7 shadow-soft-s border border-blush/10">
-                <div className="text-[2.5rem] mb-3">{icon}</div>
-                <h4 className="font-playfair font-semibold text-base text-roseDD mb-2">{title}</h4>
-                <p className="text-textL text-[.82rem] leading-relaxed">{desc}</p>
-              </div>
-            ))}
+      {/* How it works — only show on digitalbouquet tab */}
+      {activeMenu === 'digitalbouquet' && (
+        <section className="py-16 px-4 bg-gradient-to-br from-[#fff8f0] to-[#f3eaff]">
+          <div className="max-w-[800px] mx-auto text-center">
+            <h2 className="font-playfair font-bold text-[clamp(1.5rem,3vw,2rem)] text-roseDD mb-10">How Digital Gifting Works 🌸</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[
+                ['🎨', 'Create', 'Pick your gift type and personalise it with flowers, messages, music or voice.'],
+                ['🔗', 'Share', 'Get a unique link to share via WhatsApp, Instagram, email or any platform.'],
+                ['💕', 'They Receive', 'They open a beautiful page with your gift — no app needed, works on any device.'],
+              ].map(([icon, title, desc]) => (
+                <div key={title} className="bg-white rounded-2xl p-7 shadow-soft-s border border-blush/10">
+                  <div className="text-[2.5rem] mb-3">{icon}</div>
+                  <h4 className="font-playfair font-semibold text-base text-roseDD mb-2">{title}</h4>
+                  <p className="text-textL text-[.82rem] leading-relaxed">{desc}</p>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* CTA */}
-      <section className="bg-roseDD py-16 text-center px-4">
-        <h2 className="font-playfair font-bold text-[clamp(1.5rem,3vw,2rem)] text-white mb-3">Ready to Make Someone Smile? 💐</h2>
-        <p className="text-white/80 mb-7 font-light">Create your first digital gift in under 2 minutes.</p>
-        <button onClick={() => navigate('/bouquet-builder')}
-          className="bg-white text-roseDD font-bold px-8 py-3.5 rounded-full text-[.9rem] hover:-translate-y-0.5 hover:shadow-soft-l transition-all">
-          Build a Digital Bouquet 🌸
-        </button>
-      </section>
+      {/* CTA — only show on digitalbouquet tab */}
+      {activeMenu === 'digitalbouquet' && (
+        <section className="bg-roseDD py-16 text-center px-4">
+          <h2 className="font-playfair font-bold text-[clamp(1.5rem,3vw,2rem)] text-white mb-3">Ready to Make Someone Smile? 💐</h2>
+          <p className="text-white/80 mb-7 font-light">Create your first digital gift in under 2 minutes.</p>
+          <button onClick={() => navigate('/bouquet-builder')}
+            className="bg-white text-roseDD font-bold px-8 py-3.5 rounded-full text-[.9rem] hover:-translate-y-0.5 hover:shadow-soft-l transition-all">
+            Build a Digital Bouquet 🌸
+          </button>
+        </section>
+      )}
     </div>
   );
 }
