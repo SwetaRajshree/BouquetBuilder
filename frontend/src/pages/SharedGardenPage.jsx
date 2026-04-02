@@ -6,12 +6,25 @@ export default function SharedGardenPage() {
   const navigate = useNavigate();
   const [garden, setGarden] = useState(null);
   const [notFound, setNotFound] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const data = localStorage.getItem('garden_' + id);
-    if (data) setGarden(JSON.parse(data));
-    else setNotFound(true);
+    fetch(`${import.meta.env.VITE_API_URL}/api/gardens/${id}`)
+      .then(res => {
+        if (!res.ok) throw new Error('Not found');
+        return res.json();
+      })
+      .then(data => setGarden(data))
+      .catch(() => setNotFound(true))
+      .finally(() => setLoading(false));
   }, [id]);
+
+  if (loading) return (
+    <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'#f2ede2' }}>
+      <div style={{ fontSize:'2rem', animation:'spin 1s linear infinite' }}>🌸</div>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </div>
+  );
 
   if (notFound) return (
     <div style={{ minHeight:'100vh', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', background:'#f2ede2', fontFamily:"'Walter Turncoat',cursive", gap:16 }}>
@@ -24,18 +37,10 @@ export default function SharedGardenPage() {
     </div>
   );
 
-  if (!garden) return (
-    <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'#f2ede2' }}>
-      <div style={{ fontSize:'2rem', animation:'spin 1s linear infinite' }}>🌸</div>
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-    </div>
-  );
-
   return (
     <div style={{ minHeight:'100vh', background:'linear-gradient(135deg,#f2ede2,#e8f5e0)', display:'flex', flexDirection:'column', alignItems:'center', padding:'40px 20px 60px', fontFamily:"'Walter Turncoat',cursive" }}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Walter+Turncoat&display=swap');`}</style>
 
-      {/* Title */}
       <div style={{ textAlign:'center', marginBottom:32 }}>
         <div style={{ fontSize:'2.5rem', marginBottom:8 }}>🌸</div>
         <h1 style={{ fontSize:'clamp(1.8rem,4vw,2.8rem)', color:'#2d5a1e', margin:0, letterSpacing:'0.02em' }}>
@@ -46,12 +51,10 @@ export default function SharedGardenPage() {
         </p>
       </div>
 
-      {/* Garden image */}
       <div style={{ borderRadius:20, overflow:'hidden', boxShadow:'0 12px 48px rgba(45,96,21,0.2)', maxWidth:700, width:'100%' }}>
         <img src={garden.image} alt={garden.title} style={{ width:'100%', display:'block' }} />
       </div>
 
-      {/* CTA */}
       <div style={{ marginTop:36, textAlign:'center' }}>
         <p style={{ color:'#7a9a6a', fontSize:'0.88rem', marginBottom:16 }}>Want to create your own garden?</p>
         <button onClick={() => navigate('/digital-gifting')} style={{ padding:'12px 32px', borderRadius:50, background:'linear-gradient(135deg,#2d6015,#4a8a2a)', color:'white', border:'none', cursor:'pointer', fontSize:'0.95rem', fontFamily:"'Walter Turncoat',cursive", boxShadow:'0 6px 20px rgba(45,96,21,0.3)', letterSpacing:'0.04em' }}>

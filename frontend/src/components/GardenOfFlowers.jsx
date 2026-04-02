@@ -218,8 +218,10 @@ export default function GardenOfFlowers() {
   const [gardenTitle, setGardenTitle] = useState('');
   const [shareUrl, setShareUrl] = useState('');
   const [copied, setCopied] = useState(false);
+  const [sharing, setSharing] = useState(false);
 
-  const handleShare = () => {
+  const handleShare = async () => {
+    setSharing(true);
     const cv = gardenRef.current;
     const dpr = Math.max(window.devicePixelRatio || 1, 2);
     const tmp = document.createElement('canvas');
@@ -229,11 +231,24 @@ export default function GardenOfFlowers() {
     ctx.scale(dpr, dpr);
     if (islandImgRef.current) ctx.drawImage(islandImgRef.current, 0, 0, GW, GH);
     ctx.drawImage(cv, 0, 0, GW, GH);
-    const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
     const title = gardenTitle.trim() || 'My Garden of Flowers';
-    localStorage.setItem('garden_' + id, JSON.stringify({ title, image: tmp.toDataURL('image/png'), flowerCount: planted.length }));
-    const url = window.location.origin + '/shared-garden/' + id;
-    setShareUrl(url);
+    const image = tmp.toDataURL('image/png');
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/gardens/share`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, image, flowerCount: planted.length }),
+      });
+      const data = await res.json();
+      if (!data.id) throw new Error('No id returned');
+      const url = `${window.location.origin}/shared-garden/${data.id}`;
+      setShareUrl(url);
+    } catch (err) {
+      console.error(err);
+      alert('Failed to generate share link. Please try again.');
+    } finally {
+      setSharing(false);
+    }
   };
 
   const copyLink = async () => {
@@ -673,8 +688,8 @@ export default function GardenOfFlowers() {
             )}
 
             {!shareUrl && (
-              <button onClick={handleShare} style={{ width:'100%', padding:'12px', borderRadius:12, background:'linear-gradient(135deg,#2d6015,#4a8a2a)', color:'white', border:'none', cursor:'pointer', fontSize:'0.9rem', fontFamily:"'Walter Turncoat',cursive", fontWeight:600, letterSpacing:'0.04em' }}>
-                🌸 Generate Link
+              <button onClick={handleShare} disabled={sharing} style={{ width:'100%', padding:'12px', borderRadius:12, background: sharing ? '#888' : 'linear-gradient(135deg,#2d6015,#4a8a2a)', color:'white', border:'none', cursor: sharing ? 'not-allowed' : 'pointer', fontSize:'0.9rem', fontFamily:"'Walter Turncoat',cursive", fontWeight:600, letterSpacing:'0.04em' }}>
+                {sharing ? '🌸 Saving...' : '🌸 Generate Link'}
               </button>
             )}
           </div>
