@@ -4,6 +4,7 @@ import FallingPetals from '../components/FallingPetals';
 
 const GardenOfFlowers = lazy(() => import('../components/GardenOfFlowers'));
 const PolaroidBooth   = lazy(() => import('../components/PolaroidBooth'));
+const MagazinePage    = lazy(() => import('../components/MagazinePage'));
 
 function LoadingSpinner() {
   return (
@@ -164,6 +165,7 @@ export default function DigitalGiftingPage() {
 
       {activeMenu === 'garden'   && <Suspense fallback={<LoadingSpinner />}><GardenOfFlowers /></Suspense>}
       {activeMenu === 'polaroid' && <Suspense fallback={<LoadingSpinner />}><PolaroidBooth /></Suspense>}
+      {activeMenu === 'magazine' && <Suspense fallback={<LoadingSpinner />}><MagazinePage /></Suspense>}
 
       {/* How it works */}
       <section className="py-16 px-4 bg-gradient-to-br from-[#fff8f0] to-[#f3eaff]">
