@@ -956,12 +956,15 @@ function EditorPage({ layout, onBack }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ type: 'polaroid', title: caption || 'My Polaroid', state }),
       });
+      if (!res.ok) throw new Error(`Server error: ${res.status}`);
       const data = await res.json();
-      if (!data.id) throw new Error('No id');
+      if (!data.id) throw new Error('No id returned');
       setShareUrl(`${window.location.origin}/shared-polaroid/${data.id}`);
       setShowShareModal(true);
-    } catch { showToast('Failed to generate link. Try again.'); }
-    finally { setSharing(false); }
+    } catch (err) {
+      console.error('Share error:', err);
+      showToast(`Failed: ${err.message}`);
+    } finally { setSharing(false); }
   };
 
   const copyShareLink = async () => {
