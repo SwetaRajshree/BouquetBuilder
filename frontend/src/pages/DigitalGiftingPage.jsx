@@ -78,10 +78,11 @@ export default function DigitalGiftingPage() {
         navigate('/postcard');
         break;
       case 'garden':
-        // Garden component will be shown below
+      case 'polaroid':
+      case 'magazine':
+      case 'cassette':
         break;
       default:
-        // Handle other menu items
         break;
     }
   };
