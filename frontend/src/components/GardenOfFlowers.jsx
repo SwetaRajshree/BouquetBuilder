@@ -213,6 +213,31 @@ export default function GardenOfFlowers() {
     return tmp;
   }
 
+  /* share state */
+  const [showShare, setShowShare] = useState(false);
+  const [gardenTitle, setGardenTitle] = useState('');
+  const [shareUrl, setShareUrl] = useState('');
+  const [copied, setCopied] = useState(false);
+
+  const handleShare = () => {
+    const cv = gardenRef.current;
+    const tmp = document.createElement('canvas'); tmp.width = GW; tmp.height = GH;
+    const ctx = tmp.getContext('2d');
+    if (islandImgRef.current) ctx.drawImage(islandImgRef.current, 0, 0, GW, GH);
+    ctx.drawImage(cv, 0, 0);
+    const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    const title = gardenTitle.trim() || 'My Garden of Flowers';
+    localStorage.setItem('garden_' + id, JSON.stringify({ title, image: tmp.toDataURL('image/jpeg', 0.7), flowerCount: planted.length }));
+    const url = window.location.origin + '/shared-garden/' + id;
+    setShareUrl(url);
+  };
+
+  const copyLink = async () => {
+    try { await navigator.clipboard.writeText(shareUrl); }
+    catch { const t = document.createElement('textarea'); t.value = shareUrl; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t); }
+    setCopied(true); setTimeout(() => setCopied(false), 2000);
+  };
+
   /* Plant button */
   const handlePlant = () => {
     if (!marked) return;
@@ -567,10 +592,87 @@ export default function GardenOfFlowers() {
             >
               🖼️ See flower gallery
             </button>
+
+            <button
+              onClick={() => { if (planted.length > 0) { handleShare(); setShowShare(true); } }}
+              disabled={planted.length === 0}
+              style={{
+                alignSelf: 'flex-start',
+                display: 'inline-flex', alignItems: 'center', gap: 7,
+                padding: '8px 20px',
+                background: planted.length > 0 ? 'linear-gradient(135deg,#9b59b6,#8e44ad)' : 'transparent',
+                border: `1.5px solid ${planted.length > 0 ? '#9b59b6' : '#bbb'}`,
+                borderRadius: 50, cursor: planted.length > 0 ? 'pointer' : 'not-allowed',
+                color: planted.length > 0 ? 'white' : '#bbb', fontSize: '0.82rem',
+                fontFamily: "'Walter Turncoat', cursive",
+                transition: 'all 0.18s',
+                boxShadow: planted.length > 0 ? '0 4px 14px rgba(155,89,182,0.35)' : 'none',
+              }}
+              onMouseEnter={e => { if(planted.length>0){ e.currentTarget.style.transform='translateY(-1px)'; e.currentTarget.style.boxShadow='0 6px 20px rgba(155,89,182,0.5)'; }}}
+              onMouseLeave={e => { e.currentTarget.style.transform='translateY(0)'; e.currentTarget.style.boxShadow=planted.length>0?'0 4px 14px rgba(155,89,182,0.35)':'none'; }}
+            >
+              🔗 Share Garden
+            </button>
           </div>
 
         </div>
       </div>
+
+      {/* Share Modal */}
+      {showShare && (
+        <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.55)', zIndex:1000, display:'flex', alignItems:'center', justifyContent:'center', padding:20 }}
+          onClick={() => setShowShare(false)}>
+          <div style={{ background:'#fffdf7', borderRadius:20, padding:32, maxWidth:440, width:'100%', boxShadow:'0 20px 60px rgba(0,0,0,0.25)', position:'relative' }}
+            onClick={e => e.stopPropagation()}>
+            <button onClick={() => setShowShare(false)} style={{ position:'absolute', top:14, right:16, background:'none', border:'none', fontSize:'1.4rem', cursor:'pointer', color:'#888' }}>×</button>
+            <h2 style={{ fontFamily:"'Walter Turncoat',cursive", color:'#2d5a1e', fontSize:'1.5rem', marginBottom:6, textAlign:'center' }}>🌸 Share Your Garden</h2>
+            <p style={{ textAlign:'center', color:'#888', fontSize:'0.82rem', marginBottom:20 }}>Give your garden a name — it'll appear as the title when someone opens your link!</p>
+
+            <label style={{ fontSize:'0.82rem', color:'#2d5a1e', fontWeight:600, display:'block', marginBottom:6 }}>Garden Title</label>
+            <input
+              type="text"
+              placeholder="e.g. Ann's Garden of Flowers"
+              value={gardenTitle}
+              onChange={e => setGardenTitle(e.target.value)}
+              onKeyDown={e => { if(e.key==='Enter') handleShare(); }}
+              style={{ width:'100%', padding:'10px 14px', borderRadius:10, border:'2px solid #c8e6c8', fontSize:'0.9rem', fontFamily:"'Walter Turncoat',cursive", outline:'none', marginBottom:16, boxSizing:'border-box' }}
+              onFocus={e => e.target.style.borderColor='#2d6015'}
+              onBlur={e => e.target.style.borderColor='#c8e6c8'}
+              autoFocus
+            />
+
+            {shareUrl && (
+              <>
+                <label style={{ fontSize:'0.82rem', color:'#2d5a1e', fontWeight:600, display:'block', marginBottom:6 }}>Shareable Link</label>
+                <div style={{ display:'flex', gap:8, marginBottom:20 }}>
+                  <input readOnly value={shareUrl} style={{ flex:1, padding:'10px 12px', borderRadius:10, border:'1.5px solid #ddd', fontSize:'0.78rem', background:'#f8f8f8', color:'#555', outline:'none' }} />
+                  <button onClick={copyLink} style={{ padding:'10px 16px', borderRadius:10, background: copied ? '#2d6015' : '#9b59b6', color:'white', border:'none', cursor:'pointer', fontSize:'0.82rem', fontWeight:600, transition:'background 0.2s', whiteSpace:'nowrap' }}>
+                    {copied ? '✓ Copied!' : 'Copy'}
+                  </button>
+                </div>
+                <div style={{ display:'flex', gap:10, justifyContent:'center' }}>
+                  {[['📱','WhatsApp',`https://wa.me/?text=${encodeURIComponent((gardenTitle||'My Garden of Flowers')+' 🌸 '+shareUrl)}`],
+                    ['🐦','Twitter',`https://twitter.com/intent/tweet?text=${encodeURIComponent((gardenTitle||'My Garden of Flowers')+' 🌸')}&url=${encodeURIComponent(shareUrl)}`],
+                    ['✉️','Email',`mailto:?subject=${encodeURIComponent(gardenTitle||'My Garden of Flowers')}&body=${encodeURIComponent('Check out my garden! '+shareUrl)}`]
+                  ].map(([icon, label, href]) => (
+                    <a key={label} href={href} target="_blank" rel="noreferrer" style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:4, padding:'10px 14px', borderRadius:12, background:'#f0f5ec', border:'1.5px solid #c8e6c8', textDecoration:'none', color:'#2d5a1e', fontSize:'0.75rem', fontWeight:600, transition:'all 0.15s' }}
+                      onMouseEnter={e => e.currentTarget.style.background='#daf0d0'}
+                      onMouseLeave={e => e.currentTarget.style.background='#f0f5ec'}>
+                      <span style={{ fontSize:'1.3rem' }}>{icon}</span>{label}
+                    </a>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {!shareUrl && (
+              <button onClick={handleShare} style={{ width:'100%', padding:'12px', borderRadius:12, background:'linear-gradient(135deg,#2d6015,#4a8a2a)', color:'white', border:'none', cursor:'pointer', fontSize:'0.9rem', fontFamily:"'Walter Turncoat',cursive", fontWeight:600, letterSpacing:'0.04em' }}>
+                🌸 Generate Link
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Walter+Turncoat&display=swap');
