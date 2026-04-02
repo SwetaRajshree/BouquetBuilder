@@ -169,20 +169,20 @@ const STICKERS = {
    PALETTE — cute warm pastel
 ───────────────────────────────────────────── */
 const P = {
-  bg:      "#FDF6F0",       // warm cream
-  bgAlt:   "#FFF0F5",       // blush section
+  bg:      "#FEFCE8",       // butter yellow
+  bgAlt:   "#FEF9C3",       // soft lemon
   surface: "rgba(255,255,255,0.72)",
-  surfaceB:"rgba(255,240,248,0.85)",
-  border:  "rgba(255,160,190,0.25)",
-  borderHover: "rgba(255,130,170,0.55)",
-  accent:  "#F4739A",       // rose pink
+  surfaceB:"rgba(254,252,232,0.85)",
+  border:  "rgba(202,183,80,0.25)",
+  borderHover: "rgba(180,160,40,0.55)",
+  accent:  "#CA8A04",       // golden yellow
   accent2: "#FFAB76",       // peach
   accent3: "#A78BFA",       // lavender
   gold:    "#E8A87C",
-  text:    "#3D2B2B",
-  textMid: "#7A5C5C",
-  textSoft:"rgba(61,43,43,0.45)",
-  nav:     "rgba(253,246,240,0.88)",
+  text:    "#2D2A1A",
+  textMid: "#6B5E2A",
+  textSoft:"rgba(45,42,26,0.45)",
+  nav:     "rgba(254,252,232,0.88)",
 };
 
 /* ─────────────────────────────────────────────
@@ -452,10 +452,10 @@ function CuteBackground() {
   return (
     <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", pointerEvents: "none", zIndex: 0, overflow: "hidden" }}>
       {/* Soft cream base */}
-      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(160deg, #FDF6F0 0%, #FFF0F8 45%, #F5F0FF 100%)" }} />
+      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(160deg, #FEFCE8 0%, #FEF9C3 45%, #FFF8E1 100%)" }} />
 
       {/* Soft radial glows */}
-      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 65% 55% at 20% 35%, rgba(244,115,154,0.08) 0%, transparent 70%), radial-gradient(ellipse 50% 50% at 80% 70%, rgba(167,139,250,0.07) 0%, transparent 60%), radial-gradient(ellipse 40% 40% at 55% 10%, rgba(255,171,118,0.06) 0%, transparent 60%)" }} />
+      <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse 65% 55% at 20% 35%, rgba(202,138,4,0.08) 0%, transparent 70%), radial-gradient(ellipse 50% 50% at 80% 70%, rgba(167,139,250,0.07) 0%, transparent 60%), radial-gradient(ellipse 40% 40% at 55% 10%, rgba(255,171,118,0.06) 0%, transparent 60%)" }} />
 
       {/* Big aperture rings — soft */}
       <div style={{ position: "absolute", top: -60, left: -60, animation: "apertureSpin 22s linear infinite" }}>
