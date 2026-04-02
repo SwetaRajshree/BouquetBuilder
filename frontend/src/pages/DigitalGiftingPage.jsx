@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import FallingPetals from '../components/FallingPetals';
 import GardenOfFlowers from '../components/GardenOfFlowers';
+import PolaroidBooth  from '../components/PolaroidBooth';
 
 const MENU_OPTIONS = [
   { id: 'digitalbouquet', label: 'Digital Bouquet', icon: '💐' },
@@ -151,10 +152,8 @@ export default function DigitalGiftingPage() {
         </section>
       )}
 
-      {/* Garden of Flowers Component */}
-      {activeMenu === 'garden' && (
-        <GardenOfFlowers />
-      )}
+      {activeMenu === 'garden' && <GardenOfFlowers />}
+      {activeMenu === 'polaroid' && <PolaroidBooth />}
 
       {/* How it works */}
       <section className="py-16 px-4 bg-gradient-to-br from-[#fff8f0] to-[#f3eaff]">
