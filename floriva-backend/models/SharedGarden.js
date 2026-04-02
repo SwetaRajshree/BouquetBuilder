@@ -2,10 +2,13 @@ const mongoose = require('mongoose');
 
 const SharedGardenSchema = new mongoose.Schema({
   _id:         { type: String },
-  title:       { type: String, default: 'My Garden of Flowers' },
-  image:       { type: String, required: true }, // base64 PNG
+  type:        { type: String, default: 'garden' }, // 'garden' or 'polaroid'
+  title:       { type: String, default: 'My Creation' },
+  image:       { type: String, default: '' },
   flowerCount: { type: Number, default: 0 },
-  createdAt:   { type: Date, default: Date.now, expires: 60 * 60 * 24 * 30 }, // 30 days
+  // polaroid state
+  state:       { type: Object, default: null },
+  createdAt:   { type: Date, default: Date.now, expires: 60 * 60 * 24 * 30 },
 });
 
 module.exports = mongoose.model('SharedGarden', SharedGardenSchema);

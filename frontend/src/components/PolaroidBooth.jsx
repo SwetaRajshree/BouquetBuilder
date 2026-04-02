@@ -800,20 +800,17 @@ function EditorPage({ layout, onBack }) {
   };
 
   const handleShare = async () => {
-    const node = polaroidRef.current;
-    if (!node) return;
     setSharing(true);
     try {
-      const canvas = await html2canvas(node, { useCORS: true, backgroundColor: null, scale: 2 });
-      const image = canvas.toDataURL('image/png');
+      const state = { layout, images, filter, frame, scene, caption, showDate, tilted, stickers: stickers.map(s => ({ emoji: s.emoji, x: s.x, y: s.y })) };
       const res = await fetch(`${import.meta.env.VITE_API_URL}/api/gardens/share`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: caption || 'My Polaroid', image, flowerCount: 0 }),
+        body: JSON.stringify({ type: 'polaroid', title: caption || 'My Polaroid', state }),
       });
       const data = await res.json();
       if (!data.id) throw new Error('No id');
-      setShareUrl(`${window.location.origin}/shared-garden/${data.id}`);
+      setShareUrl(`${window.location.origin}/shared-polaroid/${data.id}`);
       setShowShareModal(true);
     } catch (err) {
       showToast('Failed to generate link. Try again.');

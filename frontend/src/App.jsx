@@ -31,6 +31,7 @@ import PostcardPage      from './pages/PostcardPage';
 import PlantShop         from './pages/PlantShop';
 import DigitalGiftingPage from './pages/DigitalGiftingPage';
 import SharedGardenPage  from './pages/SharedGardenPage';
+import SharedPolaroidPage from './pages/SharedPolaroidPage';
 
 // Scroll to top on route change
 function ScrollToTop() {
@@ -79,6 +80,7 @@ export default function App() {
           <Route path="/plants"             element={<PlantShop />}    />
           <Route path="/digital-gifting"     element={<DigitalGiftingPage />} />
           <Route path="/shared-garden/:id"   element={<SharedGardenPage />} />
+          <Route path="/shared-polaroid/:id"  element={<SharedPolaroidPage />} />
           <Route path="/digital-bouquet"   element={<Navigate to="/bouquet-builder" replace />} />
           {/* Fallback */}
           <Route path="*"             element={<HomePage />}         />
