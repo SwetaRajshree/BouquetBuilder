@@ -221,13 +221,17 @@ export default function GardenOfFlowers() {
 
   const handleShare = () => {
     const cv = gardenRef.current;
-    const tmp = document.createElement('canvas'); tmp.width = GW; tmp.height = GH;
+    const dpr = Math.max(window.devicePixelRatio || 1, 2);
+    const tmp = document.createElement('canvas');
+    tmp.width = GW * dpr;
+    tmp.height = GH * dpr;
     const ctx = tmp.getContext('2d');
+    ctx.scale(dpr, dpr);
     if (islandImgRef.current) ctx.drawImage(islandImgRef.current, 0, 0, GW, GH);
-    ctx.drawImage(cv, 0, 0);
+    ctx.drawImage(cv, 0, 0, GW, GH);
     const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
     const title = gardenTitle.trim() || 'My Garden of Flowers';
-    localStorage.setItem('garden_' + id, JSON.stringify({ title, image: tmp.toDataURL('image/jpeg', 0.7), flowerCount: planted.length }));
+    localStorage.setItem('garden_' + id, JSON.stringify({ title, image: tmp.toDataURL('image/png'), flowerCount: planted.length }));
     const url = window.location.origin + '/shared-garden/' + id;
     setShareUrl(url);
   };
@@ -571,11 +575,14 @@ export default function GardenOfFlowers() {
 
             <button onClick={() => {
               const cv = gardenRef.current;
-              const tmp = document.createElement("canvas"); tmp.width=GW; tmp.height=GH;
-              const ctx = tmp.getContext("2d");
+              const dpr = Math.max(window.devicePixelRatio || 1, 2);
+              const tmp = document.createElement('canvas');
+              tmp.width = GW * dpr; tmp.height = GH * dpr;
+              const ctx = tmp.getContext('2d');
+              ctx.scale(dpr, dpr);
               if (islandImgRef.current) ctx.drawImage(islandImgRef.current, 0, 0, GW, GH);
-              ctx.drawImage(cv, 0, 0);
-              const a = document.createElement("a"); a.download="my-garden.png"; a.href=tmp.toDataURL(); a.click();
+              ctx.drawImage(cv, 0, 0, GW, GH);
+              const a = document.createElement('a'); a.download='my-garden.png'; a.href=tmp.toDataURL('image/png'); a.click();
             }} style={{
               alignSelf: "flex-start",
               display: "inline-flex", alignItems: "center", gap: 7,
