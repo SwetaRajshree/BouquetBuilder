@@ -948,6 +948,8 @@ function EditorPage({ layout, onBack }) {
   };
 
   const handleShare = async () => {
+    const node = polaroidRef.current;
+    if (!node) return;
     setSharing(true);
     try {
       const state = { layout, images, filter, frame, scene, caption, showDate, tilted, stickers: stickers.map(s => ({ emoji: s.emoji, x: s.x, y: s.y })) };
