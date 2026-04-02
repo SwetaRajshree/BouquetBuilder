@@ -652,6 +652,16 @@ function CameraModal({ onCapture, onClose }) {
     onCapture(preview);
   };
 
+  const retake = () => {
+    setPreview(null);
+    navigator.mediaDevices?.getUserMedia({ video: { facingMode: "user" }, audio: false })
+      .then(stream => {
+        streamRef.current = stream;
+        if (videoRef.current) { videoRef.current.srcObject = stream; videoRef.current.play(); setReady(true); }
+      })
+      .catch(() => alert("Camera access denied or not available."));
+  };
+
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(253,246,240,0.92)", backdropFilter: "blur(10px)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center" }}>
       <div style={{ background: "white", borderRadius: 28, overflow: "hidden", width: "min(92vw,480px)", boxShadow: "0 30px 80px rgba(244,115,154,0.22), 0 0 0 1.5px rgba(244,115,154,0.18)" }}>
@@ -717,7 +727,7 @@ function CameraModal({ onCapture, onClose }) {
           </div>
         ) : (
           <div style={{ display: "flex", gap: 10, padding: "16px 20px", background: "rgba(255,240,248,0.3)" }}>
-            <button onClick={() => setPreview(null)} style={{ flex: 1, background: "rgba(244,115,154,0.06)", border: `1px solid ${P.border}`, color: P.accent, borderRadius: 14, padding: "12px 0", cursor: "pointer", fontSize: 14, fontFamily: "'DM Sans', sans-serif" }}>↺ Retake</button>
+            <button onClick={retake} style={{ flex: 1, background: "rgba(244,115,154,0.06)", border: `1px solid ${P.border}`, color: P.accent, borderRadius: 14, padding: "12px 0", cursor: "pointer", fontSize: 14, fontFamily: "'DM Sans', sans-serif" }}>↺ Retake</button>
             <button onClick={confirmPhoto} style={{ flex: 2, background: "linear-gradient(135deg,#F4739A,#FFAB76)", border: "none", color: "white", borderRadius: 14, padding: "12px 0", cursor: "pointer", fontSize: 14, fontFamily: "'DM Sans', sans-serif", fontWeight: 600 }}>✓ Use this photo</button>
           </div>
         )}
@@ -937,6 +947,8 @@ function EditorPage({ layout, onBack }) {
   const handleDownload = async () => {
     const node = polaroidRef.current;
     if (!node) return;
+    const btn = node.querySelector('button[title="Rotate"]');
+    if (btn) btn.style.display = 'none';
     try {
       const canvas = await html2canvas(node, { useCORS: true, backgroundColor: null, scale: 2 });
       const a = document.createElement('a');
@@ -945,6 +957,7 @@ function EditorPage({ layout, onBack }) {
       a.click();
       showToast('📷 Polaroid downloaded!');
     } catch { showToast('Download failed. Try again.'); }
+    finally { if (btn) btn.style.display = ''; }
   };
 
   const handleShare = async () => {
