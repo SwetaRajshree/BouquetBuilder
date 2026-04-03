@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // GSAP LOADER — loads from CDN once, calls back when ready
@@ -579,7 +578,6 @@ const OccasionCircle = ({ bg, text, label, onClick }) => {
 // MAIN APP
 // ─────────────────────────────────────────────────────────────────────────────
 export default function PostcardStudio() {
-  const navigate = useNavigate();
   const [activeTab,    setActiveTab]    = useState("greeting");
   const [activeFilter, setActiveFilter] = useState("all");
   const [modal,        setModal]        = useState(null);
@@ -691,10 +689,6 @@ export default function PostcardStudio() {
           {["Card Invitations","Greeting Cards","Make Your Own","For Professionals"].map(l=>(
             <span key={l} style={{ fontSize:12, fontWeight:500, letterSpacing:"0.06em", textTransform:"uppercase", color:"#6b6560", cursor:"pointer", transition:"color 0.2s" }} onMouseEnter={e=>e.target.style.color="#1a1714"} onMouseLeave={e=>e.target.style.color="#6b6560"}>{l}</span>
           ))}
-        </div>
-        <div style={{ display:"flex", gap:10 }}>
-          <button onClick={()=>navigate('/auth')} style={{ padding:"8px 20px", border:"1.5px solid #1a1714", background:"transparent", fontFamily:"inherit", fontSize:11, fontWeight:600, letterSpacing:"0.06em", textTransform:"uppercase", cursor:"pointer", color:"#1a1714", transition:"all 0.2s" }} onMouseEnter={e=>{e.currentTarget.style.background="#1a1714";e.currentTarget.style.color="white";}} onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color="#1a1714";}}>Log in</button>
-          <button onClick={()=>navigate('/auth')} style={{ padding:"8px 20px", background:"#1a1714", border:"1.5px solid #1a1714", color:"white", fontFamily:"inherit", fontSize:11, fontWeight:600, letterSpacing:"0.06em", textTransform:"uppercase", cursor:"pointer", transition:"all 0.2s" }} onMouseEnter={e=>e.currentTarget.style.background="#c98b8b"} onMouseLeave={e=>e.currentTarget.style.background="#1a1714"}>Sign up</button>
         </div>
       </nav>
 
