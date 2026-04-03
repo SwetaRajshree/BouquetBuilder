@@ -1,1390 +1,1056 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
 
-/* ═══════════════════════════════════════════
-   GLOBAL STYLES
-═══════════════════════════════════════════ */
-const GlobalStyles = () => (
-  <style>{`
-    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&display=swap');
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Outfit',sans-serif;background:#0a0a0f;color:#fff;overflow-x:hidden}
-    ::-webkit-scrollbar{width:6px}
-    ::-webkit-scrollbar-track{background:#111}
-    ::-webkit-scrollbar-thumb{background:#f59e0b;border-radius:3px}
-    @keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
-    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-    @keyframes slideRight{from{transform:translateX(-100%)}to{transform:translateX(0)}}
-    @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
-    @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-    @keyframes shimmer{0%{background-position:-200% center}100%{background-position:200% center}}
-    @keyframes float{0%,100%{transform:translateY(0px)}50%{transform:translateY(-12px)}}
-    @keyframes glow{0%,100%{box-shadow:0 0 20px rgba(245,158,11,0.3)}50%{box-shadow:0 0 40px rgba(245,158,11,0.6)}}
-    @keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
-    @keyframes countUp{from{opacity:0;transform:scale(0.5)}to{opacity:1;transform:scale(1)}}
-    @keyframes ripple{0%{transform:scale(0);opacity:1}100%{transform:scale(4);opacity:0}}
-    @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-    @keyframes heartbeat{0%,100%{transform:scale(1)}14%{transform:scale(1.3)}28%{transform:scale(1)}42%{transform:scale(1.3)}70%{transform:scale(1)}}
-    @keyframes toastIn{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
-    @keyframes modalIn{from{opacity:0;transform:scale(0.92) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
-    .btn-glow:hover{animation:glow 1.5s infinite}
-    .float-anim{animation:float 3s ease-in-out infinite}
-    .fade-up{animation:fadeUp 0.6s ease both}
-    .product-card:hover .card-img img{transform:scale(1.08)}
-    .nav-link{position:relative}
-    .nav-link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:2px;background:#f59e0b;transition:width .3s}
-    .nav-link:hover::after{width:100%}
-    input:focus,select:focus,textarea:focus{outline:none;border-color:#f59e0b!important;box-shadow:0 0 0 3px rgba(245,158,11,0.15)!important}
-    .img-fade{transition:opacity 0.4s ease}
-  `}</style>
-);
+const styles = `
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap');
 
-/* ═══════════════════════════════════════════
-   PRODUCT IMAGE MAPPING (Unsplash)
-═══════════════════════════════════════════ */
-const PRODUCT_IMAGES = {
-  1: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80",
-  2: "https://images.unsplash.com/photo-1513519245088-0e12902e35ca?w=400&q=80",
-  3: "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=400&q=80",
-  4: "https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=400&q=80",
-  5: "https://images.unsplash.com/photo-1578301978018-3005759f48f7?w=400&q=80",
-  6: "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&q=80",
-  7: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=400&q=80",
-  8: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=400&q=80",
-  9: "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=400&q=80",
-  10: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80",
-  11: "https://images.unsplash.com/photo-1630948629488-d9e91d8fa96d?w=400&q=80",
-  12: "https://images.unsplash.com/photo-1594040226829-7f251ab46d80?w=400&q=80",
-};
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-const CATEGORY_IMAGES = {
-  "Home & Living": "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=300&q=80",
-  "Fashion": "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=300&q=80",
-  "Jewellery": "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=300&q=80",
-  "Gifts": "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=300&q=80",
-  "Stationery": "https://images.unsplash.com/photo-1518051870910-a46e30d9db16?w=300&q=80",
-  "Paintings": "https://images.unsplash.com/photo-1578926288207-a90a103d44f6?w=300&q=80",
-};
+  :root {
+    --bg:          #fdf8f5;
+    --bg2:         #faf3ee;
+    --rose:        #c9748a;
+    --rose-deep:   #a85570;
+    --rose-light:  #f5e6eb;
+    --rose-mid:    #e8c4cd;
+    --mauve:       #9b7b8a;
+    --mauve-light: #ede3e8;
+    --cream:       #f7efe8;
+    --amber:       #c8915a;
+    --amber-light: #f5e6d8;
+    --text:        #3a2530;
+    --text-muted:  #8a6e78;
+    --white:       #ffffff;
+    --border:      rgba(180,130,145,0.18);
+    --font-display:'Cormorant Garamond', Georgia, serif;
+    --font-body:   'DM Sans', sans-serif;
+    --radius:      16px;
+    --shadow:      0 8px 32px rgba(150,90,110,0.10);
+    --shadow-hover:0 20px 48px rgba(150,90,110,0.18);
+    --transition:  all 0.35s cubic-bezier(0.4,0,0.2,1);
+  }
 
-/* ═══════════════════════════════════════════
-   DATA
-═══════════════════════════════════════════ */
-const HERO_SLIDES = [
-  {bg:"linear-gradient(135deg,#1a0533 0%,#3b0764 50%,#1e1b4b 100%)",accent:"#a855f7",title:"Handcrafted With",highlight:"Love & Soul",sub:"Discover 10,000+ authentic artisan products from across India",btn:"Explore Collections",emoji:"🎨"},
-  {bg:"linear-gradient(135deg,#1c0a00 0%,#7c2d12 50%,#1e1b4b 100%)",accent:"#f59e0b",title:"From Indian",highlight:"Artisan Hands",sub:"Support local craftsmen. Every purchase tells a story.",btn:"Shop Handmade",emoji:"🪡"},
-  {bg:"linear-gradient(135deg,#022c22 0%,#14532d 50%,#0f172a 100%)",accent:"#10b981",title:"Sell Your",highlight:"Masterpiece",sub:"Join 500+ sellers and turn your passion into income",btn:"Start Selling",emoji:"💎"},
-];
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
 
-const CATS = [
-  {name:"Home & Living",icon:"🏡",color:"#f59e0b",count:2840},
-  {name:"Fashion",icon:"👗",color:"#ec4899",count:1920},
-  {name:"Jewellery",icon:"💎",color:"#8b5cf6",count:3100},
-  {name:"Gifts",icon:"🎁",color:"#ef4444",count:1450},
-  {name:"Stationery",icon:"✏️",color:"#10b981",count:890},
-  {name:"Paintings",icon:"🎨",color:"#3b82f6",count:2200},
-];
+  /* ── NAVBAR ── */
+  .navbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 999;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 48px; height: 70px;
+    background: rgba(253,248,245,0.88);
+    backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--border);
+    transition: var(--transition);
+  }
+  .navbar.scrolled {
+    height: 58px;
+    background: rgba(253,248,245,0.97);
+    box-shadow: 0 4px 20px rgba(150,90,110,0.08);
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-family: var(--font-display); font-size: 1.5rem; font-weight: 600;
+    color: var(--rose-deep); text-decoration: none; white-space: nowrap;
+    letter-spacing: 0.01em;
+  }
+  .nav-links { display: flex; align-items: center; gap: 2px; list-style: none; }
+  .nav-links a {
+    padding: 6px 14px; border-radius: 8px;
+    font-size: 0.875rem; font-weight: 500;
+    color: var(--text); text-decoration: none; transition: var(--transition);
+  }
+  .nav-links a:hover { background: var(--rose-light); color: var(--rose-deep); }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .nav-search {
+    display: flex; align-items: center;
+    background: var(--rose-light); border-radius: 10px;
+    padding: 6px 14px; gap: 8px;
+    border: 1.5px solid transparent; transition: var(--transition);
+  }
+  .nav-search:focus-within { border-color: var(--rose); background: white; }
+  .nav-search input {
+    border: none; background: transparent; outline: none;
+    font-family: var(--font-body); font-size: 0.85rem; color: var(--text); width: 150px;
+  }
+  .nav-search input::placeholder { color: var(--text-muted); }
+  .btn-icon {
+    width: 40px; height: 40px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1.5px solid var(--rose-mid); background: transparent;
+    cursor: pointer; color: var(--rose); transition: var(--transition); position: relative;
+  }
+  .btn-icon:hover { background: var(--rose-light); border-color: var(--rose); }
+  .cart-badge {
+    position: absolute; top: -5px; right: -5px;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--rose); color: white;
+    font-size: 0.65rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .btn-artist {
+    padding: 8px 20px; border-radius: 10px;
+    background: var(--rose); color: white; border: none;
+    font-family: var(--font-body); font-size: 0.875rem; font-weight: 600;
+    cursor: pointer; transition: var(--transition);
+    animation: softPulse 2.8s ease-in-out infinite;
+  }
+  .btn-artist:hover { background: var(--rose-deep); transform: translateY(-1px); animation: none; }
+  @keyframes softPulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(201,116,138,0.35); }
+    50%      { box-shadow: 0 0 0 8px rgba(201,116,138,0); }
+  }
 
-const PRODUCTS = [
-  {id:1,name:"Darjeeling 3D Clay Fridge Magnet",shop:"Sahera's Handmade",price:249,original:415,cat:"Home & Living",rating:4.8,reviews:124,customizable:false,desc:"Handcrafted 3D clay magnet depicting the scenic Darjeeling landscape with the famous toy train. Each piece is individually handmade and painted with food-safe, non-toxic colours.",material:"Air-dry clay, acrylic paint",dimensions:"6×4 cm",deliveryDays:5},
-  {id:2,name:"Pichwai Inspired Wall Décor Plate",shop:"Sahera's Handmade",price:449,original:748,cat:"Home & Living",rating:4.9,reviews:89,customizable:false,desc:"Stunning hand-painted Pichwai inspired decorative wall plate, perfect for home décor. The intricate lotus and cow motifs are a hallmark of this ancient Indian art form.",material:"Ceramic, natural pigments",dimensions:"30 cm diameter",deliveryDays:7},
-  {id:3,name:"Miniature Food Fridge Magnet Set",shop:"Sahera's Handmade",price:199,original:332,cat:"Gifts",rating:4.7,reviews:203,customizable:false,desc:"Adorable miniature food fridge magnets, a perfect gifting option for food lovers. Set includes 6 pieces — pizza, sushi, burger, taco, ramen & dumpling.",material:"Polymer clay",dimensions:"3-4 cm each",deliveryDays:4},
-  {id:4,name:"Bengali Bridal Gachkouto",shop:"Jayati's Art Gallery",price:899,original:1499,cat:"Jewellery",rating:5.0,reviews:56,customizable:true,desc:"Traditional Bengali bridal accessory, beautifully handcrafted with intricate details. Made with gold-finish base metal, glass beads, and hand-sewn cloth.",material:"Metal alloy, glass beads, fabric",dimensions:"One size fits all",deliveryDays:10},
-  {id:5,name:"Madhubani Painting — Krishna",shop:"Art by Priya",price:1299,original:2165,cat:"Paintings",rating:4.9,reviews:78,customizable:false,desc:"Authentic Madhubani painting depicting Lord Krishna in vibrant traditional colors. Created using natural pigments and bamboo pens on handmade paper.",material:"Natural pigments on handmade paper",dimensions:"30×40 cm",deliveryDays:6},
-  {id:6,name:"Macramé Dream Catcher",shop:"Craft Studio",price:349,original:582,cat:"Home & Living",rating:4.6,reviews:167,customizable:true,desc:"Handwoven macramé dream catcher with colourful feathers and beads. Perfect for bohemian and Scandi-inspired interiors.",material:"Cotton rope, feathers, beads",dimensions:"35 cm diameter",deliveryDays:5},
-  {id:7,name:"Terracotta Jewellery Set",shop:"Mitti Arts",price:599,original:998,cat:"Jewellery",rating:4.8,reviews:91,customizable:false,desc:"Beautiful terracotta jewellery set with traditional motifs painted by hand. Includes earrings, necklace and a bracelet.",material:"Terracotta clay, acrylic",dimensions:"Earrings 4cm, Necklace 40cm",deliveryDays:5},
-  {id:8,name:"Hand-Painted Tote Bag",shop:"Canvas Creations",price:479,original:799,cat:"Fashion",rating:4.7,reviews:145,customizable:true,desc:"Cotton tote bag with a unique hand-painted Van Gogh-inspired design. 100% cotton, machine washable.",material:"100% cotton canvas, fabric paint",dimensions:"38×42 cm",deliveryDays:4},
-  {id:9,name:"Resin Coaster Set of 4",shop:"Resin Art Hub",price:649,original:1082,cat:"Home & Living",rating:4.9,reviews:212,customizable:true,desc:"Gorgeous resin art coasters with embedded dried flowers and gold flakes. Heat-resistant up to 120°C.",material:"Epoxy resin, dried flowers, gold foil",dimensions:"10 cm diameter each",deliveryDays:7},
-  {id:10,name:"Personalized Name Neon Light",shop:"Glow Crafts",price:1499,original:2499,cat:"Gifts",rating:4.8,reviews:67,customizable:true,desc:"Custom LED neon sign for your name or message. Perfect for home décor, cafes, and events.",material:"LED strip, acrylic backing",dimensions:"As per name length",deliveryDays:14},
-  {id:11,name:"Handmade Clay Earrings",shop:"Claymate Studio",price:299,original:499,cat:"Jewellery",rating:4.6,reviews:188,customizable:false,desc:"Lightweight clay earrings with hand-painted floral designs. Hypoallergenic steel hooks.",material:"Air-dry clay, steel hooks",dimensions:"3×2 cm each",deliveryDays:4},
-  {id:12,name:"Madhubani Saree",shop:"Weave Story",price:2499,original:4165,cat:"Fashion",rating:5.0,reviews:43,customizable:false,desc:"Pure cotton saree with authentic Madhubani hand-painted art by skilled artisans from Mithila.",material:"Pure cotton, natural pigments",dimensions:"5.5 metres",deliveryDays:8},
-];
+  /* ── HERO ── */
+  .hero {
+    margin-top: 70px; position: relative;
+    height: calc(100vh - 70px); min-height: 600px; overflow: hidden;
+  }
+  .hero-slide {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; padding: 0 88px;
+    opacity: 0; transition: opacity 1s ease; overflow: hidden;
+  }
+  .hero-slide.active { opacity: 1; }
+  .hero-bg {
+    position: absolute; inset: -5%;
+    transition: transform 9s ease; transform: scale(1.08);
+  }
+  .hero-slide.active .hero-bg { transform: scale(1); }
+  .hero-bg-1 { background: linear-gradient(135deg, #6b2d45 0%, #a85570 40%, #c9748a 70%, #e8b4c0 100%); }
+  .hero-bg-2 { background: linear-gradient(135deg, #7a5060 0%, #c8915a 50%, #e8c4a0 100%); }
+  .hero-bg-3 { background: linear-gradient(135deg, #4a2535 0%, #9b7b8a 50%, #c9748a 100%); }
+  .hero-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, rgba(30,10,20,0.55) 0%, rgba(30,10,20,0.1) 65%, transparent 100%);
+  }
+  .hero-petals { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .petal {
+    position: absolute; width: 16px; height: 22px;
+    border-radius: 60% 40% 60% 40% / 50% 50% 50% 50%;
+    background: rgba(255,255,255,0.16);
+    animation: floatPetal linear infinite;
+  }
+  @keyframes floatPetal {
+    0%   { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+    8%   { opacity: 1; }
+    92%  { opacity: 0.5; }
+    100% { transform: translateY(-20vh) rotate(540deg); opacity: 0; }
+  }
+  .hero-content { position: relative; z-index: 2; max-width: 620px; color: white; }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 100px; padding: 6px 18px;
+    font-size: 0.78rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
+    color: rgba(255,255,255,0.9); margin-bottom: 22px;
+    opacity: 0; transform: translateY(16px);
+    transition: opacity 0.6s ease 0.1s, transform 0.6s ease 0.1s;
+  }
+  .hero-slide.active .hero-tag { opacity: 1; transform: translateY(0); }
+  .hero-title {
+    font-family: var(--font-display); font-size: clamp(2.4rem, 5vw, 4.2rem);
+    font-weight: 600; line-height: 1.12; margin-bottom: 20px; letter-spacing: -0.01em;
+    opacity: 0; transform: translateX(-36px);
+    transition: opacity 0.7s ease 0.25s, transform 0.7s ease 0.25s;
+  }
+  .hero-slide.active .hero-title { opacity: 1; transform: translateX(0); }
+  .hero-sub {
+    font-size: 1.05rem; color: rgba(255,255,255,0.82); margin-bottom: 36px; line-height: 1.7;
+    opacity: 0; transform: translateX(-24px);
+    transition: opacity 0.7s ease 0.4s, transform 0.7s ease 0.4s;
+  }
+  .hero-slide.active .hero-sub { opacity: 1; transform: translateX(0); }
+  .hero-btns {
+    display: flex; gap: 14px; flex-wrap: wrap;
+    opacity: 0; transform: translateY(16px);
+    transition: opacity 0.6s ease 0.55s, transform 0.6s ease 0.55s;
+  }
+  .hero-slide.active .hero-btns { opacity: 1; transform: translateY(0); }
+  .btn-primary {
+    padding: 13px 28px; border-radius: 12px;
+    background: var(--rose); color: white; border: none;
+    font-family: var(--font-body); font-size: 0.95rem; font-weight: 600;
+    cursor: pointer; transition: var(--transition);
+  }
+  .btn-primary:hover { background: var(--rose-deep); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(168,85,112,0.4); }
+  .btn-outline-white {
+    padding: 13px 28px; border-radius: 12px;
+    background: transparent; color: white;
+    border: 1.5px solid rgba(255,255,255,0.55);
+    font-family: var(--font-body); font-size: 0.95rem; font-weight: 500;
+    cursor: pointer; transition: var(--transition);
+  }
+  .btn-outline-white:hover { background: rgba(255,255,255,0.12); border-color: white; }
+  .hero-dots {
+    position: absolute; bottom: 36px; left: 88px; z-index: 3; display: flex; gap: 10px;
+  }
+  .hero-dot {
+    width: 8px; height: 8px; border-radius: 4px;
+    background: rgba(255,255,255,0.4); border: none; cursor: pointer; transition: var(--transition);
+  }
+  .hero-dot.active { width: 28px; background: white; }
 
-const SUB_CATS = {
-  "Home & Living":["Woodcrafts","Vases","Decorative Bottles","Candles","Metal Products","Kitchen Accessories","Wall Decor","Dream Catcher","Table Mat & Cover","Furniture","Coaster","Tealight","Table Decor","Plants & Planters","Lampshade","Wall Clock","Nameplates","Pooja Articles"],
-  "Fashion":["T-shirt","Kurta","Ladies Side Bag","Ladies Purse","Saree","Dupattas For Women","Shoes","Tops"],
-  "Jewellery":["Clay Jewellery","Jute Jewellery","Fabric Jewellery","Handmade Earrings","Bamboo Jewellery","Hand Accessories","Hair Accessories","Crochet Jewellery","Jewellery Box","Embroidery Jewellery","Resin Jewellery","Junk Jewellery"],
-  "Gifts":["Photo Frames","Coffee Mug","Wall Clock","Keyring","Cushion","Wrist Watch","Calendar","Lamps","Explosion Boxes","Neon Light","Gift Combo","Gift for Him"],
-  "Paintings":["Sketch","Glass Paintings","Acrylic","Oil Painting","Water Colour","Digital Painting","Mixed Media","M-seal Work","Madhubani Painting"],
-  "Stationery":["Notebooks","Gift Cards","Bookmarks","Pens & Pencils","Art Kits","Planners"],
-};
+  /* ── SECTIONS ── */
+  .section { padding: 96px 60px; }
+  .section-inner { max-width: 1280px; margin: 0 auto; }
+  .section-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 48px; }
+  .section-label {
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--rose); margin-bottom: 8px;
+  }
+  .section-title {
+    font-family: var(--font-display); font-size: clamp(1.9rem, 3vw, 2.9rem);
+    font-weight: 600; color: var(--text); line-height: 1.15; letter-spacing: -0.01em;
+  }
+  .btn-explore {
+    padding: 10px 22px; border-radius: 10px;
+    border: 1.5px solid var(--rose-mid); color: var(--rose-deep); background: transparent;
+    font-family: var(--font-body); font-size: 0.875rem; font-weight: 600;
+    cursor: pointer; transition: var(--transition); white-space: nowrap;
+  }
+  .btn-explore:hover { background: var(--rose-light); border-color: var(--rose); }
 
-const MOCK_ORDERS = [
-  {id:"CB-2024-001",date:"15 Mar 2024",items:[{...PRODUCTS[0],qty:2},{...PRODUCTS[4],qty:1}],status:"Delivered",total:1797},
-  {id:"CB-2024-002",date:"28 Feb 2024",items:[{...PRODUCTS[7],qty:1}],status:"Shipped",total:479},
-  {id:"CB-2024-003",date:"10 Feb 2024",items:[{...PRODUCTS[11],qty:1},{...PRODUCTS[3],qty:1}],status:"Delivered",total:3398},
-];
+  /* fade-up */
+  .fade-up { opacity: 0; transform: translateY(36px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .fade-up.visible { opacity: 1; transform: translateY(0); }
+  .fade-up-delay-1 { transition-delay: 0.1s; }
+  .fade-up-delay-2 { transition-delay: 0.2s; }
+  .fade-up-delay-3 { transition-delay: 0.3s; }
 
-/* ═══════════════════════════════════════════
-   PRODUCT IMAGE COMPONENT
-═══════════════════════════════════════════ */
-function ProductImage({id, size="100%", height=200, radius=0, fallbackEmoji="🎨"}){
-  const [loaded, setLoaded] = useState(false);
-  const [err, setErr] = useState(false);
-  const src = PRODUCT_IMAGES[id];
-  if(!src || err) return (
-    <div style={{width:size,height,display:"flex",alignItems:"center",justifyContent:"center",
-      background:"linear-gradient(135deg,#1a1025,#1e1b4b)",borderRadius:radius,fontSize:Math.min(height*0.4,72)}}>
-      {fallbackEmoji}
-    </div>
-  );
+  /* ── OUR STORY SECTION ── */
+  .join-section {
+    padding: 96px 60px;
+    background: linear-gradient(135deg, #fdf0f3 0%, #faeaef 100%);
+    position: relative; overflow: hidden;
+  }
+  .join-section::before {
+    content: ''; position: absolute; top: -80px; right: -80px;
+    width: 320px; height: 320px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(201,116,138,0.08), transparent);
+    pointer-events: none;
+  }
+  .story-heading {
+    font-family: var(--font-display); font-size: clamp(1.9rem, 3vw, 2.9rem);
+    font-weight: 600; color: var(--text); line-height: 1.15;
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+  }
+  .join-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 28px; margin: 52px 0 44px;
+  }
+  .join-card {
+    background: white; border-radius: var(--radius);
+    padding: 36px 26px; text-align: center;
+    border: 1px solid var(--rose-mid);
+    box-shadow: 0 4px 18px rgba(150,90,110,0.07); transition: var(--transition);
+  }
+  .join-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-hover); }
+  .join-icon {
+    width: 68px; height: 68px; border-radius: 20px;
+    background: var(--rose-light); display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 20px; font-size: 1.9rem; transition: var(--transition);
+  }
+  .join-card:hover .join-icon { background: var(--rose); transform: scale(1.08) rotate(-4deg); }
+  .join-card h3 { font-family: var(--font-display); font-size: 1.2rem; color: var(--text); margin-bottom: 10px; }
+  .join-card p { font-size: 0.875rem; color: var(--text-muted); line-height: 1.65; }
+  .join-cta { text-align: center; }
+  .btn-rose-large {
+    padding: 15px 38px; border-radius: 14px;
+    background: var(--rose); color: white; border: none;
+    font-family: var(--font-body); font-size: 1rem; font-weight: 600;
+    cursor: pointer; transition: var(--transition);
+    display: inline-flex; align-items: center; gap: 10px;
+  }
+  .btn-rose-large:hover { background: var(--rose-deep); transform: translateY(-2px); box-shadow: 0 10px 28px rgba(168,85,112,0.32); }
+
+  /* ── PRODUCT CARDS ── */
+  .carousel-wrap { position: relative; }
+  .carousel-track {
+    display: flex; gap: 22px; overflow-x: auto;
+    scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
+    padding-bottom: 12px; cursor: grab;
+  }
+  .carousel-track:active { cursor: grabbing; }
+  .carousel-track::-webkit-scrollbar { height: 4px; }
+  .carousel-track::-webkit-scrollbar-track { background: var(--rose-light); border-radius: 2px; }
+  .carousel-track::-webkit-scrollbar-thumb { background: var(--rose-mid); border-radius: 2px; }
+  .carousel-arrow {
+    position: absolute; top: 50%; transform: translateY(-60%);
+    width: 42px; height: 42px; border-radius: 50%;
+    background: white; border: 1.5px solid var(--rose-mid);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; z-index: 2; color: var(--rose);
+    box-shadow: var(--shadow); transition: var(--transition);
+  }
+  .carousel-arrow:hover { background: var(--rose); color: white; border-color: var(--rose); }
+  .carousel-arrow.left { left: -20px; }
+  .carousel-arrow.right { right: -20px; }
+  .product-card {
+    min-width: 252px; max-width: 252px;
+    background: white; border-radius: var(--radius);
+    overflow: hidden; scroll-snap-align: start;
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 14px rgba(150,90,110,0.07);
+    transition: var(--transition); position: relative; flex-shrink: 0;
+  }
+  .product-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-hover); }
+  .product-img-wrap {
+    height: 215px; position: relative; overflow: hidden;
+    background: linear-gradient(135deg, var(--rose-light), var(--mauve-light));
+  }
+  .product-emoji {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 3.8rem;
+  }
+  .add-to-cart {
+    position: absolute; bottom: -50px; left: 0; right: 0;
+    background: var(--rose); color: white;
+    padding: 12px; text-align: center; font-weight: 600; font-size: 0.85rem;
+    cursor: pointer; transition: var(--transition); border: none;
+    font-family: var(--font-body); letter-spacing: 0.02em;
+  }
+  .product-card:hover .add-to-cart { bottom: 0; }
+  .product-info { padding: 15px 17px 18px; }
+  .product-region {
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--rose); margin-bottom: 4px;
+  }
+  .product-name { font-family: var(--font-display); font-size: 1.05rem; color: var(--text); margin-bottom: 5px; }
+  .product-artist { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px; }
+  .product-price { font-size: 1.05rem; font-weight: 700; color: var(--rose-deep); }
+  .product-price span { font-size: 0.78rem; font-weight: 400; color: var(--text-muted); text-decoration: line-through; margin-left: 6px; }
+
+  .pill-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+  .pill {
+    padding: 6px 16px; border-radius: 100px;
+    border: 1.5px solid var(--rose-mid); font-size: 0.82rem; font-weight: 500;
+    color: var(--rose-deep); background: transparent; cursor: pointer; transition: var(--transition);
+  }
+  .pill:hover, .pill.active { background: var(--rose); color: white; border-color: var(--rose); }
+
+  .paintings-section { background: var(--cream); }
+
+  /* ── SPOTRI ── */
+  .spotri-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .spotri-card {
+    border-radius: var(--radius); overflow: hidden; position: relative;
+    background: white; border: 1px solid var(--border);
+    box-shadow: 0 4px 14px rgba(150,90,110,0.07);
+    cursor: pointer; transition: var(--transition);
+  }
+  .spotri-card:nth-child(2) { grid-row: span 2; }
+  .spotri-card:hover { transform: scale(1.02); box-shadow: var(--shadow-hover); }
+  .spotri-img {
+    display: flex; align-items: center; justify-content: center;
+    font-size: 3.2rem; min-height: 175px;
+    background: linear-gradient(135deg, var(--rose-light), var(--mauve-light));
+    transition: transform 0.4s ease;
+  }
+  .spotri-card:nth-child(2) .spotri-img { min-height: 378px; }
+  .spotri-card:hover .spotri-img { transform: scale(1.05); }
+  .spotri-badge {
+    position: absolute; top: 14px; left: 14px;
+    background: var(--rose); color: white;
+    padding: 4px 12px; border-radius: 100px;
+    font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    opacity: 0; transform: translateY(-8px); transition: var(--transition);
+  }
+  .spotri-card:hover .spotri-badge { opacity: 1; transform: translateY(0); }
+  .spotri-info { padding: 14px 16px; }
+  .spotri-info h4 { font-family: var(--font-display); font-size: 1rem; margin-bottom: 3px; }
+  .spotri-info p { font-size: 0.78rem; color: var(--text-muted); }
+  .section-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    color: var(--rose-deep); font-weight: 600; font-size: 0.9rem;
+    text-decoration: none; margin-top: 28px; transition: var(--transition);
+  }
+  .section-link:hover { gap: 14px; color: var(--rose); }
+
+  /* ── WOODEN ── */
+  .wood-section { background: #fdf6f0; }
+  .wood-split { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: start; }
+  .wood-featured {
+    border-radius: 22px; overflow: hidden; position: relative;
+    background: linear-gradient(135deg, #7a5a3a, #b08060);
+    height: 490px; display: flex; align-items: center; justify-content: center;
+    box-shadow: var(--shadow);
+  }
+  .wood-featured-emoji { font-size: 7.5rem; }
+  .wood-featured-badge {
+    position: absolute; bottom: 22px; left: 22px; right: 22px;
+    background: rgba(255,255,255,0.95); backdrop-filter: blur(8px);
+    border-radius: 14px; padding: 18px 20px;
+  }
+  .wood-featured-badge h3 { font-family: var(--font-display); font-size: 1.2rem; color: var(--text); }
+  .wood-featured-badge p { font-size: 0.82rem; color: var(--text-muted); margin: 4px 0 8px; }
+  .wood-featured-badge .price { font-size: 1.25rem; font-weight: 700; color: #8b5e3c; }
+  .wood-list { display: flex; flex-direction: column; gap: 14px; }
+  .wood-item {
+    display: flex; gap: 16px; align-items: center;
+    background: white; border-radius: 14px; padding: 15px;
+    border: 1px solid rgba(180,130,80,0.15);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.04); transition: var(--transition); cursor: pointer;
+  }
+  .wood-item:hover { transform: translateX(6px); box-shadow: 0 6px 22px rgba(139,94,60,0.14); }
+  .wood-thumb {
+    width: 68px; height: 68px; border-radius: 12px; flex-shrink: 0;
+    background: linear-gradient(135deg, #e8d0b8, #c49a6c);
+    display: flex; align-items: center; justify-content: center; font-size: 2rem;
+  }
+  .wood-item-info h4 { font-family: var(--font-display); font-size: 0.95rem; margin-bottom: 3px; }
+  .wood-item-info p { font-size: 0.77rem; color: var(--text-muted); margin-bottom: 5px; }
+  .wood-price { font-size: 0.95rem; font-weight: 700; color: #8b5e3c; }
+  .wood-divider {
+    height: 2px; border-radius: 2px; margin: 60px 0;
+    background: linear-gradient(90deg, transparent, rgba(201,116,138,0.3), rgba(200,145,90,0.3), transparent);
+  }
+
+  /* ── STONE ── */
+  .stone-section { padding: 96px 60px; background: #2e2028; position: relative; overflow: hidden; }
+  .stone-section::before {
+    content: ''; position: absolute; inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(255,255,255,0.012) 3px, rgba(255,255,255,0.012) 6px);
+  }
+  .stone-section .section-label { color: var(--rose-mid); }
+  .stone-section .section-title { color: white; }
+  .stone-section .btn-explore { border-color: rgba(255,255,255,0.22); color: rgba(255,255,255,0.75); }
+  .stone-section .btn-explore:hover { background: rgba(255,255,255,0.08); color: white; }
+  .stone-gallery { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .stone-card {
+    border-radius: 14px; overflow: hidden; cursor: pointer;
+    background: #3e303a; border: 1px solid rgba(201,116,138,0.12);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.35); transition: var(--transition);
+  }
+  .stone-card:hover { transform: translateY(-6px); box-shadow: 0 14px 36px rgba(0,0,0,0.55); }
+  .stone-img {
+    height: 195px; display: flex; align-items: center; justify-content: center;
+    font-size: 3.4rem; background: linear-gradient(135deg, #4a3540, #2e2028); transition: transform 0.4s ease;
+  }
+  .stone-card:hover .stone-img { transform: scale(1.05); }
+  .stone-info { padding: 15px; color: rgba(255,255,255,0.88); }
+  .stone-info h4 { font-family: var(--font-display); font-size: 0.95rem; margin-bottom: 3px; }
+  .stone-info p { font-size: 0.76rem; color: rgba(255,255,255,0.45); margin-bottom: 7px; }
+  .stone-price { font-size: 0.95rem; font-weight: 700; color: var(--rose-mid); }
+
+  .lightbox {
+    position: fixed; inset: 0; z-index: 9999;
+    background: rgba(20,10,16,0.92); display: flex; align-items: center; justify-content: center;
+    backdrop-filter: blur(10px);
+  }
+  .lightbox-content {
+    background: #3e303a; border-radius: 20px; padding: 44px;
+    max-width: 460px; width: 90%; text-align: center; color: white; position: relative;
+    border: 1px solid rgba(201,116,138,0.2);
+  }
+  .lightbox-emoji { font-size: 5.5rem; margin-bottom: 18px; display: block; }
+  .lightbox-close {
+    position: absolute; top: 16px; right: 16px;
+    background: rgba(255,255,255,0.08); border: none; color: rgba(255,255,255,0.7);
+    width: 34px; height: 34px; border-radius: 50%;
+    cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center;
+    transition: var(--transition);
+  }
+  .lightbox-close:hover { background: rgba(255,255,255,0.18); color: white; }
+
+  /* ── ARTISTS ── */
+  .artists-track { display: flex; gap: 22px; overflow-x: auto; padding-bottom: 12px; }
+  .artists-track::-webkit-scrollbar { height: 4px; }
+  .artists-track::-webkit-scrollbar-thumb { background: var(--rose-mid); border-radius: 2px; }
+  .artist-card {
+    min-width: 210px; background: white; border-radius: var(--radius);
+    padding: 28px 20px; text-align: center; flex-shrink: 0;
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 14px rgba(150,90,110,0.07); transition: var(--transition);
+  }
+  .artist-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-hover); }
+  .artist-avatar {
+    width: 78px; height: 78px; border-radius: 50%;
+    margin: 0 auto 15px;
+    display: flex; align-items: center; justify-content: center; font-size: 2.4rem;
+    border: 3px solid var(--rose-light);
+    background: linear-gradient(135deg, var(--rose-light), var(--mauve-light));
+  }
+  .artist-name { font-family: var(--font-display); font-size: 1.05rem; color: var(--text); margin-bottom: 3px; }
+  .artist-craft { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 3px; }
+  .artist-location { font-size: 0.73rem; color: var(--rose); font-weight: 600; margin-bottom: 12px; }
+  .artist-stars { color: var(--amber); font-size: 0.82rem; margin-bottom: 15px; }
+  .btn-visit {
+    padding: 7px 18px; border-radius: 10px;
+    border: 1.5px solid var(--rose-mid); color: var(--rose-deep);
+    background: transparent; font-family: var(--font-body);
+    font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: var(--transition);
+  }
+  .btn-visit:hover { background: var(--rose); color: white; border-color: var(--rose); }
+
+  /* ── TESTIMONIALS ── */
+  .testimonials-section { padding: 80px 60px; background: var(--rose-light); }
+  .testimonials-inner { max-width: 860px; margin: 0 auto; }
+  .testimonial-wrap { position: relative; min-height: 155px; }
+  .testimonial {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    opacity: 0; transition: opacity 0.6s ease; padding: 0 32px;
+  }
+  .testimonial.active { opacity: 1; position: relative; }
+  .testimonial-quote {
+    font-family: var(--font-display); font-size: 1.2rem; font-style: italic;
+    color: var(--text); line-height: 1.75; margin-bottom: 18px;
+  }
+  .testimonial-author { font-weight: 600; color: var(--rose-deep); font-size: 0.88rem; }
+  .testimonial-role { font-size: 0.78rem; color: var(--text-muted); }
+  .trust-bar {
+    display: flex; justify-content: center; flex-wrap: wrap; gap: 30px;
+    margin-top: 55px; padding-top: 44px; border-top: 1px solid var(--rose-mid);
+  }
+  .trust-item { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; font-weight: 600; color: var(--rose-deep); }
+  .trust-icon {
+    width: 42px; height: 42px; border-radius: 12px;
+    background: white; display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; box-shadow: 0 2px 10px rgba(150,90,110,0.1);
+  }
+
+  /* ── FOOTER ── */
+  .footer { background: #2a1820; color: rgba(255,255,255,0.7); padding: 68px 60px 34px; }
+  .footer-grid {
+    display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 44px;
+    max-width: 1280px; margin: 0 auto;
+    padding-bottom: 44px; border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .footer-brand { font-family: var(--font-display); color: white; font-size: 1.4rem; margin-bottom: 12px; }
+  .footer-desc { font-size: 0.86rem; line-height: 1.75; color: rgba(255,255,255,0.45); margin-bottom: 20px; }
+  .footer-socials { display: flex; gap: 10px; margin-bottom: 22px; }
+  .social-btn {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: rgba(255,255,255,0.07); border: none; color: rgba(255,255,255,0.65);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 0.95rem; transition: var(--transition);
+  }
+  .social-btn:hover { background: var(--rose); color: white; }
+  .footer-col h4 { color: white; font-weight: 600; font-size: 0.88rem; margin-bottom: 17px; }
+  .footer-col ul { list-style: none; }
+  .footer-col ul li { margin-bottom: 10px; }
+  .footer-col ul li a { color: rgba(255,255,255,0.45); text-decoration: none; font-size: 0.83rem; transition: var(--transition); }
+  .footer-col ul li a:hover { color: rgba(255,255,255,0.9); }
+  .newsletter { display: flex; gap: 8px; margin-top: 10px; }
+  .newsletter input {
+    flex: 1; padding: 10px 14px; border-radius: 10px;
+    background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1);
+    color: white; font-family: var(--font-body); font-size: 0.83rem; outline: none; transition: var(--transition);
+  }
+  .newsletter input::placeholder { color: rgba(255,255,255,0.3); }
+  .newsletter input:focus { border-color: var(--rose); }
+  .newsletter button {
+    padding: 10px 15px; border-radius: 10px;
+    background: var(--rose); color: white; border: none;
+    font-family: var(--font-body); font-weight: 600; font-size: 0.83rem;
+    cursor: pointer; transition: var(--transition);
+  }
+  .newsletter button:hover { background: var(--rose-deep); }
+  .footer-bottom {
+    max-width: 1280px; margin: 22px auto 0;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 0.78rem; color: rgba(255,255,255,0.25);
+  }
+
+  @media (max-width: 1024px) {
+    .nav-links { display: none; }
+    .join-grid { grid-template-columns: 1fr; }
+    .wood-split { grid-template-columns: 1fr; }
+    .stone-gallery { grid-template-columns: repeat(2, 1fr); }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .spotri-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 640px) {
+    .section, .join-section, .testimonials-section, .stone-section, .footer { padding-left: 22px; padding-right: 22px; }
+    .hero-slide { padding: 0 28px; }
+    .hero-dots { left: 28px; }
+    .navbar { padding: 0 20px; }
+    .nav-search { display: none; }
+    .stone-gallery, .footer-grid { grid-template-columns: 1fr; }
+    .spotri-grid { grid-template-columns: 1fr; }
+  }
+`;
+
+// ── Delicate flower SVG icon for "Our Story" ──
+function FlowerIcon({ size = 30 }) {
   return (
-    <div style={{width:size,height,overflow:"hidden",borderRadius:radius,position:"relative",background:"#1a1025"}}>
-      {!loaded && <div style={{position:"absolute",inset:0,background:"linear-gradient(90deg,#1a1025 25%,#2a1a35 50%,#1a1025 75%)",backgroundSize:"200% 100%",animation:"shimmer 1.5s infinite"}}/>}
-      <img src={src} alt="" onLoad={()=>setLoaded(true)} onError={()=>setErr(true)}
-        style={{width:"100%",height:"100%",objectFit:"cover",opacity:loaded?1:0,transition:"opacity 0.4s",display:"block"}}/>
-    </div>
+    <svg width={size} height={size} viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg"
+      style={{display:"inline-block", verticalAlign:"middle", flexShrink:0}}>
+      <ellipse cx="15" cy="8.5"  rx="3.2" ry="5.6" fill="#c9748a" opacity="0.75"/>
+      <ellipse cx="15" cy="8.5"  rx="3.2" ry="5.6" fill="#c9748a" opacity="0.75" transform="rotate(60 15 15)"/>
+      <ellipse cx="15" cy="8.5"  rx="3.2" ry="5.6" fill="#c9748a" opacity="0.75" transform="rotate(120 15 15)"/>
+      <ellipse cx="15" cy="8.5"  rx="3.2" ry="5.6" fill="#e8b4c0" opacity="0.6"  transform="rotate(180 15 15)"/>
+      <ellipse cx="15" cy="8.5"  rx="3.2" ry="5.6" fill="#e8b4c0" opacity="0.6"  transform="rotate(240 15 15)"/>
+      <ellipse cx="15" cy="8.5"  rx="3.2" ry="5.6" fill="#e8b4c0" opacity="0.6"  transform="rotate(300 15 15)"/>
+      <circle cx="15" cy="15" r="4.2" fill="#fce4ec"/>
+      <circle cx="15" cy="15" r="2.6" fill="#c9748a"/>
+      <path d="M15 19.5 Q16.5 23 15 27" stroke="#7bb870" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+      <path d="M15 23 Q12.5 21.5 12 20" stroke="#7bb870" strokeWidth="1.2" strokeLinecap="round" fill="none"/>
+    </svg>
   );
 }
 
-/* ═══════════════════════════════════════════
-   TOAST SYSTEM
-═══════════════════════════════════════════ */
-function Toast({toasts,remove}){
-  return(
-    <div style={{position:"fixed",bottom:24,right:24,zIndex:9999,display:"flex",flexDirection:"column",gap:10}}>
-      {toasts.map(t=>(
-        <div key={t.id} style={{
-          background:t.type==="success"?"#065f46":t.type==="error"?"#7f1d1d":"#1e1b4b",
-          border:`1px solid ${t.type==="success"?"#10b981":t.type==="error"?"#ef4444":"#f59e0b"}`,
-          color:"#fff",padding:"12px 20px",borderRadius:12,fontSize:14,fontWeight:600,
-          display:"flex",alignItems:"center",gap:10,minWidth:260,maxWidth:340,
-          animation:"toastIn 0.4s ease both",cursor:"pointer",
-          boxShadow:"0 8px 30px rgba(0,0,0,0.5)"
-        }} onClick={()=>remove(t.id)}>
-          <span style={{fontSize:18}}>{t.type==="success"?"✅":t.type==="error"?"❌":"ℹ️"}</span>
-          <span>{t.msg}</span>
-        </div>
-      ))}
-    </div>
-  );
+function useIntersection(ref, threshold = 0.15) {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = ref.current; if (!el) return;
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect(); } },
+      { threshold }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [ref, threshold]);
+  return visible;
 }
 
-function useToast(){
-  const [toasts,setToasts]=useState([]);
-  const add=useCallback((msg,type="success")=>{
-    const id=Date.now();
-    setToasts(p=>[...p,{id,msg,type}]);
-    setTimeout(()=>setToasts(p=>p.filter(t=>t.id!==id)),3000);
-  },[]);
-  const remove=useCallback(id=>setToasts(p=>p.filter(t=>t.id!==id)),[]);
-  return{toasts,add,remove};
-}
+const heroSlides = [
+  { tag:"🌍 Global Artisan Platform", title:"Art from Every Corner of the World", sub:"Discover handcrafted masterpieces made by skilled artisans across continents. Every piece tells a unique story.", bg:"hero-bg-1", btn1:"Explore Now", btn2:"View Collections" },
+  { tag:"❤️ Support Local Artisans", title:"Shop Handmade. Change Lives.", sub:"Every purchase directly supports independent artisans and their communities.", bg:"hero-bg-2", btn1:"Shop Now", btn2:"Meet the Artists" },
+  { tag:"🎨 Become a Seller", title:"Join as an Artist & Sell Globally", sub:"Turn your craft into a livelihood. Reach millions of buyers who appreciate authentic handmade art.", bg:"hero-bg-3", btn1:"Start Selling →", btn2:"Learn More" },
+];
+const handloomProducts = [
+  {id:1,emoji:"🥻",name:"Banarasi Silk Saree",artist:"Rekha Devi",region:"Varanasi, India",price:"₹12,500",original:"₹16,000"},
+  {id:2,emoji:"🧣",name:"Assam Muga Dupatta",artist:"Priya Bora",region:"Assam, India",price:"₹3,200",original:"₹4,500"},
+  {id:3,emoji:"🏮",name:"Chanderi Cotton Stole",artist:"Sunita Patel",region:"Madhya Pradesh",price:"₹1,800",original:"₹2,400"},
+  {id:4,emoji:"🛏️",name:"Handwoven Bed Linen",artist:"Fatima Begum",region:"Jaipur, India",price:"₹5,600",original:"₹7,000"},
+  {id:5,emoji:"🧺",name:"Ikat Weave Table Cloth",artist:"Lakshmi Rao",region:"Odisha, India",price:"₹2,100",original:"₹2,800"},
+  {id:6,emoji:"🪴",name:"Kashmiri Wool Carpet",artist:"Mohammad Ali",region:"Kashmir, India",price:"₹28,000",original:"₹35,000"},
+];
+const paintingProducts = [
+  {id:1,emoji:"🎨",name:"Madhubani Forest Scene",artist:"Kamla Singh",region:"Bihar, India",price:"₹8,500",original:"₹11,000"},
+  {id:2,emoji:"🖼️",name:"Warli Tribal Dance",artist:"Jyoti Hait",region:"Maharashtra",price:"₹4,200",original:"₹5,500"},
+  {id:3,emoji:"🌊",name:"Watercolour Coastline",artist:"Ana Silva",region:"Goa, India",price:"₹6,800",original:"₹9,000"},
+  {id:4,emoji:"🌸",name:"Floral Oil Painting",artist:"Preethi Nair",region:"Kerala, India",price:"₹15,000",original:"₹19,000"},
+  {id:5,emoji:"🦚",name:"Peacock Glass Painting",artist:"Anjali Mehta",region:"Gujarat, India",price:"₹3,500",original:"₹4,800"},
+  {id:6,emoji:"✏️",name:"Charcoal Portrait Sketch",artist:"Rahul Das",region:"Kolkata, India",price:"₹2,800",original:"₹3,800"},
+];
+const spotriProducts = [
+  {id:1,emoji:"🛋️",name:"Kashmiri Embroidered Cushion",category:"Cushions",desc:"Hand-stitched floral patterns"},
+  {id:2,emoji:"🎪",name:"Kantha Work Wall Hanging",category:"Wall Art",desc:"Traditional stitch art from Bengal"},
+  {id:3,emoji:"🧵",name:"Phulkari Dupatta",category:"Textiles",desc:"Punjab's floral embroidery heritage"},
+  {id:4,emoji:"🌺",name:"Suzani Embroidery Panel",category:"Decorative",desc:"Central Asian inspired motifs"},
+  {id:5,emoji:"🎀",name:"Zardozi Work Cushion",category:"Cushions",desc:"Metallic threadwork luxury"},
+  {id:6,emoji:"🦋",name:"Mirror Work Toran",category:"Wall Art",desc:"Rajasthani door hanging"},
+];
+const woodProducts = [
+  {id:1,emoji:"🦁",name:"Saharanpur Lion Figurine",price:"₹4,500",desc:"Hand-carved teak wood"},
+  {id:2,emoji:"🌿",name:"Floral Wall Panel",price:"₹12,000",desc:"Sheesham wood, intricate detail"},
+  {id:3,emoji:"🐘",name:"Channapatna Elephant Set",price:"₹2,800",desc:"Lacquerware toy art"},
+  {id:4,emoji:"👺",name:"Kerala Tribal Mask",price:"₹6,200",desc:"Traditional ritual art"},
+];
+const stoneProducts = [
+  {id:1,emoji:"🪨",name:"Sandstone Ganesha",price:"₹8,500",desc:"Rajasthani stone carving"},
+  {id:2,emoji:"💎",name:"Marble Inlay Box",price:"₹4,200",desc:"Agra pietra dura work"},
+  {id:3,emoji:"🗿",name:"Black Granite Idol",price:"₹18,000",desc:"South Indian temple style"},
+  {id:4,emoji:"🌊",name:"Pebble River Art",price:"₹1,800",desc:"Hand-painted natural stones"},
+];
+const artists = [
+  {name:"Rekha Devi",craft:"Handloom Weaving",location:"Varanasi, India",rating:4.9,emoji:"👩‍🎨",reviews:234},
+  {name:"Jyoti Hait",craft:"Warli Painting",location:"Maharashtra, India",rating:4.8,emoji:"🎨",reviews:189},
+  {name:"Mohammad Ali",craft:"Carpet Weaving",location:"Kashmir, India",rating:5.0,emoji:"🧶",reviews:412},
+  {name:"Ana Silva",craft:"Watercolour Art",location:"Goa, India",rating:4.7,emoji:"🖌️",reviews:156},
+  {name:"Sunita Patel",craft:"Textile Art",location:"MP, India",rating:4.9,emoji:"🌸",reviews:301},
+  {name:"Rahul Das",craft:"Sketching",location:"Kolkata, India",rating:4.8,emoji:"✏️",reviews:178},
+];
+const testimonials = [
+  {quote:"I ordered a Banarasi saree as a wedding gift and the quality was absolutely breathtaking. Felt like opening a treasure chest!",author:"Priya Sharma",role:"Verified Buyer, Mumbai"},
+  {quote:"As an artisan myself, finally a platform that gives us fair visibility. My sales tripled in just three months!",author:"Kamla Devi",role:"Artist, Bihar"},
+  {quote:"The stone carving I bought for my living room gets compliments every single day. Truly one-of-a-kind.",author:"Arjun Mehta",role:"Verified Buyer, Delhi"},
+];
 
-/* ═══════════════════════════════════════════
-   STAR RATING
-═══════════════════════════════════════════ */
-function Stars({rating,size=14,interactive=false,onRate}){
-  const [hovered,setHovered]=useState(0);
-  return(
-    <span style={{display:"inline-flex",gap:2}}>
-      {[1,2,3,4,5].map(i=>(
-        <span key={i}
-          style={{fontSize:size,color:i<=(interactive?hovered||rating:rating)?"#f59e0b":"#374151",cursor:interactive?"pointer":"default",transition:"color .15s"}}
-          onMouseEnter={()=>interactive&&setHovered(i)}
-          onMouseLeave={()=>interactive&&setHovered(0)}
-          onClick={()=>interactive&&onRate&&onRate(i)}>
-          {i<=(interactive?hovered||rating:Math.floor(rating))?"★":i-0.5<=rating?"⯨":"☆"}
-        </span>
-      ))}
-    </span>
-  );
-}
-
-/* ═══════════════════════════════════════════
-   ANIMATED COUNTER
-═══════════════════════════════════════════ */
-function Counter({end,suffix="",prefix=""}){
-  const [val,setVal]=useState(0);
-  const ref=useRef();
-  useEffect(()=>{
-    const obs=new IntersectionObserver(([e])=>{
-      if(e.isIntersecting){
-        let start=0;
-        const step=end/60;
-        const t=setInterval(()=>{
-          start=Math.min(start+step,end);
-          setVal(Math.floor(start));
-          if(start>=end)clearInterval(t);
-        },16);
-      }
-    },{threshold:.3});
-    if(ref.current)obs.observe(ref.current);
-    return()=>obs.disconnect();
-  },[end]);
-  return<span ref={ref}>{prefix}{val.toLocaleString()}{suffix}</span>;
-}
-
-/* ═══════════════════════════════════════════
-   HERO SLIDER
-═══════════════════════════════════════════ */
-function HeroSlider({setPage}){
-  const [cur,setCur]=useState(0);
-  const [transitioning,setTransitioning]=useState(false);
-  const timerRef=useRef();
-
-  const go=useCallback((n)=>{
-    if(transitioning)return;
-    setTransitioning(true);
-    setTimeout(()=>{setCur(n);setTransitioning(false);},400);
-  },[transitioning]);
-
-  useEffect(()=>{
-    timerRef.current=setInterval(()=>setCur(c=>(c+1)%HERO_SLIDES.length),5000);
-    return()=>clearInterval(timerRef.current);
-  },[]);
-
-  const s=HERO_SLIDES[cur];
-
-  return(
-    <div style={{position:"relative",height:"92vh",minHeight:560,overflow:"hidden",background:s.bg,transition:"background 0.8s ease"}}>
-      {[0,1,2,3,4].map(i=>(
-        <div key={i} style={{
-          position:"absolute",
-          width:[400,300,250,350,200][i],height:[400,300,250,350,200][i],
-          borderRadius:"50%",
-          background:`radial-gradient(circle, ${s.accent}22 0%, transparent 70%)`,
-          top:["-15%","60%","20%","-10%","70%"][i]+"%",
-          left:["-10%","65%","80%","45%","-8%"][i]+"%",
-          animation:`float ${[6,8,7,9,5][i]}s ease-in-out infinite`,
-          animationDelay:`${i*0.8}s`,pointerEvents:"none"
-        }}/>
-      ))}
-      <div style={{position:"absolute",inset:0,backgroundImage:`linear-gradient(rgba(255,255,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.03) 1px,transparent 1px)`,backgroundSize:"60px 60px",pointerEvents:"none"}}/>
-      <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",textAlign:"center",padding:"0 20px",opacity:transitioning?0:1,transform:transitioning?"translateY(20px)":"translateY(0)",transition:"all 0.4s ease"}}>
-        <div style={{display:"inline-flex",alignItems:"center",gap:8,background:"rgba(255,255,255,0.08)",backdropFilter:"blur(10px)",border:`1px solid ${s.accent}44`,padding:"8px 20px",borderRadius:40,fontSize:13,color:s.accent,fontWeight:600,marginBottom:28,animation:"fadeUp 0.6s ease both"}}>
-          <span style={{animation:"bounce 1s infinite"}}>{s.emoji}</span>ArtisanWorld — India's Artisan Marketplace
-        </div>
-        <h1 style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:"clamp(2.5rem,7vw,5.5rem)",lineHeight:1.1,marginBottom:16,animation:"fadeUp 0.6s 0.1s ease both",opacity:0,animationFillMode:"both"}}>
-          <span style={{color:"rgba(255,255,255,0.9)"}}>{s.title} </span>
-          <span style={{background:`linear-gradient(135deg,${s.accent},#fff)`,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text"}}>{s.highlight}</span>
-        </h1>
-        <p style={{fontSize:"clamp(1rem,2vw,1.25rem)",color:"rgba(255,255,255,0.65)",maxWidth:560,lineHeight:1.7,marginBottom:40,animation:"fadeUp 0.6s 0.2s ease both",opacity:0,animationFillMode:"both"}}>{s.sub}</p>
-        <div style={{display:"flex",gap:16,flexWrap:"wrap",justifyContent:"center",animation:"fadeUp 0.6s 0.3s ease both",opacity:0,animationFillMode:"both"}}>
-          <button onClick={()=>setPage("shop")} style={{padding:"16px 36px",borderRadius:50,border:"none",background:`linear-gradient(135deg,${s.accent},${s.accent}99)`,color:"#fff",fontWeight:700,fontSize:15,cursor:"pointer",fontFamily:"'Outfit',sans-serif",transition:"all .3s",boxShadow:`0 8px 30px ${s.accent}44`,letterSpacing:.3}}
-          onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-3px) scale(1.03)";}}
-          onMouseLeave={e=>{e.currentTarget.style.transform="translateY(0) scale(1)";}}>{s.btn} →</button>
-          <button onClick={()=>setPage("seller")} style={{padding:"16px 36px",borderRadius:50,border:"1.5px solid rgba(255,255,255,0.3)",background:"rgba(255,255,255,0.06)",backdropFilter:"blur(10px)",color:"rgba(255,255,255,0.9)",fontWeight:700,fontSize:15,cursor:"pointer",fontFamily:"'Outfit',sans-serif",transition:"all .3s"}}
-          onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.12)";e.currentTarget.style.transform="translateY(-3px)";}}
-          onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,0.06)";e.currentTarget.style.transform="translateY(0)";}}>Become a Seller</button>
-        </div>
-        <div style={{display:"flex",gap:40,marginTop:60,animation:"fadeUp 0.6s 0.4s ease both",opacity:0,animationFillMode:"both"}}>
-          {[["10K+","Products"],["500+","Artisans"],["50K+","Happy Buyers"]].map(([n,l])=>(
-            <div key={l} style={{textAlign:"center"}}>
-              <div style={{fontSize:"1.6rem",fontWeight:800,fontFamily:"'Syne',sans-serif",color:s.accent}}>{n}</div>
-              <div style={{fontSize:12,color:"rgba(255,255,255,0.5)",marginTop:2}}>{l}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-      {[["←",(cur-1+HERO_SLIDES.length)%HERO_SLIDES.length,"20px","auto"],["→",(cur+1)%HERO_SLIDES.length,"auto","20px"]].map(([arrow,idx,l,r])=>(
-        <button key={arrow} onClick={()=>go(idx)} style={{position:"absolute",top:"50%",left:l,right:r,transform:"translateY(-50%)",width:48,height:48,borderRadius:"50%",background:"rgba(255,255,255,0.1)",border:"1px solid rgba(255,255,255,0.2)",backdropFilter:"blur(10px)",color:"#fff",fontSize:18,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",transition:"all .2s"}}
-        onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.2)";e.currentTarget.style.transform="translateY(-50%) scale(1.1)";}}
-        onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,0.1)";e.currentTarget.style.transform="translateY(-50%) scale(1)";}}>{arrow}</button>
-      ))}
-      <div style={{position:"absolute",bottom:32,left:"50%",transform:"translateX(-50%)",display:"flex",gap:8}}>
-        {HERO_SLIDES.map((_,i)=>(
-          <button key={i} onClick={()=>go(i)} style={{width:i===cur?32:8,height:8,borderRadius:4,border:"none",background:i===cur?s.accent:"rgba(255,255,255,0.3)",cursor:"pointer",transition:"all .3s",padding:0}}/>
+function Navbar() {
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const fn = () => setScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", fn);
+    return () => window.removeEventListener("scroll", fn);
+  }, []);
+  return (
+    <nav className={`navbar${scrolled?" scrolled":""}`}>
+      <a href="#" className="nav-logo">
+        <FlowerIcon size={28}/>
+        ArtisanWorld
+      </a>
+      <ul className="nav-links">
+        {["Home","Handloom","Paintings","Spotri","Wooden Sculpting","Stone Art","More ▾"].map(l=>(
+          <li key={l}><a href="#">{l}</a></li>
         ))}
-      </div>
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════════
-   TRUST BAR
-═══════════════════════════════════════════ */
-function TrustBar(){
-  const items=[{icon:"🔐",label:"Secure Payments"},{icon:"✦",label:"Authentic Products"},{icon:"🚀",label:"Free & Fast Delivery"},{icon:"↩️",label:"Easy Returns"}];
-  return(
-    <div style={{background:"#111117",borderBottom:"1px solid #1e1e2e"}}>
-      <div style={{maxWidth:1280,margin:"0 auto",display:"grid",gridTemplateColumns:"repeat(4,1fr)"}}>
-        {items.map((item,i)=>(
-          <div key={i} style={{display:"flex",alignItems:"center",justifyContent:"center",gap:10,padding:"16px 20px",background:i===1?"linear-gradient(135deg,#f59e0b,#d97706)":"transparent",borderRight:i<3?"1px solid #1e1e2e":"none"}}>
-            <span style={{fontSize:18}}>{item.icon}</span>
-            <span style={{fontWeight:600,fontSize:13,color:i===1?"#1a0a00":"rgba(255,255,255,0.7)"}}>{item.label}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════════
-   PRODUCT CARD
-═══════════════════════════════════════════ */
-function ProductCard({product,onAddToCart,onToggleWish,wished,toast,onOpenDetail}){
-  const [adding,setAdding]=useState(false);
-  const disc=Math.round((1-product.price/product.original)*100);
-
-  const handleAdd=(e)=>{
-    e.stopPropagation();
-    setAdding(true);
-    onAddToCart(product);
-    toast(`"${product.name.slice(0,30)}..." added to cart!`,"success");
-    setTimeout(()=>setAdding(false),1200);
-  };
-
-  return(
-    <div className="product-card" onClick={()=>onOpenDetail&&onOpenDetail(product)} style={{background:"#111117",borderRadius:20,overflow:"hidden",border:"1px solid #1e1e2e",transition:"all .3s",cursor:"pointer",position:"relative"}}
-    onMouseEnter={e=>{e.currentTarget.style.borderColor="#f59e0b44";e.currentTarget.style.transform="translateY(-8px)";e.currentTarget.style.boxShadow="0 24px 60px rgba(0,0,0,0.5)";}}
-    onMouseLeave={e=>{e.currentTarget.style.borderColor="#1e1e2e";e.currentTarget.style.transform="translateY(0)";e.currentTarget.style.boxShadow="none";}}>
-      <div className="card-img" style={{height:200,position:"relative",overflow:"hidden"}}>
-        <ProductImage id={product.id} height={200}/>
-        <span style={{position:"absolute",top:12,left:12,background:"#ef4444",color:"#fff",fontSize:11,fontWeight:700,padding:"4px 10px",borderRadius:20}}>{disc}% OFF</span>
-        {product.customizable&&(<span style={{position:"absolute",top:12,right:44,background:"#7c3aed",color:"#fff",fontSize:10,fontWeight:700,padding:"4px 8px",borderRadius:6}}>✦ CUSTOM</span>)}
-        <button onClick={e=>{e.stopPropagation();onToggleWish(product.id);}} style={{position:"absolute",top:8,right:8,width:32,height:32,borderRadius:"50%",background:"rgba(0,0,0,0.5)",backdropFilter:"blur(10px)",border:"none",cursor:"pointer",fontSize:16,display:"flex",alignItems:"center",justifyContent:"center",animation:wished?"heartbeat 0.6s ease":"none",transition:"transform .2s"}}>
-          {wished?"❤️":"🤍"}
+      </ul>
+      <div className="nav-right">
+        <div className="nav-search">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input placeholder="Search artworks…"/>
+        </div>
+        <button className="btn-icon">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         </button>
-      </div>
-      <div style={{padding:"16px"}}>
-        <div style={{fontSize:11,color:"#f59e0b",fontWeight:600,marginBottom:4,letterSpacing:.5}}>{product.shop}</div>
-        <div style={{fontSize:14,fontWeight:600,color:"rgba(255,255,255,0.9)",marginBottom:8,lineHeight:1.4,minHeight:38}}>{product.name}</div>
-        <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:10}}>
-          <Stars rating={product.rating} size={12}/><span style={{fontSize:11,color:"rgba(255,255,255,0.4)"}}>({product.reviews})</span>
-        </div>
-        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
-          <span style={{fontWeight:800,fontSize:18,color:"#fff"}}>₹{product.price}</span>
-          <span style={{fontSize:12,color:"rgba(255,255,255,0.3)",textDecoration:"line-through"}}>₹{product.original}</span>
-          <span style={{fontSize:11,color:"#10b981",fontWeight:600}}>Save ₹{product.original-product.price}</span>
-        </div>
-        <button onClick={handleAdd} style={{width:"100%",padding:"11px",borderRadius:12,border:"none",background:adding?"linear-gradient(135deg,#10b981,#059669)":"linear-gradient(135deg,#f59e0b,#d97706)",color:"#fff",fontWeight:700,cursor:"pointer",fontSize:13,transition:"all .3s",fontFamily:"'Outfit',sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:6,transform:adding?"scale(0.97)":"scale(1)"}}>
-          {adding?"✓ Added!":"🛒 Add to Cart"}
+        <button className="btn-icon" style={{position:"relative"}}>
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <span className="cart-badge">3</span>
         </button>
-      </div>
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════════
-   PRODUCT DETAIL MODAL
-═══════════════════════════════════════════ */
-function ProductDetail({product,onClose,onAddToCart,onToggleWish,wished,toast}){
-  const [qty,setQty]=useState(1);
-  const [tab,setTab]=useState("desc");
-  const [userRating,setUserRating]=useState(0);
-  const [reviewText,setReviewText]=useState("");
-  const [reviews,setReviews]=useState([
-    {author:"Priya M.",rating:5,text:"Absolutely beautiful! The craftsmanship is outstanding.",date:"12 Mar 2024"},
-    {author:"Rahul K.",rating:4,text:"Great quality, packed well. Slight delay in shipping but worth it.",date:"5 Feb 2024"},
-  ]);
-  const disc=Math.round((1-product.price/product.original)*100);
-
-  const handleAdd=()=>{
-    for(let i=0;i<qty;i++) onAddToCart(product);
-    toast(`${qty}x "${product.name.slice(0,25)}..." added!`,"success");
-    onClose();
-  };
-
-  const submitReview=()=>{
-    if(!userRating||!reviewText.trim()){toast("Please add a rating and review","error");return;}
-    setReviews(r=>[{author:"You",rating:userRating,text:reviewText,date:"Just now"},...r]);
-    setReviewText("");setUserRating(0);
-    toast("Review submitted!","success");
-  };
-
-  useEffect(()=>{
-    const handleKey=(e)=>{if(e.key==="Escape")onClose();};
-    window.addEventListener("keydown",handleKey);
-    return()=>window.removeEventListener("keydown",handleKey);
-  },[onClose]);
-
-  return(
-    <div style={{position:"fixed",inset:0,zIndex:5000,display:"flex",alignItems:"center",justifyContent:"center",padding:"20px"}} onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
-      <div style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.85)",backdropFilter:"blur(10px)"}}/>
-      <div style={{position:"relative",background:"#111117",borderRadius:28,border:"1px solid #1e1e2e",width:"100%",maxWidth:900,maxHeight:"90vh",overflow:"auto",animation:"modalIn 0.35s ease both",boxShadow:"0 40px 100px rgba(0,0,0,0.8)"}}>
-        <button onClick={onClose} style={{position:"sticky",top:16,float:"right",margin:"16px 16px -40px 0",zIndex:10,width:36,height:36,borderRadius:"50%",background:"rgba(255,255,255,0.1)",border:"1px solid rgba(255,255,255,0.15)",color:"#fff",fontSize:18,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:0}}>
-          {/* Image side */}
-          <div style={{padding:32,background:"linear-gradient(135deg,#0d0d14,#1a1025)"}}>
-            <div style={{borderRadius:20,overflow:"hidden",height:320,marginBottom:16}}>
-              <ProductImage id={product.id} height={320}/>
-            </div>
-            <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8}}>
-              {[0,1,2].map(i=>(
-                <div key={i} style={{borderRadius:12,overflow:"hidden",height:80,opacity:i===0?1:0.5,border:i===0?"2px solid #f59e0b":"2px solid transparent"}}>
-                  <ProductImage id={product.id} height={80}/>
-                </div>
-              ))}
-            </div>
-          </div>
-          {/* Info side */}
-          <div style={{padding:32}}>
-            <div style={{fontSize:11,color:"#f59e0b",fontWeight:700,letterSpacing:1,marginBottom:8}}>{product.shop}</div>
-            <h2 style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:"1.5rem",color:"#fff",marginBottom:12,lineHeight:1.3}}>{product.name}</h2>
-            <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16}}>
-              <Stars rating={product.rating} size={16}/>
-              <span style={{fontSize:13,color:"rgba(255,255,255,0.5)"}}>({product.reviews} reviews)</span>
-              {product.customizable&&<span style={{background:"#7c3aed22",color:"#a855f7",fontSize:11,fontWeight:700,padding:"3px 10px",borderRadius:20,border:"1px solid #7c3aed44"}}>✦ Customizable</span>}
-            </div>
-            <div style={{display:"flex",alignItems:"flex-end",gap:12,marginBottom:20}}>
-              <span style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:"2rem",color:"#fff"}}>₹{product.price}</span>
-              <span style={{fontSize:14,color:"rgba(255,255,255,0.3)",textDecoration:"line-through",marginBottom:4}}>₹{product.original}</span>
-              <span style={{background:"#ef444422",color:"#ef4444",fontSize:12,fontWeight:700,padding:"3px 10px",borderRadius:20,marginBottom:4}}>{disc}% OFF</span>
-            </div>
-            <div style={{background:"#10b98122",border:"1px solid #10b98144",borderRadius:10,padding:"10px 14px",marginBottom:20,fontSize:13,color:"#10b981"}}>
-              ✓ You save ₹{product.original-product.price} on this order
-            </div>
-
-            {/* Tabs */}
-            <div style={{display:"flex",gap:4,background:"#0a0a0f",borderRadius:10,padding:3,marginBottom:16}}>
-              {["desc","details","delivery"].map(t=>(
-                <button key={t} onClick={()=>setTab(t)} style={{flex:1,padding:"8px 4px",borderRadius:8,border:"none",background:tab===t?"#f59e0b":"transparent",color:tab===t?"#000":"rgba(255,255,255,0.5)",fontWeight:700,cursor:"pointer",fontSize:12,fontFamily:"'Outfit',sans-serif",transition:"all .2s",textTransform:"capitalize"}}>
-                  {t==="desc"?"Description":t==="details"?"Details":"Delivery"}
-                </button>
-              ))}
-            </div>
-            {tab==="desc"&&<p style={{fontSize:13,color:"rgba(255,255,255,0.65)",lineHeight:1.8,marginBottom:20}}>{product.desc}</p>}
-            {tab==="details"&&(
-              <div style={{marginBottom:20}}>
-                {[["Material",product.material],["Dimensions",product.dimensions],["Category",product.cat],["Shop",product.shop]].map(([k,v])=>(
-                  <div key={k} style={{display:"flex",justifyContent:"space-between",padding:"8px 0",borderBottom:"1px solid #1e1e2e",fontSize:13}}>
-                    <span style={{color:"rgba(255,255,255,0.4)"}}>{k}</span>
-                    <span style={{color:"rgba(255,255,255,0.85)",fontWeight:600}}>{v}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-            {tab==="delivery"&&(
-              <div style={{marginBottom:20}}>
-                <div style={{background:"#0a0a0f",borderRadius:12,padding:16,fontSize:13}}>
-                  <div style={{color:"#10b981",fontWeight:700,marginBottom:8}}>🚚 Free Delivery</div>
-                  <div style={{color:"rgba(255,255,255,0.6)",marginBottom:8}}>Estimated delivery: {product.deliveryDays}-{product.deliveryDays+2} business days</div>
-                  <div style={{color:"rgba(255,255,255,0.6)"}}>↩️ 7-day hassle-free returns</div>
-                </div>
-              </div>
-            )}
-
-            {/* Qty & CTA */}
-            <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:12}}>
-              <div style={{display:"flex",alignItems:"center",gap:12,background:"#0a0a0f",borderRadius:12,padding:"8px 16px",border:"1px solid #1e1e2e"}}>
-                <button onClick={()=>setQty(q=>Math.max(1,q-1))} style={{width:28,height:28,borderRadius:"50%",border:"1px solid #374151",background:"transparent",color:"#fff",cursor:"pointer",fontSize:16,display:"flex",alignItems:"center",justifyContent:"center"}}>−</button>
-                <span style={{color:"#fff",fontWeight:700,minWidth:20,textAlign:"center"}}>{qty}</span>
-                <button onClick={()=>setQty(q=>q+1)} style={{width:28,height:28,borderRadius:"50%",border:"1px solid #374151",background:"transparent",color:"#fff",cursor:"pointer",fontSize:16,display:"flex",alignItems:"center",justifyContent:"center"}}>+</button>
-              </div>
-              <button onClick={handleAdd} style={{flex:1,padding:"14px",borderRadius:14,border:"none",background:"linear-gradient(135deg,#f59e0b,#d97706)",color:"#fff",fontWeight:700,fontSize:15,cursor:"pointer",fontFamily:"'Outfit',sans-serif",boxShadow:"0 8px 30px rgba(245,158,11,0.3)"}}>
-                Add {qty} to Cart — ₹{product.price*qty}
-              </button>
-            </div>
-            <button onClick={()=>{onToggleWish(product.id);toast(wished?"Removed from wishlist":"Added to wishlist!","success");}} style={{width:"100%",padding:"12px",borderRadius:14,border:`1.5px solid ${wished?"#ef4444":"rgba(255,255,255,0.15)"}`,background:"transparent",color:wished?"#ef4444":"rgba(255,255,255,0.6)",fontWeight:600,cursor:"pointer",fontSize:14,fontFamily:"'Outfit',sans-serif",transition:"all .2s"}}>
-              {wished?"❤️ Remove from Wishlist":"🤍 Add to Wishlist"}
-            </button>
-          </div>
-        </div>
-
-        {/* Reviews section */}
-        <div style={{padding:"28px 32px",borderTop:"1px solid #1e1e2e"}}>
-          <h3 style={{fontFamily:"'Syne',sans-serif",fontWeight:700,fontSize:"1.2rem",color:"#fff",marginBottom:20}}>Customer Reviews</h3>
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:32}}>
-            <div>
-              {reviews.map((r,i)=>(
-                <div key={i} style={{background:"#0a0a0f",borderRadius:16,padding:16,marginBottom:12,border:"1px solid #1e1e2e"}}>
-                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:6}}>
-                    <span style={{fontWeight:700,color:"#fff",fontSize:13}}>{r.author}</span>
-                    <span style={{fontSize:11,color:"rgba(255,255,255,0.3)"}}>{r.date}</span>
-                  </div>
-                  <Stars rating={r.rating} size={13}/>
-                  <p style={{fontSize:13,color:"rgba(255,255,255,0.6)",marginTop:8,lineHeight:1.6}}>{r.text}</p>
-                </div>
-              ))}
-            </div>
-            <div>
-              <div style={{background:"#0a0a0f",borderRadius:16,padding:20,border:"1px solid #1e1e2e"}}>
-                <div style={{fontWeight:700,color:"#fff",marginBottom:12,fontSize:14}}>Write a Review</div>
-                <div style={{marginBottom:12}}>
-                  <div style={{fontSize:12,color:"rgba(255,255,255,0.5)",marginBottom:6}}>Your Rating</div>
-                  <Stars rating={userRating} size={22} interactive={true} onRate={setUserRating}/>
-                </div>
-                <textarea value={reviewText} onChange={e=>setReviewText(e.target.value)} placeholder="Share your experience..." rows={3} style={{width:"100%",padding:"12px",borderRadius:10,border:"1.5px solid #1e1e2e",background:"#111117",color:"#fff",fontSize:13,fontFamily:"'Outfit',sans-serif",resize:"none",boxSizing:"border-box"}}/>
-                <button onClick={submitReview} style={{marginTop:10,padding:"10px 20px",borderRadius:10,border:"none",background:"linear-gradient(135deg,#f59e0b,#d97706)",color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"'Outfit',sans-serif"}}>Submit Review</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════════
-   CHECKOUT MODAL
-═══════════════════════════════════════════ */
-function CheckoutModal({cart,onClose,onSuccess,toast}){
-  const [step,setStep]=useState(1);
-  const [form,setForm]=useState({name:"",phone:"",address:"",city:"",pincode:"",payment:"upi"});
-  const [loading,setLoading]=useState(false);
-  const total=cart.reduce((s,i)=>s+i.price*i.qty,0);
-
-  const handleSubmit=()=>{
-    if(!form.name||!form.phone||!form.address||!form.city||!form.pincode){toast("Please fill all delivery details","error");return;}
-    setLoading(true);
-    setTimeout(()=>{setLoading(false);setStep(3);},2000);
-  };
-
-  const inp={width:"100%",padding:"12px 16px",borderRadius:10,border:"1.5px solid #1e1e2e",background:"#0a0a0f",color:"#fff",fontSize:14,fontFamily:"'Outfit',sans-serif",boxSizing:"border-box",transition:"border .2s"};
-
-  return(
-    <div style={{position:"fixed",inset:0,zIndex:6000,display:"flex",alignItems:"center",justifyContent:"center",padding:20}} onClick={e=>{if(e.target===e.currentTarget&&step!==3)onClose();}}>
-      <div style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.85)",backdropFilter:"blur(10px)"}}/>
-      <div style={{position:"relative",background:"#111117",borderRadius:28,border:"1px solid #1e1e2e",width:"100%",maxWidth:560,animation:"modalIn 0.35s ease both",boxShadow:"0 40px 100px rgba(0,0,0,0.8)"}}>
-        {step!==3&&<button onClick={onClose} style={{position:"absolute",top:16,right:16,width:36,height:36,borderRadius:"50%",background:"rgba(255,255,255,0.1)",border:"1px solid rgba(255,255,255,0.15)",color:"#fff",fontSize:18,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>}
-
-        {/* Step indicators */}
-        {step!==3&&<div style={{padding:"24px 32px 0"}}>
-          <div style={{display:"flex",gap:0,marginBottom:24}}>
-            {[{n:1,l:"Cart"},{n:2,l:"Delivery"},{n:3,l:"Payment"}].map((s,i)=>(
-              <div key={s.n} style={{flex:1,display:"flex",alignItems:"center"}}>
-                <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:4}}>
-                  <div style={{width:32,height:32,borderRadius:"50%",background:step>=s.n?"linear-gradient(135deg,#f59e0b,#d97706)":"#1e1e2e",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:700,color:step>=s.n?"#000":"rgba(255,255,255,0.3)"}}>
-                    {step>s.n?"✓":s.n}
-                  </div>
-                  <span style={{fontSize:11,color:step>=s.n?"#f59e0b":"rgba(255,255,255,0.3)",fontWeight:600}}>{s.l}</span>
-                </div>
-                {i<2&&<div style={{flex:1,height:2,background:step>s.n?"#f59e0b":"#1e1e2e",margin:"0 8px",marginBottom:20,transition:"background .3s"}}/>}
-              </div>
-            ))}
-          </div>
-        </div>}
-
-        {step===1&&(
-          <div style={{padding:"0 32px 32px"}}>
-            <h3 style={{fontFamily:"'Syne',sans-serif",fontWeight:700,fontSize:"1.3rem",color:"#fff",marginBottom:16}}>Order Summary</h3>
-            {cart.map(item=>(
-              <div key={item.id} style={{display:"flex",gap:12,alignItems:"center",padding:"10px 0",borderBottom:"1px solid #1e1e2e"}}>
-                <div style={{width:48,height:48,borderRadius:10,overflow:"hidden",flexShrink:0}}>
-                  <ProductImage id={item.id} height={48}/>
-                </div>
-                <div style={{flex:1}}>
-                  <div style={{fontSize:13,fontWeight:600,color:"#fff"}}>{item.name}</div>
-                  <div style={{fontSize:12,color:"rgba(255,255,255,0.4)"}}>Qty: {item.qty}</div>
-                </div>
-                <div style={{fontWeight:700,color:"#f59e0b"}}>₹{item.price*item.qty}</div>
-              </div>
-            ))}
-            <div style={{display:"flex",justifyContent:"space-between",marginTop:16,fontWeight:800,fontSize:18,color:"#fff"}}>
-              <span>Total</span><span style={{color:"#f59e0b"}}>₹{total.toLocaleString()}</span>
-            </div>
-            <button onClick={()=>setStep(2)} style={{width:"100%",padding:"14px",borderRadius:14,border:"none",background:"linear-gradient(135deg,#f59e0b,#d97706)",color:"#fff",fontWeight:700,fontSize:15,cursor:"pointer",fontFamily:"'Outfit',sans-serif",marginTop:20}}>
-              Continue to Delivery →
-            </button>
-          </div>
-        )}
-
-        {step===2&&(
-          <div style={{padding:"0 32px 32px"}}>
-            <h3 style={{fontFamily:"'Syne',sans-serif",fontWeight:700,fontSize:"1.3rem",color:"#fff",marginBottom:16}}>Delivery Details</h3>
-            <div style={{display:"flex",flexDirection:"column",gap:12}}>
-              <input placeholder="Full Name *" value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} style={inp}/>
-              <input placeholder="Phone Number *" value={form.phone} onChange={e=>setForm(f=>({...f,phone:e.target.value}))} style={inp}/>
-              <textarea placeholder="Full Address *" rows={2} value={form.address} onChange={e=>setForm(f=>({...f,address:e.target.value}))} style={{...inp,resize:"none"}}/>
-              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
-                <input placeholder="City *" value={form.city} onChange={e=>setForm(f=>({...f,city:e.target.value}))} style={inp}/>
-                <input placeholder="PIN Code *" value={form.pincode} onChange={e=>setForm(f=>({...f,pincode:e.target.value}))} style={inp}/>
-              </div>
-              <div>
-                <div style={{fontSize:13,color:"rgba(255,255,255,0.5)",marginBottom:10,fontWeight:600}}>Payment Method</div>
-                {[{v:"upi",l:"UPI / QR Code",i:"📱"},{v:"card",l:"Credit / Debit Card",i:"💳"},{v:"cod",l:"Cash on Delivery",i:"💵"}].map(m=>(
-                  <div key={m.v} onClick={()=>setForm(f=>({...f,payment:m.v}))} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 16px",borderRadius:12,border:`1.5px solid ${form.payment===m.v?"#f59e0b":"#1e1e2e"}`,background:form.payment===m.v?"rgba(245,158,11,0.08)":"#0a0a0f",cursor:"pointer",marginBottom:8,transition:"all .2s"}}>
-                    <span style={{fontSize:20}}>{m.i}</span>
-                    <span style={{fontWeight:600,color:form.payment===m.v?"#f59e0b":"rgba(255,255,255,0.7)",fontSize:14}}>{m.l}</span>
-                    {form.payment===m.v&&<span style={{marginLeft:"auto",color:"#f59e0b"}}>✓</span>}
-                  </div>
-                ))}
-              </div>
-              <button onClick={handleSubmit} disabled={loading} style={{padding:"14px",borderRadius:14,border:"none",background:loading?"#374151":"linear-gradient(135deg,#f59e0b,#d97706)",color:"#fff",fontWeight:700,fontSize:15,cursor:loading?"not-allowed":"pointer",fontFamily:"'Outfit',sans-serif",display:"flex",alignItems:"center",justifyContent:"center",gap:10}}>
-                {loading?<><span style={{animation:"spin 1s linear infinite",display:"inline-block"}}>⟳</span> Processing...</>:"Place Order →"}
-              </button>
-            </div>
-          </div>
-        )}
-
-        {step===3&&(
-          <div style={{padding:48,textAlign:"center"}}>
-            <div style={{fontSize:72,marginBottom:16,animation:"bounce 1s infinite"}}>🎉</div>
-            <h2 style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:"1.8rem",color:"#fff",marginBottom:8}}>Order Placed!</h2>
-            <p style={{color:"rgba(255,255,255,0.5)",fontSize:15,marginBottom:8}}>Your order has been confirmed</p>
-            <p style={{color:"#f59e0b",fontWeight:700,fontSize:16,marginBottom:24}}>Order #CB-{Date.now().toString().slice(-6)}</p>
-            <div style={{background:"#0a0a0f",borderRadius:16,padding:"16px 24px",marginBottom:28,textAlign:"left"}}>
-              <div style={{fontSize:13,color:"rgba(255,255,255,0.5)",marginBottom:8}}>Delivery to: {form.city}, {form.pincode}</div>
-              <div style={{fontSize:13,color:"#10b981"}}>🚚 Expected delivery in 5-7 business days</div>
-            </div>
-            <button onClick={()=>{onSuccess();onClose();}} style={{padding:"14px 36px",borderRadius:14,border:"none",background:"linear-gradient(135deg,#f59e0b,#d97706)",color:"#fff",fontWeight:700,fontSize:15,cursor:"pointer",fontFamily:"'Outfit',sans-serif"}}>
-              Continue Shopping →
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════════
-   NAVBAR
-═══════════════════════════════════════════ */
-function Navbar({page,setPage,cartCount,wishCount,user,setUser,onSearch,searchQuery}){
-  const [scrolled,setScrolled]=useState(false);
-  const [search,setSearch]=useState(searchQuery||"");
-  const [searchFocus,setSearchFocus]=useState(false);
-
-  useEffect(()=>{setSearch(searchQuery||"");},[searchQuery]);
-
-  useEffect(()=>{
-    const fn=()=>setScrolled(window.scrollY>20);
-    window.addEventListener("scroll",fn);
-    return()=>window.removeEventListener("scroll",fn);
-  },[]);
-
-  const handleSearch=(e)=>{
-    const v=e.target.value;
-    setSearch(v);
-    if(onSearch) onSearch(v);
-  };
-
-  const handleSearchKey=(e)=>{
-    if(e.key==="Enter"&&search.trim()){
-      if(onSearch) onSearch(search);
-      setPage("shop");
-    }
-  };
-
-  return(
-    <nav style={{position:"sticky",top:0,zIndex:1000,background:scrolled?"rgba(10,10,15,0.95)":"rgba(10,10,15,0.8)",backdropFilter:"blur(20px)",borderBottom:"1px solid rgba(255,255,255,0.06)",transition:"all .3s"}}>
-      <div style={{maxWidth:1280,margin:"0 auto",padding:"0 24px",display:"flex",alignItems:"center",gap:16,height:68}}>
-        <div onClick={()=>setPage("home")} style={{display:"flex",alignItems:"center",gap:10,cursor:"pointer",flexShrink:0}}>
-          <div style={{width:36,height:36,borderRadius:10,background:"linear-gradient(135deg,#f59e0b,#d97706)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,flexShrink:0}}>🎨</div>
-          <span style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:22,color:"#fff",letterSpacing:"-0.5px"}}>Artisan<span style={{color:"#f59e0b"}}>World</span></span>
-        </div>
-
-        <div style={{flex:1,maxWidth:480,position:"relative"}}>
-          <input value={search} onChange={handleSearch} onKeyDown={handleSearchKey}
-            onFocus={()=>setSearchFocus(true)} onBlur={()=>setSearchFocus(false)}
-            placeholder="Search crafts, artisans, categories..."
-            style={{width:"100%",padding:"10px 44px 10px 18px",borderRadius:40,border:`1.5px solid ${searchFocus?"#f59e0b":"rgba(255,255,255,0.1)"}`,background:"rgba(255,255,255,0.06)",color:"#fff",fontSize:14,transition:"all .3s",fontFamily:"'Outfit',sans-serif",boxSizing:"border-box"}}/>
-          <button onClick={()=>{if(search.trim()){if(onSearch)onSearch(search);setPage("shop");}}} style={{position:"absolute",right:12,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",cursor:"pointer",fontSize:16,color:"rgba(255,255,255,0.4)"}}>🔍</button>
-        </div>
-
-        <div style={{display:"flex",alignItems:"center",gap:4}}>
-          {[["home","Home"],["shop","Shop"],["seller","Sell"]].map(([pg,label])=>(
-            <button key={pg} onClick={()=>setPage(pg)} className="nav-link" style={{padding:"8px 14px",borderRadius:10,border:"none",background:page===pg?"rgba(245,158,11,0.15)":"transparent",color:page===pg?"#f59e0b":"rgba(255,255,255,0.7)",fontWeight:600,cursor:"pointer",fontSize:14,transition:"all .2s",fontFamily:"'Outfit',sans-serif"}}>{label}</button>
-          ))}
-          <button onClick={()=>setPage("wishlist")} style={{position:"relative",padding:"8px 12px",borderRadius:10,border:"none",background:"transparent",cursor:"pointer",fontSize:20,transition:"transform .2s"}}
-          onMouseEnter={e=>e.currentTarget.style.transform="scale(1.15)"}
-          onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}>
-            ❤️{wishCount>0&&<span style={{position:"absolute",top:2,right:2,background:"#ef4444",color:"#fff",borderRadius:"50%",width:16,height:16,fontSize:10,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700}}>{wishCount}</span>}
-          </button>
-          <button onClick={()=>setPage("cart")} style={{position:"relative",padding:"8px 12px",borderRadius:10,border:"none",background:"transparent",cursor:"pointer",fontSize:20,transition:"transform .2s"}}
-          onMouseEnter={e=>e.currentTarget.style.transform="scale(1.15)"}
-          onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}>
-            🛒{cartCount>0&&<span style={{position:"absolute",top:2,right:2,background:"#f59e0b",color:"#000",borderRadius:"50%",width:16,height:16,fontSize:10,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700,animation:"countUp .3s ease"}}>{cartCount}</span>}
-          </button>
-          {user?(
-            <div style={{display:"flex",alignItems:"center",gap:8}}>
-              <div style={{width:34,height:34,borderRadius:"50%",background:"linear-gradient(135deg,#7c3aed,#db2777)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer",border:"2px solid #f59e0b"}} onClick={()=>setPage("profile")}>{user.name[0].toUpperCase()}</div>
-              <button onClick={()=>setUser(null)} style={{padding:"6px 12px",borderRadius:8,border:"1px solid rgba(255,255,255,0.1)",background:"transparent",cursor:"pointer",fontSize:12,color:"rgba(255,255,255,0.5)",fontFamily:"'Outfit',sans-serif"}}>Logout</button>
-            </div>
-          ):(
-            <button onClick={()=>setPage("login")} style={{padding:"9px 20px",borderRadius:30,border:"none",background:"linear-gradient(135deg,#f59e0b,#d97706)",color:"#fff",fontWeight:700,cursor:"pointer",fontSize:13,fontFamily:"'Outfit',sans-serif",boxShadow:"0 4px 15px rgba(245,158,11,0.3)"}}>Login / Register</button>
-          )}
-        </div>
-      </div>
-      <div style={{background:"#0d0d14",borderTop:"1px solid rgba(255,255,255,0.04)",overflowX:"auto",scrollbarWidth:"none"}}>
-        <div style={{display:"flex",padding:"0 24px",maxWidth:1280,margin:"0 auto"}}>
-          {CATS.map(cat=>(
-            <button key={cat.name} onClick={()=>setPage("shop")} style={{padding:"10px 18px",border:"none",background:"transparent",color:"rgba(255,255,255,0.55)",cursor:"pointer",fontSize:13,fontWeight:500,whiteSpace:"nowrap",transition:"all .2s",fontFamily:"'Outfit',sans-serif",display:"flex",alignItems:"center",gap:6,borderBottom:"2px solid transparent"}}
-            onMouseEnter={e=>{e.currentTarget.style.color=cat.color;e.currentTarget.style.borderBottomColor=cat.color;}}
-            onMouseLeave={e=>{e.currentTarget.style.color="rgba(255,255,255,0.55)";e.currentTarget.style.borderBottomColor="transparent";}}><span>{cat.icon}</span>{cat.name}</button>
-          ))}
-        </div>
+        <button className="btn-artist">Join as Artist</button>
       </div>
     </nav>
   );
 }
 
-/* ═══════════════════════════════════════════
-   HOME PAGE
-═══════════════════════════════════════════ */
-function HomePage({setPage,setCart,wishlist,toggleWish,toast,onOpenDetail}){
-  const [activeCat,setActiveCat]=useState("Home & Living");
-  const addToCart=useCallback((product)=>{setCart(prev=>{const ex=prev.find(i=>i.id===product.id);return ex?prev.map(i=>i.id===product.id?{...i,qty:i.qty+1}:i):[...prev,{...product,qty:1}];});},[setCart]);
-  return(
-    <div style={{background:"#0a0a0f"}}>
-      <HeroSlider setPage={setPage}/>
-      <TrustBar/>
-      <div style={{background:"#0d0d14",padding:"60px 24px",borderBottom:"1px solid #1e1e2e"}}>
-        <div style={{maxWidth:1280,margin:"0 auto",display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:24}}>
-          {[{n:10000,suffix:"+",label:"Handmade Products",icon:"📦"},{n:500,suffix:"+",label:"Indian Artisans",icon:"🧑‍🎨"},{n:50000,suffix:"+",label:"Happy Customers",icon:"😊"},{n:100,suffix:"%",label:"Authentic Products",icon:"✅"}].map(s=>(
-            <div key={s.label} style={{background:"#111117",borderRadius:20,padding:"28px 24px",border:"1px solid #1e1e2e",textAlign:"center",transition:"all .3s"}}
-            onMouseEnter={e=>{e.currentTarget.style.borderColor="#f59e0b44";e.currentTarget.style.transform="translateY(-4px)";}}
-            onMouseLeave={e=>{e.currentTarget.style.borderColor="#1e1e2e";e.currentTarget.style.transform="translateY(0)";}}>
-              <div style={{fontSize:36,marginBottom:12}}>{s.icon}</div>
-              <div style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:"2rem",color:"#f59e0b"}}><Counter end={s.n} suffix={s.suffix}/></div>
-              <div style={{fontSize:13,color:"rgba(255,255,255,0.5)",marginTop:4}}>{s.label}</div>
+function HeroSection() {
+  const [current, setCurrent] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setCurrent(c=>(c+1)%heroSlides.length), 4200);
+    return () => clearInterval(t);
+  }, []);
+  const petals = Array.from({length:10},(_,i)=>({id:i,left:`${8+Math.random()*84}%`,duration:`${9+Math.random()*11}s`,delay:`${-Math.random()*16}s`}));
+  return (
+    <section className="hero">
+      {heroSlides.map((s,i)=>(
+        <div key={i} className={`hero-slide${i===current?" active":""}`}>
+          <div className={`hero-bg ${s.bg}`}/>
+          <div className="hero-overlay"/>
+          <div className="hero-petals">
+            {petals.map(p=><div key={p.id} className="petal" style={{left:p.left,animationDuration:p.duration,animationDelay:p.delay}}/>)}
+          </div>
+          <div className="hero-content">
+            <div className="hero-tag">{s.tag}</div>
+            <h1 className="hero-title">{s.title}</h1>
+            <p className="hero-sub">{s.sub}</p>
+            <div className="hero-btns">
+              <button className="btn-primary">{s.btn1}</button>
+              <button className="btn-outline-white">{s.btn2}</button>
+            </div>
+          </div>
+        </div>
+      ))}
+      <div className="hero-dots">
+        {heroSlides.map((_,i)=><button key={i} className={`hero-dot${i===current?" active":""}`} onClick={()=>setCurrent(i)}/>)}
+      </div>
+    </section>
+  );
+}
+
+function OurStorySection() {
+  const ref = useRef(null); const visible = useIntersection(ref);
+  const steps = [
+    {emoji:"📸",title:"Upload Your Artwork",desc:"Create a stunning portfolio with photos and descriptions of your handcrafted pieces."},
+    {emoji:"💰",title:"Set Your Price",desc:"You're in control. Set fair prices for your work and keep up to 85% of every sale."},
+    {emoji:"🌍",title:"Reach Global Buyers",desc:"Connect with customers from 120+ countries who value authentic handmade art."},
+  ];
+  return (
+    <section className="join-section">
+      <div className="section-inner" ref={ref}>
+        <div style={{textAlign:"center"}} className={`fade-up${visible?" visible":""}`}>
+          <div className="section-label">Our Community</div>
+          <h2 style={{fontFamily:"var(--font-display)",fontSize:"clamp(1.9rem,3vw,2.9rem)",fontWeight:600,color:"var(--text)",display:"flex",alignItems:"center",justifyContent:"center",gap:12}}>
+            <FlowerIcon size={36}/>
+            Our Story
+          </h2>
+          <p style={{color:"var(--text-muted)",marginTop:14,fontSize:"1rem",maxWidth:540,margin:"14px auto 0"}}>
+            Are you an artisan? Join our global community — thousands of makers have already transformed their craft into a sustainable livelihood.
+          </p>
+        </div>
+        <div className="join-grid">
+          {steps.map((s,i)=>(
+            <div key={i} className={`join-card fade-up fade-up-delay-${i+1}${visible?" visible":""}`}>
+              <div className="join-icon">{s.emoji}</div>
+              <h3>{s.title}</h3>
+              <p>{s.desc}</p>
             </div>
           ))}
         </div>
+        <div className="join-cta">
+          <button className="btn-rose-large">Start Selling Today →</button>
+        </div>
       </div>
+    </section>
+  );
+}
 
-      <section style={{padding:"80px 24px",background:"#0a0a0f"}}>
-        <div style={{maxWidth:1280,margin:"0 auto"}}>
-          <div style={{textAlign:"center",marginBottom:48}}>
-            <span style={{color:"#f59e0b",fontSize:13,fontWeight:600,letterSpacing:2}}>BROWSE BY</span>
-            <h2 style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:"2.5rem",color:"#fff",marginTop:8}}>Featured Categories</h2>
-          </div>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(180px,1fr))",gap:20}}>
-            {CATS.map(cat=>(
-              <div key={cat.name} onClick={()=>setPage("shop")} style={{background:"#111117",borderRadius:20,overflow:"hidden",cursor:"pointer",border:"1px solid #1e1e2e",transition:"all .3s"}}
-              onMouseEnter={e=>{e.currentTarget.style.borderColor=cat.color+"66";e.currentTarget.style.transform="translateY(-6px)";}}
-              onMouseLeave={e=>{e.currentTarget.style.borderColor="#1e1e2e";e.currentTarget.style.transform="translateY(0)";}}>
-                <div style={{height:100,overflow:"hidden",position:"relative"}}>
-                  <img src={CATEGORY_IMAGES[cat.name]} alt={cat.name} style={{width:"100%",height:"100%",objectFit:"cover",opacity:0.6}}/>
-                  <div style={{position:"absolute",inset:0,background:`linear-gradient(to top,#111117,transparent)`}}/>
-                  <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",fontSize:30}}>{cat.icon}</div>
-                </div>
-                <div style={{padding:"12px 16px"}}>
-                  <div style={{fontWeight:700,fontSize:14,color:"#fff",marginBottom:4}}>{cat.name}</div>
-                  <div style={{fontSize:11,color:"rgba(255,255,255,0.35)"}}>{cat.count.toLocaleString()} items</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section style={{padding:"0 24px 80px",background:"#0a0a0f"}}>
-        <div style={{maxWidth:1280,margin:"0 auto"}}>
-          <div style={{display:"flex",alignItems:"flex-end",justifyContent:"space-between",marginBottom:36}}>
-            <div><span style={{color:"#f59e0b",fontSize:13,fontWeight:600,letterSpacing:2}}>FRESHLY ADDED</span><h2 style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:"2.2rem",color:"#fff",marginTop:6}}>New Arrivals</h2></div>
-            <button onClick={()=>setPage("shop")} style={{padding:"10px 24px",borderRadius:30,border:"1.5px solid rgba(245,158,11,0.5)",background:"transparent",color:"#f59e0b",fontWeight:600,cursor:"pointer",fontSize:13,fontFamily:"'Outfit',sans-serif"}}
-            onMouseEnter={e=>e.currentTarget.style.background="rgba(245,158,11,0.1)"}
-            onMouseLeave={e=>e.currentTarget.style.background="transparent"}>View All →</button>
-          </div>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(230px,1fr))",gap:20}}>
-            {PRODUCTS.slice(0,8).map(p=>(
-              <ProductCard key={p.id} product={p} onAddToCart={addToCart} onToggleWish={()=>toggleWish(p.id)} wished={wishlist.includes(p.id)} toast={toast} onOpenDetail={onOpenDetail}/>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section style={{padding:"0 24px 80px",background:"#0a0a0f"}}>
-        <div style={{maxWidth:1280,margin:"0 auto"}}>
-          <div style={{textAlign:"center",marginBottom:40}}>
-            <span style={{color:"#f59e0b",fontSize:13,fontWeight:600,letterSpacing:2}}>BROWSE WITHIN</span>
-            <h2 style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:"2.2rem",color:"#fff",marginTop:6}}>Shop by Sub-Category</h2>
-          </div>
-          <div style={{display:"flex",gap:10,marginBottom:32,flexWrap:"wrap",justifyContent:"center"}}>
-            {Object.keys(SUB_CATS).map(cat=>{const c=CATS.find(x=>x.name===cat);return(
-              <button key={cat} onClick={()=>setActiveCat(cat)} style={{padding:"10px 20px",borderRadius:30,background:activeCat===cat?c?.color||"#f59e0b":"#111117",color:activeCat===cat?"#fff":"rgba(255,255,255,0.6)",fontWeight:600,cursor:"pointer",fontSize:13,transition:"all .2s",fontFamily:"'Outfit',sans-serif",border:`1.5px solid ${activeCat===cat?c?.color||"#f59e0b":"#1e1e2e"}`}}>{c?.icon} {cat}</button>
-            );})}
-          </div>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(130px,1fr))",gap:14}}>
-            {(SUB_CATS[activeCat]||[]).map(sub=>{const c=CATS.find(x=>x.name===activeCat);return(
-              <div key={sub} onClick={()=>setPage("shop")} style={{background:"#111117",borderRadius:14,padding:"18px 12px",textAlign:"center",cursor:"pointer",border:"1px solid #1e1e2e",transition:"all .25s",fontSize:13,fontWeight:600,color:"rgba(255,255,255,0.8)"}}
-              onMouseEnter={e=>{e.currentTarget.style.borderColor=c?.color+"55";e.currentTarget.style.color="#fff";e.currentTarget.style.background=c?.color+"11";e.currentTarget.style.transform="translateY(-3px)";}}
-              onMouseLeave={e=>{e.currentTarget.style.borderColor="#1e1e2e";e.currentTarget.style.color="rgba(255,255,255,0.8)";e.currentTarget.style.background="#111117";e.currentTarget.style.transform="translateY(0)";}}>{sub}</div>
-            );})}
-          </div>
-        </div>
-      </section>
-
-      <section style={{padding:"80px 24px"}}>
-        <div style={{maxWidth:1100,margin:"0 auto"}}>
-          <div style={{borderRadius:28,padding:"64px 56px",background:"linear-gradient(135deg,#1a0533,#3b0764)",border:"1px solid rgba(168,85,247,0.3)",display:"flex",alignItems:"center",justifyContent:"space-between",gap:32,flexWrap:"wrap",boxShadow:"0 0 80px rgba(168,85,247,0.15)"}}>
-            <div>
-              <div style={{color:"#a855f7",fontSize:13,fontWeight:600,letterSpacing:2,marginBottom:12}}>FOR ARTISANS</div>
-              <h2 style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:"clamp(1.8rem,4vw,2.8rem)",color:"#fff",marginBottom:16,lineHeight:1.2}}>Turn Your Passion<br/><span style={{color:"#a855f7"}}>Into Income</span></h2>
-              <p style={{color:"rgba(255,255,255,0.6)",maxWidth:440,lineHeight:1.7,marginBottom:28}}>Join 500+ artisans already selling on ArtisanWorld. Setup takes under 5 minutes. Keep 85% of every sale.</p>
-              <button onClick={()=>setPage("seller")} style={{padding:"15px 36px",borderRadius:50,border:"none",background:"linear-gradient(135deg,#a855f7,#7c3aed)",color:"#fff",fontWeight:700,fontSize:15,cursor:"pointer",fontFamily:"'Outfit',sans-serif",boxShadow:"0 8px 30px rgba(168,85,247,0.4)",transition:"all .3s"}}
-              onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-3px)";}}
-              onMouseLeave={e=>{e.currentTarget.style.transform="translateY(0)";}}>Start Selling for Free →</button>
+function ProductCarousel({products}) {
+  const trackRef = useRef(null);
+  const scroll = dir => trackRef.current?.scrollBy({left:dir*280,behavior:"smooth"});
+  const drag = useRef({active:false,startX:0,scrollLeft:0});
+  return (
+    <div className="carousel-wrap">
+      <button className="carousel-arrow left" onClick={()=>scroll(-1)}>
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div className="carousel-track" ref={trackRef}
+        onMouseDown={e=>{drag.current={active:true,startX:e.pageX-trackRef.current.offsetLeft,scrollLeft:trackRef.current.scrollLeft};}}
+        onMouseUp={()=>{drag.current.active=false;}}
+        onMouseLeave={()=>{drag.current.active=false;}}
+        onMouseMove={e=>{if(!drag.current.active)return;e.preventDefault();trackRef.current.scrollLeft=drag.current.scrollLeft-(e.pageX-trackRef.current.offsetLeft-drag.current.startX)*1.4;}}>
+        {products.map(p=>(
+          <div key={p.id} className="product-card">
+            <div className="product-img-wrap">
+              <div className="product-emoji">{p.emoji}</div>
+              <button className="add-to-cart">Add to Cart</button>
             </div>
-            <div style={{fontSize:120,animation:"float 4s ease-in-out infinite"}}>🧑‍🎨</div>
+            <div className="product-info">
+              <div className="product-region">{p.region}</div>
+              <div className="product-name">{p.name}</div>
+              <div className="product-artist">by {p.artist}</div>
+              <div className="product-price">{p.price}<span>{p.original}</span></div>
+            </div>
           </div>
-        </div>
-      </section>
+        ))}
+      </div>
+      <button className="carousel-arrow right" onClick={()=>scroll(1)}>
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
     </div>
   );
 }
 
-/* ═══════════════════════════════════════════
-   SHOP PAGE (with wired search)
-═══════════════════════════════════════════ */
-function ShopPage({cart,setCart,wishlist,toggleWish,toast,onOpenDetail,initialSearch=""}){
-  const [filter,setFilter]=useState("All");
-  const [sort,setSort]=useState("featured");
-  const [search,setSearch]=useState(initialSearch);
-  const [priceRange,setPriceRange]=useState(5000);
-
-  useEffect(()=>{setSearch(initialSearch);},[initialSearch]);
-
-  const filtered=PRODUCTS
-    .filter(p=>filter==="All"||p.cat===filter)
-    .filter(p=>p.name.toLowerCase().includes(search.toLowerCase())||p.shop.toLowerCase().includes(search.toLowerCase())||p.cat.toLowerCase().includes(search.toLowerCase()))
-    .filter(p=>p.price<=priceRange)
-    .sort((a,b)=>{
-      if(sort==="price-low")return a.price-b.price;
-      if(sort==="price-high")return b.price-a.price;
-      if(sort==="rating")return b.rating-a.rating;
-      return 0;
-    });
-
-  const addToCart=useCallback((product)=>{setCart(prev=>{const ex=prev.find(i=>i.id===product.id);return ex?prev.map(i=>i.id===product.id?{...i,qty:i.qty+1}:i):[...prev,{...product,qty:1}];});},[setCart]);
-
-  return(
-    <div style={{background:"#0a0a0f",minHeight:"100vh",padding:"40px 24px"}}>
-      <div style={{maxWidth:1280,margin:"0 auto"}}>
-        <div style={{marginBottom:40}}>
-          <span style={{color:"#f59e0b",fontSize:13,fontWeight:600,letterSpacing:2}}>ALL PRODUCTS</span>
-          <h1 style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:"2.5rem",color:"#fff",marginTop:8}}>Shop Handmade</h1>
-        </div>
-        <div style={{display:"flex",gap:12,marginBottom:32,flexWrap:"wrap",alignItems:"center"}}>
-          <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search products, shops, categories..."
-            style={{padding:"10px 18px",borderRadius:30,border:"1.5px solid #1e1e2e",background:"#111117",color:"#fff",fontSize:14,fontFamily:"'Outfit',sans-serif",flex:1,minWidth:200}}/>
-          <select value={sort} onChange={e=>setSort(e.target.value)} style={{padding:"10px 18px",borderRadius:30,border:"1.5px solid #1e1e2e",background:"#111117",color:"#fff",fontSize:13,fontFamily:"'Outfit',sans-serif",cursor:"pointer"}}>
-            <option value="featured">Featured</option>
-            <option value="price-low">Price: Low to High</option>
-            <option value="price-high">Price: High to Low</option>
-            <option value="rating">Top Rated</option>
-          </select>
-          <div style={{display:"flex",alignItems:"center",gap:8,background:"#111117",borderRadius:30,padding:"8px 16px",border:"1.5px solid #1e1e2e"}}>
-            <span style={{fontSize:12,color:"rgba(255,255,255,0.5)"}}>Max ₹</span>
-            <input type="range" min={100} max={5000} value={priceRange} onChange={e=>setPriceRange(+e.target.value)} style={{width:100,accentColor:"#f59e0b"}}/>
-            <span style={{fontSize:12,color:"#f59e0b",fontWeight:700,minWidth:44}}>₹{priceRange}</span>
-          </div>
-        </div>
-        <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:20}}>
-          {["All",...CATS.map(c=>c.name)].map(f=>(
-            <button key={f} onClick={()=>setFilter(f)} style={{padding:"8px 16px",borderRadius:20,background:filter===f?"#f59e0b":"#111117",color:filter===f?"#000":"rgba(255,255,255,0.6)",fontWeight:600,cursor:"pointer",fontSize:12,transition:"all .2s",fontFamily:"'Outfit',sans-serif",border:`1px solid ${filter===f?"#f59e0b":"#1e1e2e"}`}}>{f}</button>
-          ))}
-        </div>
-        <div style={{marginBottom:16,fontSize:13,color:"rgba(255,255,255,0.4)"}}>Showing {filtered.length} of {PRODUCTS.length} products</div>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(230px,1fr))",gap:20}}>
-          {filtered.map(p=>(<ProductCard key={p.id} product={p} onAddToCart={addToCart} onToggleWish={()=>toggleWish(p.id)} wished={wishlist.includes(p.id)} toast={toast} onOpenDetail={onOpenDetail}/>))}
-        </div>
-        {filtered.length===0&&(
-          <div style={{textAlign:"center",padding:"80px 0",color:"rgba(255,255,255,0.3)"}}>
-            <div style={{fontSize:64,marginBottom:16}}>🔍</div>
-            <div style={{fontSize:18,fontWeight:600}}>No products found</div>
-            <div style={{fontSize:14,marginTop:8}}>Try adjusting your filters or search</div>
-            <button onClick={()=>{setSearch("");setFilter("All");setPriceRange(5000);}} style={{marginTop:16,padding:"10px 24px",borderRadius:20,border:"none",background:"#f59e0b",color:"#000",fontWeight:700,cursor:"pointer",fontFamily:"'Outfit',sans-serif"}}>Clear Filters</button>
-          </div>
-        )}
+function HandloomSection() {
+  const ref=useRef(null);const visible=useIntersection(ref);
+  const pills=["Sarees","Dupattas","Stoles","Bed Linen","Table Cloth","Carpets"];
+  const [active,setActive]=useState(0);
+  return (
+    <section className="section"><div className="section-inner" ref={ref}>
+      <div className={`section-header fade-up${visible?" visible":""}`}>
+        <div><div className="section-label">Textile Heritage</div><h2 className="section-title">Handloom</h2></div>
+        <button className="btn-explore">Explore All →</button>
       </div>
-    </div>
+      <div className={`fade-up fade-up-delay-1${visible?" visible":""}`}>
+        <ProductCarousel products={handloomProducts}/>
+        <div className="pill-row">{pills.map((p,i)=><button key={p} className={`pill${i===active?" active":""}`} onClick={()=>setActive(i)}>{p}</button>)}</div>
+      </div>
+    </div></section>
   );
 }
 
-/* ═══════════════════════════════════════════
-   CART PAGE
-═══════════════════════════════════════════ */
-function CartPage({cart,setCart,setPage,toast,setShowCheckout}){
-  const total=cart.reduce((s,i)=>s+i.price*i.qty,0);
-  const savings=cart.reduce((s,i)=>s+(i.original-i.price)*i.qty,0);
-  const updateQty=(id,delta)=>setCart(prev=>prev.map(i=>i.id===id?{...i,qty:Math.max(1,i.qty+delta)}:i));
-  const remove=(id)=>{setCart(prev=>prev.filter(i=>i.id!==id));toast("Item removed","info");};
-
-  if(cart.length===0)return(
-    <div style={{minHeight:"70vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"#0a0a0f",gap:20}}>
-      <div style={{fontSize:80}}>🛒</div>
-      <h2 style={{fontFamily:"'Syne',sans-serif",color:"#fff",fontSize:"2rem"}}>Your cart is empty</h2>
-      <p style={{color:"rgba(255,255,255,0.4)"}}>Add some handcrafted goodies!</p>
-      <button onClick={()=>setPage("shop")} style={{padding:"14px 36px",borderRadius:30,border:"none",background:"linear-gradient(135deg,#f59e0b,#d97706)",color:"#fff",fontWeight:700,cursor:"pointer",fontSize:15,fontFamily:"'Outfit',sans-serif"}}>Browse Products →</button>
-    </div>
-  );
-
-  return(
-    <div style={{background:"#0a0a0f",minHeight:"100vh",padding:"40px 24px"}}>
-      <div style={{maxWidth:1100,margin:"0 auto"}}>
-        <h1 style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:"2rem",color:"#fff",marginBottom:32}}>
-          Your Cart <span style={{color:"#f59e0b",fontSize:"1.2rem"}}>({cart.reduce((s,i)=>s+i.qty,0)} items)</span>
-        </h1>
-        <div style={{display:"grid",gridTemplateColumns:"1fr 340px",gap:32,alignItems:"start"}}>
-          <div style={{display:"flex",flexDirection:"column",gap:16}}>
-            {cart.map(item=>(
-              <div key={item.id} style={{background:"#111117",borderRadius:20,padding:"20px",border:"1px solid #1e1e2e",display:"flex",gap:20,alignItems:"center"}}>
-                <div style={{width:80,height:80,borderRadius:16,overflow:"hidden",flexShrink:0}}>
-                  <ProductImage id={item.id} height={80}/>
-                </div>
-                <div style={{flex:1}}>
-                  <div style={{fontSize:11,color:"#f59e0b",fontWeight:600,marginBottom:4}}>{item.shop}</div>
-                  <div style={{fontWeight:600,color:"#fff",marginBottom:8}}>{item.name}</div>
-                  <div style={{display:"flex",alignItems:"center",gap:16}}>
-                    <div style={{display:"flex",alignItems:"center",gap:10}}>
-                      <button onClick={()=>updateQty(item.id,-1)} style={{width:28,height:28,borderRadius:"50%",border:"1px solid #374151",background:"transparent",color:"#fff",cursor:"pointer",fontSize:16,display:"flex",alignItems:"center",justifyContent:"center"}}>−</button>
-                      <span style={{color:"#fff",fontWeight:700,minWidth:20,textAlign:"center"}}>{item.qty}</span>
-                      <button onClick={()=>updateQty(item.id,1)} style={{width:28,height:28,borderRadius:"50%",border:"1px solid #374151",background:"transparent",color:"#fff",cursor:"pointer",fontSize:16,display:"flex",alignItems:"center",justifyContent:"center"}}>+</button>
-                    </div>
-                    <span style={{fontWeight:800,color:"#f59e0b",fontSize:18}}>₹{(item.price*item.qty).toLocaleString()}</span>
-                  </div>
-                </div>
-                <button onClick={()=>remove(item.id)} style={{background:"transparent",border:"none",cursor:"pointer",fontSize:18,color:"rgba(255,255,255,0.3)",transition:"color .2s"}}
-                onMouseEnter={e=>e.currentTarget.style.color="#ef4444"}
-                onMouseLeave={e=>e.currentTarget.style.color="rgba(255,255,255,0.3)"}>✕</button>
-              </div>
-            ))}
-          </div>
-          <div style={{background:"#111117",borderRadius:24,padding:"28px",border:"1px solid #1e1e2e",position:"sticky",top:90}}>
-            <h3 style={{fontFamily:"'Syne',sans-serif",fontWeight:700,color:"#fff",marginBottom:20,fontSize:"1.2rem"}}>Order Summary</h3>
-            <div style={{display:"flex",flexDirection:"column",gap:12,marginBottom:20}}>
-              <div style={{display:"flex",justifyContent:"space-between",fontSize:14,color:"rgba(255,255,255,0.6)"}}><span>Subtotal</span><span>₹{total.toLocaleString()}</span></div>
-              <div style={{display:"flex",justifyContent:"space-between",fontSize:14,color:"#10b981"}}><span>You Save</span><span>₹{savings.toLocaleString()}</span></div>
-              <div style={{display:"flex",justifyContent:"space-between",fontSize:14,color:"rgba(255,255,255,0.6)"}}><span>Delivery</span><span style={{color:"#10b981"}}>FREE</span></div>
-              <div style={{height:1,background:"#1e1e2e",margin:"4px 0"}}/>
-              <div style={{display:"flex",justifyContent:"space-between",fontWeight:800,fontSize:20,color:"#fff"}}><span>Total</span><span style={{color:"#f59e0b"}}>₹{total.toLocaleString()}</span></div>
-            </div>
-            <button onClick={()=>setShowCheckout(true)} style={{width:"100%",padding:"16px",borderRadius:14,border:"none",background:"linear-gradient(135deg,#f59e0b,#d97706)",color:"#fff",fontWeight:700,fontSize:16,cursor:"pointer",fontFamily:"'Outfit',sans-serif",transition:"all .3s",boxShadow:"0 8px 30px rgba(245,158,11,0.3)"}}
-            onMouseEnter={e=>e.currentTarget.style.transform="translateY(-2px)"}
-            onMouseLeave={e=>e.currentTarget.style.transform="translateY(0)"}>Proceed to Checkout →</button>
-            <button onClick={()=>setPage("shop")} style={{width:"100%",padding:"12px",borderRadius:14,border:"1px solid #1e1e2e",background:"transparent",color:"rgba(255,255,255,0.5)",fontWeight:600,cursor:"pointer",fontSize:14,marginTop:10,fontFamily:"'Outfit',sans-serif"}}>Continue Shopping</button>
-          </div>
-        </div>
+function PaintingsSection() {
+  const ref=useRef(null);const visible=useIntersection(ref);
+  const pills=["Watercolour","Oil Painting","Acrylic","Madhubani","Glass Painting","Sketch","Digital Art"];
+  const [active,setActive]=useState(0);
+  return (
+    <section className="section paintings-section"><div className="section-inner" ref={ref}>
+      <div className={`section-header fade-up${visible?" visible":""}`}>
+        <div><div className="section-label">Fine Arts</div><h2 className="section-title">Paintings</h2></div>
+        <button className="btn-explore">Explore All →</button>
       </div>
-    </div>
+      <div className={`fade-up fade-up-delay-1${visible?" visible":""}`}>
+        <ProductCarousel products={paintingProducts}/>
+        <div className="pill-row">{pills.map((p,i)=><button key={p} className={`pill${i===active?" active":""}`} onClick={()=>setActive(i)}>{p}</button>)}</div>
+      </div>
+    </div></section>
   );
 }
 
-/* ═══════════════════════════════════════════
-   WISHLIST PAGE
-═══════════════════════════════════════════ */
-function WishlistPage({wishlist,toggleWish,setCart,setPage,toast,onOpenDetail}){
-  const items=PRODUCTS.filter(p=>wishlist.includes(p.id));
-  const moveToCart=(product)=>{
-    setCart(prev=>{const ex=prev.find(i=>i.id===product.id);return ex?prev.map(i=>i.id===product.id?{...i,qty:i.qty+1}:i):[...prev,{...product,qty:1}];});
-    toggleWish(product.id);toast("Moved to cart!","success");
-  };
-  if(items.length===0)return(
-    <div style={{minHeight:"70vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"#0a0a0f",gap:20}}>
-      <div style={{fontSize:80}}>❤️</div>
-      <h2 style={{fontFamily:"'Syne',sans-serif",color:"#fff",fontSize:"2rem"}}>Your wishlist is empty</h2>
-      <p style={{color:"rgba(255,255,255,0.4)"}}>Save items you love!</p>
-      <button onClick={()=>setPage("shop")} style={{padding:"14px 36px",borderRadius:30,border:"none",background:"linear-gradient(135deg,#f59e0b,#d97706)",color:"#fff",fontWeight:700,cursor:"pointer",fontSize:15,fontFamily:"'Outfit',sans-serif"}}>Browse Products →</button>
-    </div>
+function SpotriSection() {
+  const ref=useRef(null);const visible=useIntersection(ref);
+  return (
+    <section className="section" style={{background:"var(--bg2)"}}><div className="section-inner" ref={ref}>
+      <div className={`section-header fade-up${visible?" visible":""}`}>
+        <div><div className="section-label">Embroidery & Textile Art</div><h2 className="section-title">Spotri</h2></div>
+        <button className="btn-explore">Explore All →</button>
+      </div>
+      <div className={`spotri-grid fade-up fade-up-delay-1${visible?" visible":""}`}>
+        {spotriProducts.map(p=>(
+          <div key={p.id} className="spotri-card">
+            <div className="spotri-img">{p.emoji}</div>
+            <span className="spotri-badge">{p.category}</span>
+            <div className="spotri-info"><h4>{p.name}</h4><p>{p.desc}</p></div>
+          </div>
+        ))}
+      </div>
+      <a href="#" className="section-link">View All Spotri Art →</a>
+    </div></section>
   );
-  return(
-    <div style={{background:"#0a0a0f",minHeight:"100vh",padding:"40px 24px"}}>
-      <div style={{maxWidth:1280,margin:"0 auto"}}>
-        <h1 style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:"2rem",color:"#fff",marginBottom:32}}>Wishlist <span style={{color:"#f59e0b",fontSize:"1.2rem"}}>({items.length} items)</span></h1>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))",gap:20}}>
-          {items.map(p=>(
-            <div key={p.id} style={{background:"#111117",borderRadius:20,overflow:"hidden",border:"1px solid #1e1e2e",transition:"all .3s",cursor:"pointer"}}
-            onClick={()=>onOpenDetail&&onOpenDetail(p)}
-            onMouseEnter={e=>{e.currentTarget.style.borderColor="#f59e0b44";e.currentTarget.style.transform="translateY(-6px)";}}
-            onMouseLeave={e=>{e.currentTarget.style.borderColor="#1e1e2e";e.currentTarget.style.transform="translateY(0)";}}>
-              <div style={{height:160,position:"relative"}}>
-                <ProductImage id={p.id} height={160}/>
-                <button onClick={e=>{e.stopPropagation();toggleWish(p.id);}} style={{position:"absolute",top:8,right:8,width:32,height:32,borderRadius:"50%",background:"rgba(0,0,0,0.5)",border:"none",cursor:"pointer",fontSize:16,display:"flex",alignItems:"center",justifyContent:"center"}}>❤️</button>
-              </div>
-              <div style={{padding:"16px"}}>
-                <div style={{fontSize:11,color:"#f59e0b",fontWeight:600,marginBottom:4}}>{p.shop}</div>
-                <div style={{fontWeight:600,color:"#fff",marginBottom:10,fontSize:14}}>{p.name}</div>
-                <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14}}>
-                  <span style={{fontWeight:800,fontSize:18,color:"#fff"}}>₹{p.price}</span>
-                  <span style={{fontSize:12,color:"rgba(255,255,255,0.3)",textDecoration:"line-through"}}>₹{p.original}</span>
-                </div>
-                <button onClick={e=>{e.stopPropagation();moveToCart(p);}} style={{width:"100%",padding:"11px",borderRadius:12,border:"none",background:"linear-gradient(135deg,#f59e0b,#d97706)",color:"#fff",fontWeight:700,cursor:"pointer",fontSize:13,fontFamily:"'Outfit',sans-serif"}}>Move to Cart 🛒</button>
-              </div>
+}
+
+function WoodSection() {
+  const ref=useRef(null);const visible=useIntersection(ref);
+  return (
+    <section className="section wood-section"><div className="section-inner" ref={ref}>
+      <div className={`section-header fade-up${visible?" visible":""}`}>
+        <div><div className="section-label">Master Craft</div><h2 className="section-title" style={{color:"#6b4020"}}>Wooden Sculpting</h2></div>
+        <button className="btn-explore" style={{borderColor:"#c49a6c",color:"#8b5e3c"}}>Explore All →</button>
+      </div>
+      <div className={`wood-split fade-up fade-up-delay-1${visible?" visible":""}`}>
+        <div className="wood-featured">
+          <div className="wood-featured-emoji">{woodProducts[0].emoji}</div>
+          <div className="wood-featured-badge">
+            <h3>{woodProducts[0].name}</h3><p>{woodProducts[0].desc}</p>
+            <div className="price">{woodProducts[0].price}</div>
+          </div>
+        </div>
+        <div className="wood-list">
+          {woodProducts.map(p=>(
+            <div key={p.id} className="wood-item">
+              <div className="wood-thumb">{p.emoji}</div>
+              <div className="wood-item-info"><h4>{p.name}</h4><p>{p.desc}</p><div className="wood-price">{p.price}</div></div>
             </div>
           ))}
         </div>
       </div>
-    </div>
+      <div className="wood-divider"/>
+    </div></section>
   );
 }
 
-/* ═══════════════════════════════════════════
-   PROFILE PAGE
-═══════════════════════════════════════════ */
-function ProfilePage({user,setUser,setPage,cart,wishlist,toast}){
-  const [tab,setTab]=useState("orders");
-  const [orders,setOrders]=useState(MOCK_ORDERS);
-
-  if(!user)return(
-    <div style={{minHeight:"70vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"#0a0a0f",gap:20}}>
-      <div style={{fontSize:80}}>🔐</div>
-      <h2 style={{fontFamily:"'Syne',sans-serif",color:"#fff",fontSize:"2rem"}}>Please log in</h2>
-      <button onClick={()=>setPage("login")} style={{padding:"14px 36px",borderRadius:30,border:"none",background:"linear-gradient(135deg,#f59e0b,#d97706)",color:"#fff",fontWeight:700,cursor:"pointer",fontSize:15,fontFamily:"'Outfit',sans-serif"}}>Login →</button>
-    </div>
-  );
-
-  const statusColor={Delivered:"#10b981",Shipped:"#3b82f6",Processing:"#f59e0b",Cancelled:"#ef4444"};
-
-  return(
-    <div style={{background:"#0a0a0f",minHeight:"100vh",padding:"40px 24px"}}>
-      <div style={{maxWidth:1000,margin:"0 auto"}}>
-        {/* Profile header */}
-        <div style={{background:"#111117",borderRadius:24,padding:"32px",border:"1px solid #1e1e2e",marginBottom:28,display:"flex",gap:24,alignItems:"center"}}>
-          <div style={{width:80,height:80,borderRadius:"50%",background:"linear-gradient(135deg,#7c3aed,#db2777)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:32,fontWeight:800,color:"#fff",flexShrink:0}}>
-            {user.name[0].toUpperCase()}
-          </div>
-          <div style={{flex:1}}>
-            <h2 style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:"1.8rem",color:"#fff",marginBottom:4}}>{user.name}</h2>
-            <p style={{color:"rgba(255,255,255,0.5)",fontSize:14}}>{user.email}</p>
-            <span style={{marginTop:8,display:"inline-block",background:user.role==="seller"?"#7c3aed22":"#10b98122",color:user.role==="seller"?"#a855f7":"#10b981",fontSize:12,fontWeight:700,padding:"4px 12px",borderRadius:20}}>
-              {user.role==="seller"?"⭐ Seller":"🛍️ Buyer"}
-            </span>
-          </div>
-          <div style={{display:"flex",gap:16}}>
-            {[{v:orders.length,l:"Orders"},{v:wishlist.length,l:"Wishlist"},{v:cart.length,l:"In Cart"}].map(({v,l})=>(
-              <div key={l} style={{textAlign:"center",padding:"12px 20px",background:"#0a0a0f",borderRadius:16,border:"1px solid #1e1e2e"}}>
-                <div style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:"1.5rem",color:"#f59e0b"}}>{v}</div>
-                <div style={{fontSize:12,color:"rgba(255,255,255,0.4)",marginTop:2}}>{l}</div>
-              </div>
-            ))}
-          </div>
+function StoneSection() {
+  const ref=useRef(null);const visible=useIntersection(ref);
+  const [lightbox,setLightbox]=useState(null);
+  return (
+    <section className="stone-section">
+      <div className="section-inner" ref={ref}>
+        <div className={`section-header fade-up${visible?" visible":""}`}>
+          <div><div className="section-label">Ancient Craft</div><h2 className="section-title">Stone Art</h2></div>
+          <button className="btn-explore">Explore All →</button>
         </div>
-
-        {/* Tabs */}
-        <div style={{display:"flex",gap:4,background:"#111117",borderRadius:16,padding:6,marginBottom:24,border:"1px solid #1e1e2e"}}>
-          {[{v:"orders",l:"📦 Order History"},{v:"settings",l:"⚙️ Account Settings"}].map(t=>(
-            <button key={t.v} onClick={()=>setTab(t.v)} style={{flex:1,padding:"12px",borderRadius:12,border:"none",background:tab===t.v?"#f59e0b":"transparent",color:tab===t.v?"#000":"rgba(255,255,255,0.6)",fontWeight:700,cursor:"pointer",fontSize:14,fontFamily:"'Outfit',sans-serif",transition:"all .2s"}}>{t.l}</button>
-          ))}
-        </div>
-
-        {tab==="orders"&&(
-          <div>
-            {orders.length===0&&(
-              <div style={{textAlign:"center",padding:"60px",color:"rgba(255,255,255,0.3)"}}>
-                <div style={{fontSize:48,marginBottom:12}}>📦</div>
-                <div style={{fontSize:16,fontWeight:600}}>No orders yet</div>
-                <button onClick={()=>setPage("shop")} style={{marginTop:16,padding:"10px 24px",borderRadius:20,border:"none",background:"#f59e0b",color:"#000",fontWeight:700,cursor:"pointer",fontFamily:"'Outfit',sans-serif"}}>Start Shopping</button>
-              </div>
-            )}
-            {orders.map(order=>(
-              <div key={order.id} style={{background:"#111117",borderRadius:20,padding:"24px",border:"1px solid #1e1e2e",marginBottom:16}}>
-                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
-                  <div>
-                    <div style={{fontWeight:700,color:"#fff",fontSize:15}}>{order.id}</div>
-                    <div style={{fontSize:12,color:"rgba(255,255,255,0.4)",marginTop:2}}>Ordered on {order.date}</div>
-                  </div>
-                  <div style={{display:"flex",gap:12,alignItems:"center"}}>
-                    <span style={{fontWeight:800,color:"#f59e0b",fontSize:18}}>₹{order.total.toLocaleString()}</span>
-                    <span style={{padding:"6px 14px",borderRadius:20,background:`${statusColor[order.status]}22`,color:statusColor[order.status],fontSize:12,fontWeight:700}}>{order.status}</span>
-                  </div>
-                </div>
-                <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
-                  {order.items.map((item,i)=>(
-                    <div key={i} style={{display:"flex",gap:10,alignItems:"center",background:"#0a0a0f",borderRadius:12,padding:"10px 14px",border:"1px solid #1e1e2e"}}>
-                      <div style={{width:40,height:40,borderRadius:8,overflow:"hidden",flexShrink:0}}>
-                        <ProductImage id={item.id} height={40}/>
-                      </div>
-                      <div>
-                        <div style={{fontSize:12,fontWeight:600,color:"rgba(255,255,255,0.8)"}}>{item.name.slice(0,24)}...</div>
-                        <div style={{fontSize:11,color:"rgba(255,255,255,0.4)"}}>Qty: {item.qty} × ₹{item.price}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                {order.status==="Delivered"&&(
-                  <button style={{marginTop:12,padding:"8px 18px",borderRadius:10,border:"1px solid rgba(245,158,11,0.3)",background:"transparent",color:"#f59e0b",fontWeight:600,cursor:"pointer",fontSize:13,fontFamily:"'Outfit',sans-serif"}}>
-                    ⭐ Write a Review
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-
-        {tab==="settings"&&(
-          <div style={{background:"#111117",borderRadius:20,padding:"28px",border:"1px solid #1e1e2e"}}>
-            <h3 style={{fontFamily:"'Syne',sans-serif",fontWeight:700,color:"#fff",marginBottom:20}}>Account Settings</h3>
-            {[["Full Name",user.name],["Email",user.email],["Phone","Not added"],["Location","Not added"]].map(([label,val])=>(
-              <div key={label} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"14px 0",borderBottom:"1px solid #1e1e2e"}}>
-                <div>
-                  <div style={{fontSize:12,color:"rgba(255,255,255,0.4)",marginBottom:2}}>{label}</div>
-                  <div style={{fontSize:14,color:"rgba(255,255,255,0.85)",fontWeight:600}}>{val}</div>
-                </div>
-                <button style={{padding:"6px 14px",borderRadius:8,border:"1px solid #1e1e2e",background:"transparent",color:"rgba(255,255,255,0.5)",fontSize:12,cursor:"pointer",fontFamily:"'Outfit',sans-serif"}}>Edit</button>
-              </div>
-            ))}
-            <button onClick={()=>{setUser(null);setPage("home");toast("Logged out","info");}} style={{marginTop:20,padding:"12px 24px",borderRadius:12,border:"1px solid #ef444444",background:"transparent",color:"#ef4444",fontWeight:700,cursor:"pointer",fontSize:14,fontFamily:"'Outfit',sans-serif"}}>
-              Logout from all devices
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-/* ═══════════════════════════════════════════
-   LOGIN PAGE
-═══════════════════════════════════════════ */
-function LoginPage({setUser,setPage,toast}){
-  const [tab,setTab]=useState("login");
-  const [form,setForm]=useState({name:"",email:"",password:"",role:"buyer"});
-  const [loading,setLoading]=useState(false);
-  const inp={width:"100%",padding:"14px 18px",borderRadius:12,border:"1.5px solid #1e1e2e",background:"#0a0a0f",color:"#fff",fontSize:14,fontFamily:"'Outfit',sans-serif",boxSizing:"border-box",transition:"border .2s"};
-  const handle=()=>{
-    if(!form.email||!form.password){toast("Please fill all required fields","error");return;}
-    setLoading(true);
-    setTimeout(()=>{
-      setUser({name:form.name||form.email.split("@")[0],email:form.email,role:form.role});
-      toast(`Welcome${form.name?" "+form.name:""}! 🎉`,"success");
-      setPage(form.role==="seller"?"seller":"profile");
-      setLoading(false);
-    },1200);
-  };
-  return(
-    <div style={{minHeight:"100vh",background:"#0a0a0f",display:"flex",alignItems:"center",justifyContent:"center",padding:"40px 24px"}}>
-      <div style={{background:"#111117",borderRadius:28,padding:"48px",border:"1px solid #1e1e2e",width:"100%",maxWidth:440,boxShadow:"0 40px 80px rgba(0,0,0,0.6)"}}>
-        <div style={{textAlign:"center",marginBottom:32}}>
-          <div style={{fontSize:48,marginBottom:12}}>🎨</div>
-          <h2 style={{fontFamily:"'Syne',sans-serif",fontWeight:800,color:"#fff",fontSize:"1.8rem"}}>{tab==="login"?"Welcome Back":"Join ArtisanWorld"}</h2>
-          <p style={{color:"rgba(255,255,255,0.4)",fontSize:14,marginTop:8}}>{tab==="login"?"Sign in to continue shopping":"Create your account today"}</p>
-        </div>
-        <div style={{display:"flex",background:"#0a0a0f",borderRadius:12,padding:4,marginBottom:28}}>
-          {["login","register"].map(t=>(
-            <button key={t} onClick={()=>setTab(t)} style={{flex:1,padding:"10px",borderRadius:10,border:"none",background:tab===t?"#f59e0b":"transparent",color:tab===t?"#000":"rgba(255,255,255,0.5)",fontWeight:700,cursor:"pointer",fontSize:14,fontFamily:"'Outfit',sans-serif",transition:"all .2s",textTransform:"capitalize"}}>{t==="login"?"Sign In":"Register"}</button>
-          ))}
-        </div>
-        <div style={{display:"flex",flexDirection:"column",gap:14}}>
-          {tab==="register"&&<input placeholder="Full Name" value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} style={inp}/>}
-          <input placeholder="Email Address *" type="email" value={form.email} onChange={e=>setForm(f=>({...f,email:e.target.value}))} style={inp}/>
-          <input placeholder="Password *" type="password" value={form.password} onChange={e=>setForm(f=>({...f,password:e.target.value}))} style={inp}/>
-          {tab==="register"&&<select value={form.role} onChange={e=>setForm(f=>({...f,role:e.target.value}))} style={{...inp,cursor:"pointer"}}>
-            <option value="buyer">I'm a Buyer</option>
-            <option value="seller">I'm a Seller / Artisan</option>
-          </select>}
-          <button onClick={handle} disabled={loading} style={{padding:"15px",borderRadius:14,border:"none",background:loading?"#374151":"linear-gradient(135deg,#f59e0b,#d97706)",color:"#fff",fontWeight:700,fontSize:15,cursor:loading?"not-allowed":"pointer",fontFamily:"'Outfit',sans-serif",transition:"all .3s",marginTop:8,boxShadow:loading?"none":"0 8px 30px rgba(245,158,11,0.3)"}}>
-            {loading?"Please wait...":tab==="login"?"Sign In →":"Create Account →"}
-          </button>
-        </div>
-        <div style={{marginTop:24,display:"flex",gap:12}}>
-          {["Google","Facebook"].map(p=>(
-            <button key={p} style={{flex:1,padding:"12px",borderRadius:12,border:"1px solid #1e1e2e",background:"transparent",color:"rgba(255,255,255,0.6)",cursor:"pointer",fontSize:13,fontFamily:"'Outfit',sans-serif",transition:"all .2s"}}
-            onMouseEnter={e=>{e.currentTarget.style.borderColor="#f59e0b44";e.currentTarget.style.color="#fff";}}
-            onMouseLeave={e=>{e.currentTarget.style.borderColor="#1e1e2e";e.currentTarget.style.color="rgba(255,255,255,0.6)";}}>{p==="Google"?"🌐":"📘"} {p}</button>
+        <div className={`stone-gallery fade-up fade-up-delay-1${visible?" visible":""}`}>
+          {stoneProducts.map(p=>(
+            <div key={p.id} className="stone-card" onClick={()=>setLightbox(p)}>
+              <div className="stone-img">{p.emoji}</div>
+              <div className="stone-info"><h4>{p.name}</h4><p>{p.desc}</p><div className="stone-price">{p.price}</div></div>
+            </div>
           ))}
         </div>
       </div>
-    </div>
+      {lightbox&&(
+        <div className="lightbox" onClick={()=>setLightbox(null)}>
+          <div className="lightbox-content" onClick={e=>e.stopPropagation()}>
+            <button className="lightbox-close" onClick={()=>setLightbox(null)}>✕</button>
+            <span className="lightbox-emoji">{lightbox.emoji}</span>
+            <h2 style={{fontFamily:"var(--font-display)",color:"white",marginBottom:8}}>{lightbox.name}</h2>
+            <p style={{color:"rgba(255,255,255,0.5)",marginBottom:16}}>{lightbox.desc}</p>
+            <div style={{fontSize:"1.4rem",color:"var(--rose-mid)",fontWeight:700,marginBottom:22}}>{lightbox.price}</div>
+            <button className="btn-primary" style={{margin:"0 auto"}}>Add to Cart</button>
+          </div>
+        </div>
+      )}
+    </section>
   );
 }
 
-/* ═══════════════════════════════════════════
-   SELLER PAGE
-═══════════════════════════════════════════ */
-function SellerPage({user,setPage,toast}){
-  const [tab,setTab]=useState("dashboard");
-  const [myProducts,setMyProducts]=useState(PRODUCTS.slice(0,3));
-  const [form,setForm]=useState({name:"",category:"Home & Living",desc:"",price:"",stock:""});
-  const [formLoading,setFormLoading]=useState(false);
-  const sellerInput={width:"100%",padding:"13px 16px",borderRadius:12,border:"1.5px solid #1e1e2e",background:"#0a0a0f",color:"#fff",fontSize:14,fontFamily:"'Outfit',sans-serif",boxSizing:"border-box",transition:"border .2s"};
-
-  const addProduct=()=>{
-    if(!form.name||!form.price){toast("Product name and price are required","error");return;}
-    setFormLoading(true);
-    setTimeout(()=>{
-      setMyProducts(p=>[{id:Date.now(),name:form.name,shop:user?.name||"My Shop",price:parseInt(form.price),original:Math.round(parseInt(form.price)*1.67),cat:form.category,rating:5.0,reviews:0,customizable:false,desc:form.desc,material:"Handmade",dimensions:"As described",deliveryDays:7},...p]);
-      setForm({name:"",category:"Home & Living",desc:"",price:"",stock:""});
-      toast("Product listed successfully! 🎉","success");
-      setTab("products");
-      setFormLoading(false);
-    },1500);
-  };
-
-  if(!user)return(
-    <div style={{minHeight:"70vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"#0a0a0f",gap:20}}>
-      <div style={{fontSize:80}}>🔐</div>
-      <h2 style={{fontFamily:"'Syne',sans-serif",color:"#fff",fontSize:"2rem"}}>Seller Access Required</h2>
-      <p style={{color:"rgba(255,255,255,0.4)"}}>Please login to access the seller dashboard</p>
-      <button onClick={()=>setPage("login")} style={{padding:"14px 36px",borderRadius:30,border:"none",background:"linear-gradient(135deg,#f59e0b,#d97706)",color:"#fff",fontWeight:700,cursor:"pointer",fontSize:15,fontFamily:"'Outfit',sans-serif"}}>Login / Register →</button>
-    </div>
-  );
-
-  const stats=[{label:"Total Products",value:myProducts.length,icon:"📦",color:"#f59e0b"},{label:"Total Orders",value:24,icon:"🛒",color:"#10b981"},{label:"Revenue",value:"₹18,420",icon:"💰",color:"#a855f7"},{label:"Rating",value:"4.8★",icon:"⭐",color:"#3b82f6"}];
-
-  return(
-    <div style={{background:"#0a0a0f",minHeight:"100vh",padding:"40px 24px"}}>
-      <div style={{maxWidth:1280,margin:"0 auto"}}>
-        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:32}}>
-          <div><span style={{color:"#f59e0b",fontSize:13,fontWeight:600,letterSpacing:2}}>SELLER HUB</span><h1 style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:"2rem",color:"#fff",marginTop:6}}>Welcome, {user.name} 👋</h1></div>
-        </div>
-        <div style={{display:"flex",gap:8,background:"#111117",borderRadius:16,padding:6,marginBottom:28,border:"1px solid #1e1e2e",maxWidth:500}}>
-          {[{v:"dashboard",l:"Dashboard"},{v:"products",l:"My Products"},{v:"add",l:"+ Add Product"}].map(t=>(
-            <button key={t.v} onClick={()=>setTab(t.v)} style={{flex:1,padding:"10px",borderRadius:10,border:"none",background:tab===t.v?"#f59e0b":"transparent",color:tab===t.v?"#000":"rgba(255,255,255,0.5)",fontWeight:700,cursor:"pointer",fontSize:13,fontFamily:"'Outfit',sans-serif",transition:"all .2s"}}>{t.l}</button>
-          ))}
-        </div>
-
-        {tab==="dashboard"&&(
-          <div>
-            <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:20,marginBottom:28}}>
-              {stats.map(s=>(
-                <div key={s.label} style={{background:"#111117",borderRadius:20,padding:"24px",border:"1px solid #1e1e2e"}}>
-                  <div style={{fontSize:28,marginBottom:8}}>{s.icon}</div>
-                  <div style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:"1.6rem",color:s.color}}>{s.value}</div>
-                  <div style={{fontSize:13,color:"rgba(255,255,255,0.4)",marginTop:4}}>{s.label}</div>
-                </div>
-              ))}
-            </div>
-            <div style={{background:"#111117",borderRadius:20,padding:"24px",border:"1px solid #1e1e2e"}}>
-              <h3 style={{fontFamily:"'Syne',sans-serif",fontWeight:700,color:"#fff",marginBottom:16}}>Recent Orders</h3>
-              {[{id:"#3847",product:"Madhubani Painting",buyer:"Priya M.",amount:1299,status:"Shipped"},{id:"#3846",product:"Terracotta Set",buyer:"Amit K.",amount:599,status:"Delivered"},{id:"#3845",product:"Clay Earrings",buyer:"Neha R.",amount:299,status:"Processing"}].map(o=>(
-                <div key={o.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 0",borderBottom:"1px solid #1e1e2e",fontSize:13}}>
-                  <span style={{color:"#f59e0b",fontWeight:700}}>{o.id}</span>
-                  <span style={{color:"rgba(255,255,255,0.8)",flex:1,margin:"0 16px"}}>{o.product}</span>
-                  <span style={{color:"rgba(255,255,255,0.5)",marginRight:16}}>{o.buyer}</span>
-                  <span style={{color:"#fff",fontWeight:700,marginRight:16}}>₹{o.amount}</span>
-                  <span style={{padding:"4px 10px",borderRadius:10,background:o.status==="Delivered"?"#10b98122":o.status==="Shipped"?"#3b82f622":"#f59e0b22",color:o.status==="Delivered"?"#10b981":o.status==="Shipped"?"#3b82f6":"#f59e0b",fontWeight:600,fontSize:11}}>{o.status}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {tab==="products"&&(
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(220px,1fr))",gap:20}}>
-            {myProducts.map(p=>(
-              <div key={p.id} style={{background:"#111117",borderRadius:20,overflow:"hidden",border:"1px solid #1e1e2e"}}>
-                <div style={{height:140,position:"relative"}}>
-                  <ProductImage id={p.id} height={140}/>
-                </div>
-                <div style={{padding:"14px"}}>
-                  <div style={{fontWeight:600,color:"#fff",fontSize:13,marginBottom:8}}>{p.name}</div>
-                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                    <span style={{color:"#f59e0b",fontWeight:800}}>₹{p.price}</span>
-                    <button onClick={()=>setMyProducts(prev=>prev.filter(x=>x.id!==p.id))} style={{padding:"5px 10px",borderRadius:8,border:"1px solid #ef444444",background:"transparent",color:"#ef4444",fontSize:11,cursor:"pointer",fontFamily:"'Outfit',sans-serif"}}>Delete</button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {tab==="add"&&(
-          <div style={{maxWidth:600}}>
-            <div style={{background:"#111117",borderRadius:24,padding:"32px",border:"1px solid #1e1e2e"}}>
-              <h3 style={{fontFamily:"'Syne',sans-serif",fontWeight:700,color:"#fff",marginBottom:20}}>Add New Product</h3>
-              <div style={{display:"flex",flexDirection:"column",gap:14}}>
-                <input placeholder="Product Name *" value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} style={sellerInput}/>
-                <textarea placeholder="Description" rows={3} value={form.desc} onChange={e=>setForm(f=>({...f,desc:e.target.value}))} style={{...sellerInput,resize:"none"}}/>
-                <select value={form.category} onChange={e=>setForm(f=>({...f,category:e.target.value}))} style={{...sellerInput,cursor:"pointer"}}>
-                  {CATS.map(c=><option key={c.name} value={c.name}>{c.name}</option>)}
-                </select>
-                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
-                  <input placeholder="Price (₹) *" type="number" value={form.price} onChange={e=>setForm(f=>({...f,price:e.target.value}))} style={sellerInput}/>
-                  <input placeholder="Stock Quantity" type="number" value={form.stock} onChange={e=>setForm(f=>({...f,stock:e.target.value}))} style={sellerInput}/>
-                </div>
-                <button onClick={addProduct} disabled={formLoading} style={{padding:"15px",borderRadius:14,border:"none",background:formLoading?"#374151":"linear-gradient(135deg,#f59e0b,#d97706)",color:"#fff",fontWeight:700,fontSize:15,cursor:formLoading?"not-allowed":"pointer",fontFamily:"'Outfit',sans-serif",transition:"all .3s",marginTop:4}}>
-                  {formLoading?"Adding Product...":"Add Product →"}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+function ArtistsSection() {
+  const ref=useRef(null);const visible=useIntersection(ref);
+  return (
+    <section className="section"><div className="section-inner" ref={ref}>
+      <div className={`section-header fade-up${visible?" visible":""}`}>
+        <div><div className="section-label">Meet the Makers</div><h2 className="section-title">Featured Artists Spotlight</h2></div>
+        <button className="btn-explore">View All →</button>
       </div>
-    </div>
+      <div className={`artists-track fade-up fade-up-delay-1${visible?" visible":""}`}>
+        {artists.map((a,i)=>(
+          <div key={i} className="artist-card">
+            <div className="artist-avatar">{a.emoji}</div>
+            <div className="artist-name">{a.name}</div>
+            <div className="artist-craft">{a.craft}</div>
+            <div className="artist-location">📍 {a.location}</div>
+            <div className="artist-stars">{"★".repeat(Math.floor(a.rating))} {a.rating} ({a.reviews})</div>
+            <button className="btn-visit">Visit Shop</button>
+          </div>
+        ))}
+      </div>
+    </div></section>
   );
 }
 
-/* ═══════════════════════════════════════════
-   FOOTER
-═══════════════════════════════════════════ */
-function Footer({setPage}){
-  return(
-    <footer style={{background:"#080810",borderTop:"1px solid #1e1e2e",padding:"60px 24px 32px"}}>
-      <div style={{maxWidth:1280,margin:"0 auto"}}>
-        <div style={{display:"grid",gridTemplateColumns:"2fr 1fr 1fr 1fr",gap:48,marginBottom:48}}>
-          <div>
-            <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16}}>
-              <div style={{width:36,height:36,borderRadius:10,background:"linear-gradient(135deg,#f59e0b,#d97706)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>🎨</div>
-              <span style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:22,color:"#fff"}}>Artisan<span style={{color:"#f59e0b"}}>World</span></span>
-            </div>
-            <p style={{fontSize:13,color:"rgba(255,255,255,0.35)",lineHeight:1.9,maxWidth:280}}>India's premier marketplace for handmade artisan products. Connecting creators with craft lovers since 2024.</p>
-            <div style={{display:"flex",gap:10,marginTop:20}}>
-              {["📘","📸","🐦","▶️"].map((icon,i)=>(
-                <div key={i} style={{width:36,height:36,borderRadius:10,background:"#111117",border:"1px solid #1e1e2e",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,cursor:"pointer"}}>{icon}</div>
-              ))}
-            </div>
-          </div>
-          {[["Shop",["Home & Living","Fashion","Jewellery","Gifts","Stationery","Paintings"]],["Sellers",["Start Selling","Seller Dashboard","Seller FAQs","Pricing & Fees","Success Stories"]],["Support",["Track Order","Returns Policy","Contact Us","FAQs","Size Guide"]]].map(([title,links])=>(
-            <div key={title}>
-              <h4 style={{color:"rgba(255,255,255,0.9)",fontWeight:700,marginBottom:16,fontSize:14,letterSpacing:.5}}>{title}</h4>
-              {links.map(l=>(
-                <div key={l} style={{fontSize:13,color:"rgba(255,255,255,0.35)",marginBottom:10,cursor:"pointer",transition:"color .2s"}}
-                onMouseEnter={e=>e.target.style.color="#f59e0b"}
-                onMouseLeave={e=>e.target.style.color="rgba(255,255,255,0.35)"}>{l}</div>
-              ))}
+function TestimonialsSection() {
+  const [current,setCurrent]=useState(0);
+  const ref=useRef(null);const visible=useIntersection(ref);
+  useEffect(()=>{const t=setInterval(()=>setCurrent(c=>(c+1)%testimonials.length),5200);return()=>clearInterval(t);},[]);
+  const trust=[{icon:"🔒",label:"Secure Payments"},{icon:"✅",label:"Verified Artisans"},{icon:"🚚",label:"Worldwide Delivery"},{icon:"↩️",label:"30-day Returns"}];
+  return (
+    <section className="testimonials-section" ref={ref}>
+      <div className="testimonials-inner">
+        <div style={{textAlign:"center",marginBottom:40}} className={`fade-up${visible?" visible":""}`}>
+          <div className="section-label">What People Say</div>
+          <h2 className="section-title">Loved by Buyers & Artists</h2>
+        </div>
+        <div className={`testimonial-wrap fade-up fade-up-delay-1${visible?" visible":""}`}>
+          {testimonials.map((t,i)=>(
+            <div key={i} className={`testimonial${i===current?" active":""}`}>
+              <p className="testimonial-quote">"{t.quote}"</p>
+              <div className="testimonial-author">{t.author}</div>
+              <div className="testimonial-role">{t.role}</div>
             </div>
           ))}
         </div>
-        <div style={{borderTop:"1px solid #1e1e2e",paddingTop:24,display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:12}}>
-          <p style={{fontSize:12,color:"rgba(255,255,255,0.25)"}}>© 2024 ArtisanWorld. Made with ❤️ in India. All rights reserved.</p>
-          <div style={{display:"flex",gap:16}}>
-            {["Privacy Policy","Terms of Service","Cookie Policy"].map(l=>(
-              <span key={l} style={{fontSize:12,color:"rgba(255,255,255,0.25)",cursor:"pointer"}}
-              onMouseEnter={e=>e.target.style.color="#f59e0b"}
-              onMouseLeave={e=>e.target.style.color="rgba(255,255,255,0.25)"}>{l}</span>
-            ))}
+        <div style={{display:"flex",justifyContent:"center",gap:8,marginTop:22}}>
+          {testimonials.map((_,i)=>(
+            <button key={i} onClick={()=>setCurrent(i)}
+              style={{width:i===current?26:8,height:8,borderRadius:4,background:i===current?"var(--rose)":"var(--rose-mid)",border:"none",cursor:"pointer",transition:"all 0.35s ease"}}/>
+          ))}
+        </div>
+        <div className={`trust-bar fade-up fade-up-delay-2${visible?" visible":""}`}>
+          {trust.map(t=>(
+            <div key={t.label} className="trust-item">
+              <div className="trust-icon">{t.icon}</div>{t.label}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Footer() {
+  const cats=["Handloom","Paintings","Spotri","Wooden Sculpting","Stone Art","Jewellery","Pottery"];
+  const sell=["Become a Seller","Seller Guidelines","Pricing & Fees","Artist Resources","Community Forum"];
+  const about=["About Us","Our Mission","Blog","Press Kit","Careers","Partners"];
+  return (
+    <footer className="footer">
+      <div className="footer-grid">
+        <div>
+          <div className="footer-brand">🌸 ArtisanWorld</div>
+          <p className="footer-desc">Connecting artisans and art-lovers across the globe. Every purchase supports a craftsperson and their heritage.</p>
+          <div className="footer-socials">
+            {["𝕏","f","in","📷","▶"].map((s,i)=><button key={i} className="social-btn">{s}</button>)}
           </div>
+          <p style={{fontSize:"0.78rem",color:"rgba(255,255,255,0.32)",marginBottom:8}}>Subscribe to our newsletter</p>
+          <div className="newsletter">
+            <input placeholder="Your email address"/>
+            <button>Subscribe</button>
+          </div>
+        </div>
+        <div className="footer-col"><h4>About</h4><ul>{about.map(l=><li key={l}><a href="#">{l}</a></li>)}</ul></div>
+        <div className="footer-col"><h4>Categories</h4><ul>{cats.map(l=><li key={l}><a href="#">{l}</a></li>)}</ul></div>
+        <div className="footer-col">
+          <h4>Sell With Us</h4><ul>{sell.map(l=><li key={l}><a href="#">{l}</a></li>)}</ul>
+          <div style={{marginTop:18}}><h4>Contact</h4><ul>
+            <li><a href="#">support@artisanworld.com</a></li>
+            <li><a href="#">+91 98765 43210</a></li>
+            <li><a href="#">Live Chat</a></li>
+          </ul></div>
+        </div>
+      </div>
+      <div className="footer-bottom">
+        <span>© 2025 ArtisanWorld. All rights reserved.</span>
+        <div style={{display:"flex",gap:18}}>
+          {["Privacy Policy","Terms of Service","Cookie Policy"].map(l=>(
+            <a key={l} href="#" style={{color:"rgba(255,255,255,0.25)",textDecoration:"none",fontSize:"0.76rem"}}>{l}</a>
+          ))}
         </div>
       </div>
     </footer>
   );
 }
 
-/* ═══════════════════════════════════════════
-   HANDCRAFT PAGE (main export)
-═══════════════════════════════════════════ */
-export default function HandcraftPage(){
-  const navigate=useNavigate();
-  const [page,setPage]=useState("home");
-
-  const handleSetPage=(p)=>{
-    if(p==="shop"){navigate("/buy");return;}
-    if(p==="seller"){navigate("/auth");return;}
-    if(p==="login"){navigate("/auth");return;}
-    if(p==="cart"){navigate("/cart");return;}
-    if(p==="profile"){navigate("/account");return;}
-    setPage(p);
-  };
-  const [cart,setCart]=useState([]);
-  const [wishlist,setWishlist]=useState([]);
-  const [detailProduct,setDetailProduct]=useState(null);
-  const [showCheckout,setShowCheckout]=useState(false);
-  const [globalSearch,setGlobalSearch]=useState("");
-  const {toasts,add:addToast,remove:removeToast}=useToast();
-
-  const toggleWish=useCallback((id)=>{
-    setWishlist(prev=>prev.includes(id)?prev.filter(x=>x!==id):[...prev,id]);
-  },[]);
-
-  const handleOrderSuccess=()=>{
-    setCart([]);
-    addToast("Order placed! View in your orders 🎉","success");
-    navigate("/tracking");
-  };
-
-  const openDetail=(product)=>setDetailProduct(product);
-  const closeDetail=()=>setDetailProduct(null);
-
-  return(
+export default function HandcraftPage() {
+  return (
     <>
-      <GlobalStyles/>
-      {page==="home"&&<HomePage setPage={handleSetPage} setCart={setCart} wishlist={wishlist} toggleWish={toggleWish} toast={addToast} onOpenDetail={openDetail}/>}
-      {page==="shop"&&<ShopPage cart={cart} setCart={setCart} wishlist={wishlist} toggleWish={toggleWish} toast={addToast} onOpenDetail={openDetail} initialSearch={globalSearch}/>}
-      {page==="wishlist"&&<WishlistPage wishlist={wishlist} toggleWish={toggleWish} setCart={setCart} setPage={handleSetPage} toast={addToast} onOpenDetail={openDetail}/>}
-      {page==="seller"&&<SellerPage user={null} setPage={handleSetPage} toast={addToast}/>}
-      <Toast toasts={toasts} remove={removeToast}/>
-
-      {detailProduct&&(
-        <ProductDetail
-          product={detailProduct}
-          onClose={closeDetail}
-          onAddToCart={(p)=>{setCart(prev=>{const ex=prev.find(i=>i.id===p.id);return ex?prev.map(i=>i.id===p.id?{...i,qty:i.qty+1}:i):[...prev,{...p,qty:1}];});}}
-          onToggleWish={toggleWish}
-          wished={wishlist.includes(detailProduct.id)}
-          toast={addToast}
-        />
-      )}
-
-      {showCheckout&&cart.length>0&&(
-        <CheckoutModal
-          cart={cart}
-          onClose={()=>setShowCheckout(false)}
-          onSuccess={handleOrderSuccess}
-          toast={addToast}
-        />
-      )}
+      <style>{styles}</style>
+      <Navbar/>
+      <HeroSection/>
+      <OurStorySection/>
+      <HandloomSection/>
+      <PaintingsSection/>
+      <SpotriSection/>
+      <WoodSection/>
+      <StoneSection/>
+      <ArtistsSection/>
+      <TestimonialsSection/>
+      <Footer/>
     </>
   );
 }
