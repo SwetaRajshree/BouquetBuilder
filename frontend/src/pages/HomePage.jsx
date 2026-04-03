@@ -207,26 +207,6 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* ── Featured Shops ── */}
-      <section className="bg-white py-2">
-        <div className="max-w-[1200px] mx-auto px-4 py-10">
-          <div className="flex items-end justify-between mb-6 flex-wrap gap-4">
-            <div>
-              <h2 className="font-playfair font-bold text-[clamp(1.6rem,3vw,2.1rem)] text-roseDD">🌹 Featured Shops</h2>
-              <p className="text-[.9rem] text-textL font-light mt-1">Handpicked florists loved by our community</p>
-            </div>
-            <button onClick={() => navigate('/shops')} className="border-[1.5px] border-rose text-roseD text-[.85rem] font-medium px-5 py-2 rounded-full hover:bg-rose hover:text-white transition-all">
-              View All →
-            </button>
-          </div>
-          <div className="scroll-row">
-            {shops.map((s, i) => <ShopCard key={s._id} shop={{ ...s, id: s._id, img: ['🌺','🌸','🌹','🌼','💐'][i%5], color: '#FFB6C1', specialty: s.area || s.city || 'Florist', rating: '4.8', distance: s.area || '', open: true }} />)}
-          </div>
-        </div>
-      </section>
-
-      <FloralDivider />
-
       {/* ── Occasions ── */}
       <section className="py-2">
         <div className="max-w-[1200px] mx-auto px-4 py-10">
@@ -241,6 +221,26 @@ export default function HomePage() {
                 <h4 className="font-playfair font-semibold text-[.94rem] text-roseDD">{o.label}</h4>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <FloralDivider />
+
+      {/* ── Featured Shops ── */}
+      <section className="bg-white py-2">
+        <div className="max-w-[1200px] mx-auto px-4 py-10">
+          <div className="flex items-end justify-between mb-6 flex-wrap gap-4">
+            <div>
+              <h2 className="font-playfair font-bold text-[clamp(1.6rem,3vw,2.1rem)] text-roseDD">🌹 Featured Shops</h2>
+              <p className="text-[.9rem] text-textL font-light mt-1">Handpicked florists loved by our community</p>
+            </div>
+            <button onClick={() => navigate('/shops')} className="border-[1.5px] border-rose text-roseD text-[.85rem] font-medium px-5 py-2 rounded-full hover:bg-rose hover:text-white transition-all">
+              View All →
+            </button>
+          </div>
+          <div className="scroll-row">
+            {shops.map((s, i) => <ShopCard key={s._id} shop={{ ...s, id: s._id, img: ['🌺','🌸','🌹','🌼','💐'][i%5], color: '#FFB6C1', specialty: s.area || s.city || 'Florist', rating: '4.8', distance: s.area || '', open: true }} />)}
           </div>
         </div>
       </section>
