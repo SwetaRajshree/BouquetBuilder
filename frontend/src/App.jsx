@@ -4,6 +4,7 @@ import { useEffect }                  from 'react';
 
 import Navbar           from './components/Navbar';
 import Footer           from './components/Footer';
+import { FloraWidget }  from './components/FloraChat';
 
 import HomePage         from './pages/HomePage';
 import ShopsPage        from './pages/ShopsPage';
@@ -100,6 +101,7 @@ export default function App() {
       </main>
 
       {showFooter && <Footer />}
+      <FloraWidget />
     </div>
   );
 }
