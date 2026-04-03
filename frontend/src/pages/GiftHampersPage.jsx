@@ -138,7 +138,12 @@ export default function GiftHampersPage() {
         <p style={{ margin: '0 auto', fontSize: 15, color: 'rgba(253,248,240,0.75)', maxWidth: 480, lineHeight: 1.7 }}>
           Luxury hampers with chocolates, candles, spa sets & more — perfect for every occasion
         </p>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 32, marginTop: 36 }}>
+        <button
+          onClick={() => navigate('/shops')}
+          style={{ marginTop: 28, padding: '13px 32px', background: 'linear-gradient(135deg,#c9a84c,#a8863a)', color: '#fff', border: 'none', borderRadius: 40, fontSize: 14, fontWeight: 800, cursor: 'pointer', boxShadow: '0 6px 22px rgba(201,168,76,0.45)', letterSpacing: 0.5 }}>
+          🏪 Browse Gift Shops
+        </button>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 32, marginTop: 28 }}>
           {[['9+', 'Hampers'], ['100%', 'Curated'], ['Free', 'Wrapping']].map(([n, l]) => (
             <div key={l} style={{ textAlign: 'center' }}>
               <div style={{ fontSize: 22, fontWeight: 900, color: '#f0d898' }}>{n}</div>
