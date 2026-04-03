@@ -30,6 +30,7 @@ import DigitalPostcardPage    from './pages/DigitalPostcardPage';
 import HandcraftPage          from './pages/HandcraftPage';
 import CollectionPage         from './pages/CollectionPage';
 import ForeverFlowersPage     from './pages/ForeverFlowersPage';
+import InstantGiftsPage       from './pages/InstantGiftsPage';
 
 import DigitalGiftingPage from './pages/DigitalGiftingPage';
 import BuyPage            from './pages/BuyPage';
@@ -101,6 +102,7 @@ export default function App() {
           <Route path="/handcraft"          element={<HandcraftPage />} />
           <Route path="/collection"          element={<CollectionPage />} />
           <Route path="/forever-flowers"     element={<ForeverFlowersPage />} />
+          <Route path="/instant-gifts"        element={<InstantGiftsPage />} />
           {/* Fallback */}
           <Route path="*"             element={<HomePage />}         />
         </Routes>

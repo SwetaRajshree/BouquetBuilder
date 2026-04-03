@@ -545,7 +545,7 @@ export default function GiftSection() {
             accentColor={C.rose}
             btnGrad={C.btnGrad}
             emoji="⚡"
-            onClick={()=>setCat("instant")}
+            onClick={()=>navigate('/instant-gifts')}
             floatingEmojis={[
               {emoji:"🚀", top:"12%", left:"8%",  size:16, dur:2.8, delay:0},
               {emoji:"⏱️", top:"58%", left:"7%",  size:14, dur:3.1, delay:0.4},
