@@ -29,6 +29,7 @@ import PostcardPage           from './pages/PostcardPage';
 import DigitalPostcardPage    from './pages/DigitalPostcardPage';
 import HandcraftPage          from './pages/HandcraftPage';
 import CollectionPage         from './pages/CollectionPage';
+import ForeverFlowersPage     from './pages/ForeverFlowersPage';
 
 import DigitalGiftingPage from './pages/DigitalGiftingPage';
 import BuyPage            from './pages/BuyPage';
@@ -99,6 +100,7 @@ export default function App() {
           <Route path="/digital-bouquet"   element={<Navigate to="/bouquet-builder" replace />} />
           <Route path="/handcraft"          element={<HandcraftPage />} />
           <Route path="/collection"          element={<CollectionPage />} />
+          <Route path="/forever-flowers"     element={<ForeverFlowersPage />} />
           {/* Fallback */}
           <Route path="*"             element={<HomePage />}         />
         </Routes>

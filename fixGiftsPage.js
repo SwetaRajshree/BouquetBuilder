@@ -4,12 +4,13 @@ const path = require('path');
 const file = path.join(__dirname, 'frontend/src/pages/GiftsPage.jsx');
 let lines = fs.readFileSync(file, 'utf8').split('\n');
 
-// Fix 1: Add flowers to CATEGORIES array
+// Find the onClick after Forever Flowers title and change it
+let inForeverFlowers = false;
 for (let i = 0; i < lines.length; i++) {
-  if (lines[i].includes('key:"all"') && lines[i].includes('All Gifts')) {
-    // Insert flowers category after this line
-    lines.splice(i + 1, 0, '  { key:"flowers",   label:"Forever Flowers",   icon:"🌸" },');
-    console.log('Added flowers category at line', i + 2);
+  if (lines[i].includes('Forever Flowers,')) inForeverFlowers = true;
+  if (inForeverFlowers && lines[i].includes('onClick={()=>setCat(')) {
+    lines[i] = lines[i].replace(/onClick=\{.*?\}/, 'onClick={()=>navigate(\'/forever-flowers\')}');
+    console.log('Fixed line', i + 1, ':', lines[i].trim());
     break;
   }
 }
