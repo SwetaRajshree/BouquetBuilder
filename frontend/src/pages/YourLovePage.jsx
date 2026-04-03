@@ -97,11 +97,6 @@ const FloatUp = ({ x, delay, duration, color }) => (
   </div>
 );
 
-const buildEntries = (data) => data.map((review, i) => ({
-  ...review,
-  hp: buildHeartProps([review], i)[0] || buildHeartProps(data)[i],
-}));
-
 // ─── MAIN ─────────────────────────────────────────────────────────────────────
 export default function HeartJarReviews() {
   const [entries, setEntries] = useState([]);
@@ -110,16 +105,16 @@ export default function HeartJarReviews() {
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone]             = useState(false);
 
-  const loadEntries = (data) => setEntries(buildHeartProps(data).map((hp, i) => ({ ...data[i], hp })));
+  const toEntries = (data) => buildHeartProps(data).map((hp, i) => ({ ...data[i], hp }));
 
   useEffect(() => {
-    const fetch_ = () =>
+    const load = () =>
       fetch(`${API}/api/reviews`)
         .then(r => r.json())
-        .then(data => { if (Array.isArray(data) && data.length > 0) loadEntries(data); })
+        .then(data => { if (Array.isArray(data) && data.length > 0) setEntries(toEntries(data)); })
         .catch(() => {});
-    fetch_();
-    const t = setInterval(fetch_, 30000);
+    load();
+    const t = setInterval(load, 30000);
     return () => clearInterval(t);
   }, []);
 
@@ -132,8 +127,7 @@ export default function HeartJarReviews() {
         body: JSON.stringify(form),
       });
       const saved = await res.json();
-      const updated = [saved, ...entries.map(e => { const {hp,...r}=e; return r; })];
-      loadEntries(updated);
+      setEntries(prev => toEntries([saved, ...prev.map(({ hp, ...r }) => r)]));
       setDone(true);
       setForm({ name: '', text: '', rating: 5 });
       setTimeout(() => { setDone(false); setShowForm(false); }, 2500);
