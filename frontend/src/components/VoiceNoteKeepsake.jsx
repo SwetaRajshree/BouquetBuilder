@@ -574,7 +574,6 @@ function PlayerScreen({ data, onNewMemory }) {
     });
   },[waveData]);
 
-  useEffect(()=>{
   const playingRef = useRef(false);
   const rafRef = useRef(null);
 
