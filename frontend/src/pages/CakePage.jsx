@@ -63,11 +63,10 @@ const chatFlow = [
 
 const CATEGORIES = ['All', 'Wedding', 'Birthday', 'Anniversary', 'Dessert', 'Occasion'];
 
-function CakeGrid() {
+function CakeGrid({ activeCategory, setActiveCategory }) {
   const { addToCart, cartItems } = useCartContext();
   const [cakes, setCakes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeCategory, setActiveCategory] = useState('All');
   const [sortBy, setSortBy] = useState('recommended');
   const [toast, setToast] = useState('');
 
@@ -156,7 +155,7 @@ function CakeGrid() {
 function MainTabs({ active, onNav }) {
   return (
     <div style={{ background: '#fff', borderBottom: '1px solid #f0f0f0', fontFamily: "'Poppins',sans-serif", padding: '0 48px', display: 'flex', gap: 4 }}>
-      {[['cakes', '🎂 Cakes'], ['bakers', '🏪 Choose Your Baker']].map(([key, label]) => (
+      {[['cakes', '🎂 Cakes'], ['customize', '✏️ Customise'], ['bakers', '🏪 Pick a Local Baker']].map(([key, label]) => (
         <button key={key} onClick={() => onNav(key)}
           style={{ background: 'none', border: 'none', padding: '14px 20px', fontSize: 14, fontWeight: active === key ? 700 : 500, color: active === key ? '#e53935' : '#555', cursor: 'pointer', fontFamily: "'Poppins',sans-serif", borderBottom: active === key ? '2.5px solid #e53935' : '2.5px solid transparent', transition: 'all 0.2s' }}>
           {label}
@@ -166,7 +165,7 @@ function MainTabs({ active, onNav }) {
   );
 }
 
-function HeroSlider({ onCustomize }) {
+function HeroSlider({ onCustomize, onSetCategory }) {
   const [cur, setCur] = useState(0);
   const [prev, setPrev] = useState(null);
   const [direction, setDirection] = useState(1);
@@ -193,6 +192,9 @@ function HeroSlider({ onCustomize }) {
       cakeEmoji: "🎂",
       decorEmoji: ["🍓", "🍫", "🌸"],
       stats: [{ n: "50+", l: "Flavours" }, { n: "4.9★", l: "Rating" }, { n: "2hr", l: "Delivery" }],
+      orderAction: () => onSetCategory('Birthday'),
+      exploreAction: () => onSetCategory('All'),
+      orderLabel: "SHOP NOW",
     },
     {
       id: 1,
@@ -211,6 +213,9 @@ function HeroSlider({ onCustomize }) {
       cakeEmoji: "🦁",
       decorEmoji: ["🌿", "⭐", "🎪"],
       stats: [{ n: "100+", l: "Themes" }, { n: "4.8★", l: "Rating" }, { n: "Custom", l: "Design" }],
+      orderAction: () => onCustomize(),
+      exploreAction: () => onSetCategory('All'),
+      orderLabel: "CUSTOMISE NOW",
     },
     {
       id: 2,
@@ -229,6 +234,9 @@ function HeroSlider({ onCustomize }) {
       cakeEmoji: "🍰",
       decorEmoji: ["✨", "🏆", "🎖️"],
       stats: [{ n: "Chef", l: "Crafted" }, { n: "4.9★", l: "Rating" }, { n: "Fresh", l: "Daily" }],
+      orderAction: () => onSetCategory('Dessert'),
+      exploreAction: () => onSetCategory('All'),
+      orderLabel: "SHOP NOW",
     },
     {
       id: 3,
@@ -247,6 +255,9 @@ function HeroSlider({ onCustomize }) {
       cakeEmoji: "💕",
       decorEmoji: ["🌹", "💌", "🌸"],
       stats: [{ n: "Couples", l: "Choice" }, { n: "4.9★", l: "Rating" }, { n: "Same", l: "Day" }],
+      orderAction: () => onSetCategory('Anniversary'),
+      exploreAction: () => onSetCategory('All'),
+      orderLabel: "SHOP NOW",
     },
   ];
 
@@ -355,7 +366,7 @@ function HeroSlider({ onCustomize }) {
           {/* CTA Buttons */}
           <div style={{ display: "flex", gap: 14, flexWrap: "wrap", animation: "fadeUpSub 0.6s ease both", animationDelay: "0.45s" }}>
             <button
-              onClick={onCustomize}
+              onClick={s.orderAction}
               style={{
                 backgroundImage: s.accentBg, color: "#fff", border: "none",
                 borderRadius: 8, padding: "14px 36px", fontSize: 14, fontWeight: 700,
@@ -367,9 +378,10 @@ function HeroSlider({ onCustomize }) {
               onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-3px) scale(1.04)"; e.currentTarget.style.boxShadow = `0 14px 36px ${s.accent}66`; }}
               onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = `0 8px 28px ${s.accent}55`; }}
             >
-              ORDER NOW
+              {s.orderLabel}
             </button>
             <button
+              onClick={s.exploreAction}
               style={{
                 background: "rgba(255,255,255,0.12)", backdropFilter: "blur(8px)",
                 color: s.textDark, border: `1.5px solid ${s.textDark}33`,
@@ -866,7 +878,13 @@ function Toast({ msg }) {
 export default function CakePage() {
   const { addToCart } = useCartContext();
   const [tab, setTab] = useState('cakes');
+  const [activeCategory, setActiveCategory] = useState('All');
   const [toast, setToast] = useState(null);
+
+  const handleSetCategory = (cat) => {
+    setActiveCategory(cat);
+    setTab('cakes');
+  };
 
   const handleCustomizeComplete = () => {
     setTab('bakers');
@@ -884,8 +902,8 @@ export default function CakePage() {
 
       {tab === 'cakes' && (
         <>
-          <HeroSlider onCustomize={() => setTab('customize')} />
-          <CakeGrid />
+          <HeroSlider onCustomize={() => setTab('customize')} onSetCategory={handleSetCategory} />
+          <CakeGrid activeCategory={activeCategory} setActiveCategory={setActiveCategory} />
           <div style={{ padding: '60px 48px', background: '#fff', fontFamily: "'Poppins',sans-serif" }}>
             <h2 style={{ textAlign: 'center', fontSize: 34, fontWeight: 700, color: '#222', fontFamily: "'Playfair Display',serif", marginBottom: 8 }}>How It Works</h2>
             <p style={{ textAlign: 'center', color: '#888', marginBottom: 48, fontSize: 15 }}>3 simple steps to your dream cake</p>
