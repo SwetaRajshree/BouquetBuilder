@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useCartContext } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
+import { useNavigate } from 'react-router-dom';
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -80,6 +81,7 @@ function ProductCard({ item, onAdd, inCart, wished, onWish }) {
 export default function CollectionPage() {
   const { addToCart, cartItems } = useCartContext();
   const { wishlist, toggle: toggleWish } = useWishlist();
+  const navigate = useNavigate();
 
   const [items, setItems]       = useState([]);
   const [loading, setLoading]   = useState(true);
@@ -126,6 +128,23 @@ export default function CollectionPage() {
 
       {/* Header */}
       <div style={{ maxWidth: 1160, margin: '0 auto', padding: '48px 22px 0' }}>
+
+        {/* Back button + Shop button row */}
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:24 }}>
+          <button onClick={() => navigate(-1)}
+            style={{ display:'flex', alignItems:'center', gap:6, background:'rgba(44,26,46,0.06)', border:'1.5px solid #e8d8de', borderRadius:10, padding:'8px 16px', color:'#4a3050', fontSize:13, fontWeight:600, cursor:'pointer', transition:'all 0.2s' }}
+            onMouseEnter={e => e.currentTarget.style.background='rgba(44,26,46,0.12)'}
+            onMouseLeave={e => e.currentTarget.style.background='rgba(44,26,46,0.06)'}>
+            ← Back
+          </button>
+          <button onClick={() => navigate('/gift-shops')}
+            style={{ display:'flex', alignItems:'center', gap:8, background:'linear-gradient(135deg,#a855f7,#7c3aed)', border:'none', borderRadius:10, padding:'9px 20px', color:'#fff', fontSize:13, fontWeight:700, cursor:'pointer', boxShadow:'0 4px 14px rgba(124,58,237,0.35)', transition:'all 0.2s' }}
+            onMouseEnter={e => e.currentTarget.style.transform='translateY(-1px)'}
+            onMouseLeave={e => e.currentTarget.style.transform='translateY(0)'}>
+            💎 Jewellery Studio
+          </button>
+        </div>
+
         <p style={{ margin: '0 0 6px', fontSize: 10.5, fontWeight: 700, color: '#e8476a', letterSpacing: 3.5, textTransform: 'uppercase' }}>Jewellery Collection</p>
         <h1 style={{ margin: '0 0 10px', fontSize: 38, fontWeight: 900, color: '#2c1a2e', lineHeight: 1.1, letterSpacing: -1 }}>
           Shop by Category
