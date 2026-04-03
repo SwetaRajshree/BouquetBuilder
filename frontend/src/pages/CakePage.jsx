@@ -57,12 +57,9 @@ function Navbar({ cartCount, onNav, active }) {
             <input placeholder="Search cakes, flavours, occasions…" style={{ border: "none", outline: "none", width: "100%", fontSize: 13, background: "transparent" }} />
           </div>
         </div>
-        <div style={{ display: "flex", gap: 22 }}>
-          {[{ i: "🔄", l: "Track", href: "/tracking" }, { i: "🛒", l: `Cart${cartCount > 0 ? ` (${cartCount})` : ""}`, href: "/cart" }, { i: "👤", l: "Login", href: "/auth" }].map(x => (
-            <div key={x.l} onClick={() => window.location.href = x.href} style={{ color: "#fff", textAlign: "center", cursor: "pointer", fontSize: 12 }}><div style={{ fontSize: 18 }}>{x.i}</div>{x.l}</div>
-          ))}
-        </div>
-      </div>
+        <div style={{ display: "flex, gap: 22 }}>
+ <div onClick={() => window.location.href = /tracking} style={{ color: #fff, textAlign: center, cursor: pointer, fontSize: 12 }}><div style={{ fontSize: 18 }}>??</div>Track</div>
+ </div>
       <div style={{ background: "#fff", borderBottom: "1px solid #f0f0f0", overflowX: "auto", whiteSpace: "nowrap" }}>
         <div style={{ display: "inline-flex", padding: "0 20px" }}>
           {navItems.map(item => (
