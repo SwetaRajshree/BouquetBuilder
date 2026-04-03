@@ -127,7 +127,10 @@ export default function DigitalCardPage() {
     try {
       const d = JSON.parse(sessionStorage.getItem('bouquet_data'));
       if (d) setBouquet(d);
-    } catch {}
+      else navigate('/bouquet-builder', { replace: true });
+    } catch {
+      navigate('/bouquet-builder', { replace: true });
+    }
   }, []);
 
   const spotifyEmbedId = spotifyLink.match(/track\/([a-zA-Z0-9]+)/)?.[1] || null;
