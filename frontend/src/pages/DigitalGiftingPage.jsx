@@ -2,9 +2,10 @@ import { useNavigate } from 'react-router-dom';
 import { useState, lazy, Suspense } from 'react';
 import FallingPetals from '../components/FallingPetals';
 
-const GardenOfFlowers = lazy(() => import('../components/GardenOfFlowers'));
-const PolaroidBooth   = lazy(() => import('../components/PolaroidBooth'));
-const MagazinePage    = lazy(() => import('../components/MagazinePage'));
+const GardenOfFlowers    = lazy(() => import('../components/GardenOfFlowers'));
+const PolaroidBooth      = lazy(() => import('../components/PolaroidBooth'));
+const MagazinePage       = lazy(() => import('../components/MagazinePage'));
+const VoiceNoteKeepsake  = lazy(() => import('../components/VoiceNoteKeepsake'));
 
 function LoadingSpinner() {
   return (
@@ -167,6 +168,7 @@ export default function DigitalGiftingPage() {
       {activeMenu === 'garden'   && <Suspense fallback={<LoadingSpinner />}><GardenOfFlowers /></Suspense>}
       {activeMenu === 'polaroid' && <Suspense fallback={<LoadingSpinner />}><PolaroidBooth /></Suspense>}
       {activeMenu === 'magazine' && <Suspense fallback={<LoadingSpinner />}><MagazinePage /></Suspense>}
+      {activeMenu === 'cassette' && <Suspense fallback={<LoadingSpinner />}><VoiceNoteKeepsake /></Suspense>}
 
       {/* How it works — only show on digitalbouquet tab */}
       {activeMenu === 'digitalbouquet' && (
