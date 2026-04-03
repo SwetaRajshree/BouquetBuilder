@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+﻿import { useState, useRef, useEffect, useCallback } from "react";
 
 /* ─────────────────────────────────────────
    GLOBAL CSS
@@ -190,145 +190,48 @@ const css = `
 .vnk-player-timer{font-size:.9rem;color:var(--gold);margin-bottom:16px;letter-spacing:.04em}
 
 /* cassette outer */
-.vnk-cassette-outer{position:relative;display:flex;flex-direction:column;align-items:center;margin:0 auto}
+  .vnk-cassette-outer{position:relative;display:flex;align-items:flex-start;gap:10px;margin:0 auto}
 
-/* cassette row */
-.vnk-cassette{position:relative;display:flex;align-items:stretch;width:400px;height:320px}
+/* cassette */
+  .vnk-cassette{position:relative;display:flex;align-items:stretch;width:360px;height:240px}
 
-/* paper — wider */
-.vnk-c-paper{
-  position:relative;flex:1;
-  background:var(--paper);border-radius:10px 0 0 10px;overflow:hidden;
-  box-shadow:inset -3px 0 8px rgba(0,0,0,.12);
-}
-.vnk-c-paper-texture{position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 22px,rgba(160,140,100,.09) 22px,rgba(160,140,100,.09) 23px);pointer-events:none}
-.vnk-c-redline{position:absolute;right:0;top:0;bottom:0;width:2px;background:var(--red);opacity:.85;z-index:10}
+/* paper */
+  .vnk-c-paper{position:relative;flex:1;background:var(--paper);border-radius:10px 0 0 10px;overflow:hidden;box-shadow:inset -3px 0 8px rgba(0,0,0,.12);}
+  .vnk-c-paper-texture{position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 22px,rgba(160,140,100,.09) 22px,rgba(160,140,100,.09) 23px);pointer-events:none}
+  .vnk-c-redline{position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--red);opacity:.85;z-index:10}
 
-/* photo strip — bigger, 55% width */
-.vnk-photo-strip{position:absolute;right:0;top:0;height:100%;width:55%;overflow:hidden}
-.vnk-strip-img{
-  width:100%;height:185px;object-fit:cover;border-radius:3px;
-  border:3px solid white;position:absolute;right:0;
-  box-shadow:0 4px 16px rgba(0,0,0,.3);
-  animation:vnkReveal .7s cubic-bezier(.22,.68,0,1.15) both;
-}
-@keyframes vnkReveal{
-  from{clip-path:inset(100% 0 0 0);transform:translateY(14px)}
-  to{clip-path:inset(0% 0 0 0);transform:translateY(0)}
-}
+/* horizontal film strip */
+  .vnk-photo-strip{position:absolute;top:10px;left:0;right:0;height:calc(100% - 56px);overflow:hidden}
+  .vnk-film-track{display:flex;flex-direction:row;height:100%;will-change:transform}
+  .vnk-strip-img{width:130px;height:100%;object-fit:cover;flex-shrink:0;border:3px solid white;margin-right:6px;box-shadow:0 4px 16px rgba(0,0,0,.3);}
+
+/* film perforations */
+  .vnk-perfs{position:absolute;top:0;left:0;right:0;height:10px;display:flex;gap:8px;padding:1px 6px;background:rgba(0,0,0,.15);overflow:hidden}
+  .vnk-perf{width:14px;height:8px;border-radius:2px;background:rgba(255,255,255,.35);flex-shrink:0}
 
 /* waveform */
-.vnk-waveform-wrap{position:absolute;bottom:16px;left:0;right:0;height:70px;display:flex;align-items:flex-end;overflow:hidden}
-.vnk-waveform-wrap canvas{width:100%;height:100%;display:block}
+  .vnk-waveform-wrap{position:absolute;bottom:6px;left:0;right:0;height:40px;display:flex;align-items:flex-end;overflow:hidden}
+  .vnk-waveform-wrap canvas{width:100%;height:100%;display:block}
 
-/* spool — flush right of paper — but label text becomes animation source */
-.vnk-c-spool{
-  width:52px;height:320px;flex-shrink:0;position:relative;
-  background:linear-gradient(90deg,#6a6a6a,#bababa 50%,#6a6a6a);
-  border-radius:0 8px 8px 0;
-  box-shadow:4px 0 14px rgba(0,0,0,.55);
-}
-.vnk-spool-grooves{position:absolute;inset:10px 8px;background:repeating-linear-gradient(180deg,#555 0,#555 5px,#7a7a7a 5px,#7a7a7a 9px);border-radius:4px}
-.vnk-spool-label{
-  position:absolute;right:2px;top:50%;
-  transform:translateY(-50%) rotate(90deg);
-  font-size:.58rem;letter-spacing:.22em;color:#444;white-space:nowrap;pointer-events:none
-}
+/* spool */
+  .vnk-c-spool{width:44px;height:240px;flex-shrink:0;position:relative;background:linear-gradient(90deg,#6a6a6a,#bababa 50%,#6a6a6a);border-radius:0 8px 8px 0;box-shadow:4px 0 14px rgba(0,0,0,.55);}
+  .vnk-spool-grooves{position:absolute;inset:10px 8px;background:repeating-linear-gradient(180deg,#555 0,#555 5px,#7a7a7a 5px,#7a7a7a 9px);border-radius:4px}
+  .vnk-spool-label{position:absolute;right:2px;top:50%;transform:translateY(-50%) rotate(90deg);font-size:.58rem;letter-spacing:.22em;color:#444;white-space:nowrap;pointer-events:none}
 
-/* ── photo-emit slot — the mouth the photo slides out of ──
-   Positioned flush against the spool's LEFT edge, vertically centred on the photo strip */
-.vnk-emit-slot{
-  position:absolute;
-  /* right edge of the paper area aligns with spool */
-  right:52px; /* = spool width, so slot sits right at the paper→spool boundary */
-  top:12px;
-  width:6px;
-  height:calc(100% - 24px);
-  border-radius:3px 0 0 3px;
-  background:rgba(0,0,0,.18);
-  box-shadow:inset 2px 0 6px rgba(0,0,0,.35);
-  pointer-events:none;
-  overflow:hidden;
-}
-.vnk-emit-glow{
-  position:absolute;inset:0;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.08));
-  animation:vnkEmitPulse 2s ease-in-out infinite;
-}
-@keyframes vnkEmitPulse{
-  0%,100%{opacity:.5}50%{opacity:1}
-}
-
-/* ── HANDLE below cassette, centred, rotates on drag ── */
-.vnk-handle-assembly{
-  display:flex;flex-direction:column;align-items:center;
-  cursor:grab;user-select:none;
-  transform-origin:50% 0%;
-  will-change:transform;
-  margin-top:2px;
-}
-.vnk-handle-assembly:active{cursor:grabbing}
-
-/* handle pieces — sleek & ornate */
-.vnk-h-cap{
-  width:20px;height:11px;
-  background:linear-gradient(180deg,#d8d8d8 0%,#aaa 100%);
-  border-radius:10px 10px 0 0;
-  box-shadow:0 -1px 4px rgba(0,0,0,.3);
-}
-.vnk-h-bar{
-  width:13px;height:80px;
-  background:linear-gradient(90deg,#888,#e8e8e8 35%,#d0d0d0 60%,#888);
-  border-radius:6px 6px 3px 3px;
-  box-shadow:2px 2px 8px rgba(0,0,0,.45),inset 0 1px 3px rgba(255,255,255,.5);
-  position:relative;
-}
-/* thin groove lines along bar */
-.vnk-h-bar::before{
-  content:'';position:absolute;left:3px;top:14px;bottom:14px;width:1px;
-  background:rgba(255,255,255,.3);border-radius:1px;
-}
-.vnk-h-bar::after{
-  content:'';position:absolute;right:3px;top:14px;bottom:14px;width:1px;
-  background:rgba(0,0,0,.2);border-radius:1px;
-}
-.vnk-h-ring{
-  width:24px;height:24px;
-  background:radial-gradient(circle at 38% 35%,#eeeeee,#aaa 55%,#666);
-  border-radius:50%;
-  box-shadow:0 2px 8px rgba(0,0,0,.6),inset 0 1px 3px rgba(255,255,255,.3);
-  display:flex;align-items:center;justify-content:center;
-}
-.vnk-h-ring-inner{
-  width:12px;height:12px;
-  background:radial-gradient(circle at 40% 38%,#c8c8c8,#4a4a4a);
-  border-radius:50%;
-}
-.vnk-h-waist{
-  width:10px;height:20px;
-  background:linear-gradient(180deg,#9a9a9a,#d0d0d0,#9a9a9a);
-  border-radius:2px;
-}
-.vnk-h-heart{
-  width:52px;height:52px;
-  background:radial-gradient(circle at 37% 33%,#f5f5f5,#b0b0b0 40%,#666);
-  border-radius:50%;
-  box-shadow:0 4px 18px rgba(0,0,0,.7),inset 0 1px 4px rgba(255,255,255,.35);
-  display:flex;align-items:center;justify-content:center;
-  font-size:20px;color:#2a2a2a;
-  position:relative;
-}
-.vnk-h-heart::before{
-  content:'';position:absolute;inset:5px;
-  border-radius:50%;
-  border:1.5px solid rgba(255,255,255,.22);
-  pointer-events:none;
-}
-.vnk-h-lower{
-  width:11px;height:22px;
-  background:linear-gradient(180deg,#9a9a9a,#d8d8d8 50%,#9a9a9a);
-  border-radius:0 0 3px 3px;
-}
+/* HANDLE - small, to the right of spool */
+  .vnk-handle-assembly{display:flex;flex-direction:column;align-items:center;cursor:grab;user-select:none;transform-origin:50% 0%;will-change:transform;flex-shrink:0;margin-top:6px;}
+  .vnk-handle-assembly:active{cursor:grabbing}
+  .vnk-h-cap{width:11px;height:7px;background:linear-gradient(180deg,#d8d8d8,#aaa);border-radius:6px 6px 0 0;box-shadow:0 -1px 3px rgba(0,0,0,.3);}
+  .vnk-h-bar{width:7px;height:40px;background:linear-gradient(90deg,#888,#e8e8e8 35%,#d0d0d0 60%,#888);border-radius:4px 4px 2px 2px;box-shadow:1px 1px 5px rgba(0,0,0,.4);position:relative;}
+  .vnk-h-bar::before{content:'';position:absolute;left:2px;top:8px;bottom:8px;width:1px;background:rgba(255,255,255,.3);border-radius:1px}
+  .vnk-h-bar::after{content:'';position:absolute;right:2px;top:8px;bottom:8px;width:1px;background:rgba(0,0,0,.2);border-radius:1px}
+  .vnk-h-ring{width:14px;height:14px;background:radial-gradient(circle at 38% 35%,#eee,#aaa 55%,#666);border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;}
+  .vnk-h-ring-inner{width:7px;height:7px;background:radial-gradient(circle at 40% 38%,#c8c8c8,#4a4a4a);border-radius:50%}
+  .vnk-h-waist{width:6px;height:10px;background:linear-gradient(180deg,#9a9a9a,#d0d0d0,#9a9a9a);border-radius:2px}
+  .vnk-h-heart{width:28px;height:28px;background:radial-gradient(circle at 37% 33%,#f5f5f5,#b0b0b0 40%,#666);border-radius:50%;box-shadow:0 3px 10px rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;font-size:11px;color:#2a2a2a;position:relative;}
+  .vnk-h-heart::before{content:'';position:absolute;inset:3px;border-radius:50%;border:1px solid rgba(255,255,255,.22);pointer-events:none}
+  .vnk-h-lower{width:6px;height:12px;background:linear-gradient(180deg,#9a9a9a,#d8d8d8 50%,#9a9a9a);border-radius:0 0 2px 2px}
+  .vnk-h-base{width:14px;height:7px;background:linear-gradient(180deg,#a0a0a0,#cccccc);border-radius:0 0 8px 8px;box-shadow:0 2px 4px rgba(0,0,0,.4);}
 .vnk-h-base{
   width:24px;height:12px;
   background:linear-gradient(180deg,#a0a0a0,#cccccc);
@@ -618,74 +521,58 @@ function PlayerScreen({ data, onNewMemory }) {
 
   const canvasRef    = useRef(null);
   const audioRef     = useRef(null);
-  const stripRef     = useRef(null);
+  const filmTrackRef = useRef(null);
   const handleAssRef = useRef(null);
 
   const [playPos,      setPlayPos]      = useState(0);
   const [showHint,     setShowHint]     = useState(true);
   const [toastVisible, setToastVisible] = useState(false);
   const [handleAngle,  setHandleAngle]  = useState(0);
+  const [filmOffset,   setFilmOffset]   = useState(0);
 
-  const accRotRef    = useRef(0);
-  const draggingRef  = useRef(false);
-  const lastDeltaRef = useRef(0);
+  const accRotRef  = useRef(0);
+  const draggingRef = useRef(false);
+  const totalFilmW = useRef(0);
 
   useEffect(()=>{
-    const audio=new Audio(audioUrl);
-    audioRef.current=audio;
-    audio.addEventListener("timeupdate",()=>{
-      if(!audio.duration)return;
-      const pct=audio.currentTime/audio.duration;
+    const audio = new Audio(audioUrl);
+    audioRef.current = audio;
+    audio.addEventListener('timeupdate',()=>{
+      if(!audio.duration) return;
+      const pct = audio.currentTime / audio.duration;
       setPlayPos(audio.currentTime);
       drawProgress(pct);
-      updateStrip(pct);
-      const ang=pct*720;
-      accRotRef.current=ang;
-      setHandleAngle(ang);
+      setFilmOffset(pct * totalFilmW.current);
+      accRotRef.current = pct * 720;
+      setHandleAngle(pct * 720);
     });
-    return()=>{audio.pause();audio.src=""};
+    return ()=>{ audio.pause(); audio.src=''; };
   },[audioUrl]);
 
-  useEffect(()=>{ drawProgress(0); },[]);
-  useEffect(()=>{ updateStrip(0); },[photos]);
+  useEffect(()=>{
+    if(photos?.length) totalFilmW.current = photos.length * 136;
+    drawProgress(0);
+  },[photos]);
 
-  const drawProgress=useCallback((pct)=>{
-    const canvas=canvasRef.current; if(!canvas)return;
-    const w=canvas.offsetWidth||290,h=70;
+  const drawProgress = useCallback((pct)=>{
+    const canvas = canvasRef.current; if(!canvas) return;
+    const w = canvas.offsetWidth||290, h = 40;
     canvas.width=w; canvas.height=h;
-    const ctx=canvas.getContext("2d");
+    const ctx = canvas.getContext('2d');
     ctx.clearRect(0,0,w,h);
-    const d=waveData?.length>0?waveData:Array.from({length:60},()=>Math.random()*80+10);
-    const bw=Math.max(2,w/d.length-1);
+    const d = waveData?.length>0 ? waveData : Array.from({length:60},()=>Math.random()*80+10);
+    const bw = Math.max(2,w/d.length-1);
     d.forEach((v,i)=>{
       const bh=Math.max(3,(v/255)*h*1.2);
-      ctx.fillStyle=(i/d.length)<=pct?"rgba(224,92,92,.88)":"rgba(224,92,92,.22)";
+      ctx.fillStyle=(i/d.length)<=pct?'rgba(224,92,92,.88)':'rgba(224,92,92,.22)';
       ctx.beginPath(); ctx.roundRect(i*(bw+1),h-bh,bw,bh,2); ctx.fill();
     });
   },[waveData]);
 
-  const updateStrip=useCallback((pct)=>{
-    if(!stripRef.current||!photos?.length)return;
-    const imgs=stripRef.current.querySelectorAll("img");
-    const total=photos.length*190;
-    const off=pct*total;
-    imgs.forEach((img,i)=>{
-      const y=i*190-off;
-      img.style.top=y+"px";
-      const dist=Math.abs(y-90);
-      img.style.opacity=dist<140?Math.max(0,1-dist/140):0;
-    });
-  },[photos]);
-
-  /* handle drag */
   useEffect(()=>{
-    const el=handleAssRef.current; if(!el)return;
+    const el=handleAssRef.current; if(!el) return;
     let startAngle=0;
-
-    const getCenter=()=>{
-      const r=el.getBoundingClientRect();
-      return{x:r.left+r.width/2,y:r.top};
-    };
+    const getCenter=()=>{ const r=el.getBoundingClientRect(); return{x:r.left+r.width/2,y:r.top}; };
     const angle=(cx,cy,ex,ey)=>Math.atan2(ey-cy,ex-cx)*180/Math.PI;
 
     const onDown=(e)=>{
@@ -695,66 +582,66 @@ function PlayerScreen({ data, onNewMemory }) {
       const pt=e.touches?e.touches[0]:e;
       const c=getCenter();
       startAngle=angle(c.x,c.y,pt.clientX,pt.clientY)-accRotRef.current;
-      document.addEventListener("mousemove",onMove);
-      document.addEventListener("touchmove",onMove,{passive:false});
-      document.addEventListener("mouseup",onUp);
-      document.addEventListener("touchend",onUp);
+      document.addEventListener('mousemove',onMove);
+      document.addEventListener('touchmove',onMove,{passive:false});
+      document.addEventListener('mouseup',onUp);
+      document.addEventListener('touchend',onUp);
     };
+
     const onMove=(e)=>{
-      if(!draggingRef.current)return;
+      if(!draggingRef.current) return;
       e.preventDefault();
       const pt=e.touches?e.touches[0]:e;
       const c=getCenter();
       const ang=angle(c.x,c.y,pt.clientX,pt.clientY);
       let delta=ang-startAngle-accRotRef.current;
-      while(delta>180)delta-=360;
-      while(delta<-180)delta+=360;
+      while(delta>180) delta-=360;
+      while(delta<-180) delta+=360;
       const aud=audioRef.current;
-      if(delta>0){
+      if(Math.abs(delta)>0.5){
         accRotRef.current+=delta;
         setHandleAngle(accRotRef.current);
         if(aud?.duration){
-          aud.currentTime=Math.min(aud.duration,aud.currentTime+delta/720*aud.duration);
-          if(aud.paused)aud.play().catch(()=>{});
-        }
-      }else if(delta<-2){
-        accRotRef.current+=delta;
-        setHandleAngle(accRotRef.current);
-        if(aud?.duration){
-          aud.currentTime=Math.max(0,aud.currentTime-Math.abs(delta)/720*aud.duration);
-          if(!aud.paused)aud.pause();
+          const newTime=Math.max(0,Math.min(aud.duration,aud.currentTime+(delta/720)*aud.duration));
+          aud.currentTime=newTime;
+          if(delta>0 && aud.paused) aud.play().catch(()=>{});
+          if(delta<0 && !aud.paused) aud.pause();
+          const pct=newTime/aud.duration;
+          setFilmOffset(pct*totalFilmW.current);
+          drawProgress(pct);
+          setPlayPos(newTime);
         }
       }
       startAngle=ang-accRotRef.current;
-      lastDeltaRef.current=delta;
-    };
-    const onUp=()=>{
-      draggingRef.current=false;
-      document.removeEventListener("mousemove",onMove);
-      document.removeEventListener("touchmove",onMove);
-      document.removeEventListener("mouseup",onUp);
-      document.removeEventListener("touchend",onUp);
-      const aud=audioRef.current;
-      if(lastDeltaRef.current>2&&aud?.paused&&aud.currentTime<aud.duration)aud.play().catch(()=>{});
     };
 
-    el.addEventListener("mousedown",onDown);
-    el.addEventListener("touchstart",onDown,{passive:false});
+    const onUp=()=>{
+      draggingRef.current=false;
+      const aud=audioRef.current;
+      if(aud && !aud.paused) aud.pause();
+      document.removeEventListener('mousemove',onMove);
+      document.removeEventListener('touchmove',onMove);
+      document.removeEventListener('mouseup',onUp);
+      document.removeEventListener('touchend',onUp);
+    };
+
+    el.addEventListener('mousedown',onDown);
+    el.addEventListener('touchstart',onDown,{passive:false});
     return()=>{
-      el.removeEventListener("mousedown",onDown);
-      el.removeEventListener("touchstart",onDown);
-      document.removeEventListener("mousemove",onMove);
-      document.removeEventListener("touchmove",onMove);
-      document.removeEventListener("mouseup",onUp);
-      document.removeEventListener("touchend",onUp);
+      el.removeEventListener('mousedown',onDown);
+      el.removeEventListener('touchstart',onDown);
+      document.removeEventListener('mousemove',onMove);
+      document.removeEventListener('touchmove',onMove);
+      document.removeEventListener('mouseup',onUp);
+      document.removeEventListener('touchend',onUp);
     };
   },[]);
 
   const share=()=>{
-    const msg="Check out this voice note keepsake!";
-    if(navigator.share){navigator.share({title:"Voice Note Keepsake",text:msg}).catch(()=>{})}
+    const msg='Check out this voice note keepsake!';
+    if(navigator.share){navigator.share({title:'Voice Note Keepsake',text:msg}).catch(()=>{})}
     else{
-      navigator.clipboard.writeText(window.location.href+" — "+msg).then(()=>{
+      navigator.clipboard.writeText(window.location.href+' - '+msg).then(()=>{
         setToastVisible(true);setTimeout(()=>setToastVisible(false),2500);
       }).catch(()=>{});
     }
@@ -769,54 +656,49 @@ function PlayerScreen({ data, onNewMemory }) {
       <div className="vnk-player-timer">{fmt(Math.floor(playPos))} / {fmt(duration)}</div>
 
       <div className="vnk-cassette-outer">
-        {/* cassette: paper + spool side by side */}
         <div className="vnk-cassette">
           <div className="vnk-c-paper">
             <div className="vnk-c-paper-texture"/>
-
-            {/* photo strip */}
-            <div className="vnk-photo-strip" ref={stripRef}>
-              {photos?.map((url,i)=>(
-                <img key={i} className="vnk-strip-img" src={url} alt={`m${i}`}
-                  style={{top:i*190, opacity:i===0?1:0, animationDelay:`${i*0.1}s`}}/>
-              ))}
+            <div className="vnk-perfs">
+              {Array.from({length:20}).map((_,i)=><div key={i} className="vnk-perf"/>)}
             </div>
-
-            {/* emit slot — flush to spool (right edge of paper) */}
-            <div className="vnk-emit-slot">
-              <div className="vnk-emit-glow"/>
+            <div className="vnk-photo-strip">
+              <div
+                ref={filmTrackRef}
+                className="vnk-film-track"
+                style={{transform:`translateX(-${filmOffset}px)`}}
+              >
+                {photos?.map((url,i)=>(
+                  <img key={i} className="vnk-strip-img" src={url} alt={`m${i}`}/>
+                ))}
+              </div>
             </div>
-
             <div className="vnk-c-redline"/>
             <div className="vnk-waveform-wrap"><canvas ref={canvasRef}/></div>
           </div>
-
-          {/* spool flush against paper */}
           <div className="vnk-c-spool">
             <div className="vnk-spool-grooves"/>
             <span className="vnk-spool-label">@keepsake</span>
           </div>
         </div>
 
-        {/* ── ornate handle below, centred, rotates on drag ── */}
         <div
           className="vnk-handle-assembly"
           ref={handleAssRef}
-          style={{transform:`rotate(${handleAngle}deg)`,transformOrigin:"50% 0%"}}
+          style={{transform:`rotate(${handleAngle}deg)`,transformOrigin:'50% 0%'}}
         >
           <div className="vnk-h-cap"/>
           <div className="vnk-h-bar"/>
           <div className="vnk-h-ring"><div className="vnk-h-ring-inner"/></div>
           <div className="vnk-h-waist"/>
-          <div className="vnk-h-heart">♥</div>
+          <div className="vnk-h-heart">&#9829;</div>
           <div className="vnk-h-lower"/>
           <div className="vnk-h-base"/>
         </div>
-
-        {showHint&&<p className="vnk-handle-hint">Turn the handle clockwise to play ↻</p>}
       </div>
 
-      <div className={`vnk-toast${toastVisible?" show":""}`}>Copied to clipboard!</div>
+      {showHint&&<p className="vnk-handle-hint">Turn the handle clockwise to play &#8635;</p>}
+      <div className={`vnk-toast${toastVisible?' show':''}`}>Copied to clipboard!</div>
     </div>
   );
 }
