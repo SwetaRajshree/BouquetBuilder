@@ -682,19 +682,9 @@ export default function PostcardStudio() {
         ::-webkit-scrollbar-thumb { background:#b8a99a; border-radius:3px; }
       `}</style>
 
-      {/* ════ NAV ════ */}
-      <nav style={{ position:"fixed", top:0, left:0, right:0, zIndex:100, background:"rgba(250,248,243,0.94)", backdropFilter:"blur(20px)", borderBottom:"1px solid rgba(184,169,154,0.2)", padding:"0 48px", height:64, display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-        <div style={{ fontFamily:"'Playfair Display',serif", fontSize:22, fontWeight:700, letterSpacing:"-0.5px", color:"#1a1714" }}>Post<span style={{ color:"#c98b8b" }}>card</span> <span style={{ fontSize:12, fontWeight:400, fontStyle:"italic", opacity:0.5 }}>Studio</span></div>
-        <div style={{ display:"flex", gap:32 }}>
-          {["Card Invitations","Greeting Cards","Make Your Own","For Professionals"].map(l=>(
-            <span key={l} style={{ fontSize:12, fontWeight:500, letterSpacing:"0.06em", textTransform:"uppercase", color:"#6b6560", cursor:"pointer", transition:"color 0.2s" }} onMouseEnter={e=>e.target.style.color="#1a1714"} onMouseLeave={e=>e.target.style.color="#6b6560"}>{l}</span>
-          ))}
-        </div>
-      </nav>
-
       {/* ════ HERO ════ */}
       <section style={{
-        minHeight:"100vh", paddingTop:64, position:"relative", overflow:"hidden",
+        minHeight:"100vh", paddingTop:62, position:"relative", overflow:"hidden",
         display:"grid", gridTemplateColumns:"1fr 1fr", alignItems:"center",
         background:"linear-gradient(150deg,#f9f5ee 0%,#f4ede0 55%,#ede4d6 100%)",
       }}>
@@ -759,7 +749,7 @@ export default function PostcardStudio() {
       </section>
 
       {/* ════ TABS ════ */}
-      <div style={{ position:"sticky", top:64, zIndex:50, background:"rgba(255,254,249,0.95)", backdropFilter:"blur(16px)", borderBottom:"1px solid rgba(184,169,154,0.2)", padding:"0 80px", display:"flex", overflowX:"auto" }}>
+      <div style={{ position:"sticky", top:62, zIndex:40, background:"rgba(255,254,249,0.95)", backdropFilter:"blur(16px)", borderBottom:"1px solid rgba(184,169,154,0.2)", padding:"0 80px", display:"flex", overflowX:"auto" }}>
         {tabs.map(t=>(
           <button key={t.id} onClick={()=>scrollTo(t.id)} style={{ padding:"18px 24px", fontSize:12, fontWeight:activeTab===t.id?700:500, letterSpacing:"0.04em", color:activeTab===t.id?"#1a1714":"#6b6560", background:"none", border:"none", cursor:"pointer", borderBottom:activeTab===t.id?"2.5px solid #1a1714":"2.5px solid transparent", transition:"all 0.2s", whiteSpace:"nowrap", fontFamily:"inherit" }}>{t.label}</button>
         ))}
