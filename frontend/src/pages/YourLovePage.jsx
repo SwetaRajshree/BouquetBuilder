@@ -15,11 +15,13 @@ const seededRand = (seed) => {
 
 const buildHeartProps = (reviews) => reviews.map((_, i) => {
   const rand = seededRand(i * 31 + 7);
-  const cols = Math.min(reviews.length, 10);
-  const rows = Math.ceil(reviews.length / cols);
-  const col = i % cols; const row = Math.floor(i / cols);
-  const x = Math.max(3, Math.min(93, (col/cols)*80+8 + (rand()-0.5)*9));
-  const y = Math.max(2, Math.min(94, 5+(row/rows)*87 + (rand()-0.5)*7));
+  const total = reviews.length;
+  const cols = total <= 3 ? total : Math.ceil(Math.sqrt(total));
+  const rows = Math.ceil(total / cols);
+  const col = i % cols;
+  const row = Math.floor(i / cols);
+  const x = Math.max(8, Math.min(88, (col / Math.max(cols - 1, 1)) * 70 + 12 + (rand() - 0.5) * 10));
+  const y = Math.max(5, Math.min(88, (row / Math.max(rows - 1, 1)) * 75 + 8 + (rand() - 0.5) * 10));
   return { x, y, size:19+rand()*15, rotation:(rand()-0.5)*75, zIdx:Math.floor(rand()*22),
     color:PAPER_COLORS[Math.floor(rand()*PAPER_COLORS.length)],
     floatDuration:3.2+rand()*4.5, floatDelay:rand()*6,
