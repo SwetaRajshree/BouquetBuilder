@@ -914,6 +914,11 @@ export default function CakePage() {
 
       {tab === 'customize' && (
         <div style={{ background: 'linear-gradient(180deg,#fff5f5,#fce4ec)', paddingTop: 48, fontFamily: "'Poppins',sans-serif" }}>
+          <div style={{ padding: '0 48px 0', paddingTop: 0 }}>
+            <button onClick={() => setTab('cakes')} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'none', border: '1.5px solid #e53935', color: '#e53935', borderRadius: 8, padding: '10px 20px', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'Poppins',sans-serif", marginBottom: 24 }}>
+              ← Back to Cakes
+            </button>
+          </div>
           <div style={{ textAlign: 'center', marginBottom: 40, padding: '0 24px' }}>
             <div style={{ display: 'inline-block', background: '#e8f5e9', color: '#2e7d32', borderRadius: 20, padding: '6px 20px', fontSize: 13, fontWeight: 600, marginBottom: 14 }}>🎂 Dream Cake Builder</div>
             <h1 style={{ fontSize: 38, fontFamily: "'Playfair Display',serif", fontStyle: 'italic', color: '#880e4f', marginBottom: 8 }}>Your Dream Cake, Just a Chat Away!</h1>
@@ -925,12 +930,12 @@ export default function CakePage() {
 
       {tab === 'bakers' && (
         <>
-          <NearbyBakers onSelect={handleBakerSelect} />
-          <div style={{ textAlign: 'center', padding: '0 0 40px' }}>
-            <button onClick={() => setTab('customize')} style={{ background: 'none', border: '1.5px solid #e53935', color: '#e53935', borderRadius: 8, padding: '12px 32px', fontSize: 14, cursor: 'pointer', fontFamily: "'Poppins',sans-serif" }}>
-              ← Customise My Cake
+          <div style={{ padding: '24px 48px 0', background: '#fafafa' }}>
+            <button onClick={() => setTab('customize')} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'none', border: '1.5px solid #e53935', color: '#e53935', borderRadius: 8, padding: '10px 20px', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'Poppins',sans-serif" }}>
+              ← Back to Customise
             </button>
           </div>
+          <NearbyBakers onSelect={handleBakerSelect} />
         </>
       )}
 
