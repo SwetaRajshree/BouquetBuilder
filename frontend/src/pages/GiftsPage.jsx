@@ -65,7 +65,6 @@ const CATEGORIES = [
   { key:"jewellery", label:"Jewellery",          icon:"💎" },
 ];
 
-const OCCASIONS = ["Birthday","Anniversary","Valentine's Day","Mother's Day","Wedding","Diwali","Just Because"];
 
 const PRODUCTS = [
   { id:"c1", cat:"customize", name:"Build-Your-Own Gift Box",   sub:"Chocolates · Candles · Keepsakes · Card",      price:699,  was:999,  badge:"Most Popular",    badgeColor:"rose",    tag:"Bestseller", img:"https://images.unsplash.com/photo-1607344645866-009c320b63e0?w=600&q=80", rating:4.8, reviews:312 },
@@ -387,7 +386,6 @@ export default function GiftSection() {
   const [jewelleryItems, setJewelleryItems] = useState([]);
   const [jewellerySubCat, setJewellerySubCat] = useState("all");
   const [foreverFlowers, setForeverFlowers] = useState([]);
-  const [occasion,setOccasion] = useState(null);
   const [search,setSearch]     = useState("");
   const [sortBy,setSortBy]     = useState("default");
   const [cart,setCart]         = useState([]);
@@ -448,7 +446,6 @@ export default function GiftSection() {
   }).sort((a,b)=>{
     if(sortBy==="price_asc") return a.price-b.price;
     if(sortBy==="price_desc") return b.price-a.price;
-    if(sortBy==="rating") return b.rating-a.rating;
     return 0;
   });
 
@@ -680,23 +677,6 @@ export default function GiftSection() {
         </div>
 
 
-        {/* ── Occasion Pills ── */}
-        <div style={{ marginBottom:32 }}>
-          <p style={{ margin:"0 0 12px", fontSize:10.5, fontWeight:900, color:C.champagne, textTransform:"uppercase", letterSpacing:3 }}>🌺 Shop By Occasion</p>
-          <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
-            {OCCASIONS.map(o=>(
-              <button key={o} onClick={()=>setOccasion(occasion===o?null:o)}
-                style={{ padding:"8px 18px", borderRadius:40,
-                  border:occasion===o?`2px solid ${C.rose}`:`1.5px solid ${C.borderMid}`,
-                  background:occasion===o?C.roseLight:"rgba(255,252,250,0.85)",
-                  color:occasion===o?C.roseDark:C.inkMid,
-                  fontSize:12.5, fontWeight:700, cursor:"pointer", transition:"all 0.2s", letterSpacing:0.2,
-                  boxShadow:occasion===o?`0 2px 12px ${C.rose}25`:"none" }}>
-                {o}
-              </button>
-            ))}
-          </div>
-        </div>
 
         {/* ── Category + Search Bar ── */}
         <div style={{ background:"rgba(255,252,250,0.8)", backdropFilter:"blur(10px)", borderRadius:18, padding:"16px 20px", marginBottom:28, border:`1.5px solid ${C.borderMid}`, display:"flex", justifyContent:"space-between", alignItems:"center", flexWrap:"wrap", gap:12, boxShadow:`0 4px 20px rgba(232,71,106,0.06)` }}>
@@ -724,7 +704,6 @@ export default function GiftSection() {
               <option value="default">Featured</option>
               <option value="price_asc">Price: Low → High</option>
               <option value="price_desc">Price: High → Low</option>
-              <option value="rating">Top Rated</option>
             </select>
           </div>
         </div>
