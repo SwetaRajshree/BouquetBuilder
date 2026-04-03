@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // GSAP LOADER — loads from CDN once, calls back when ready
@@ -578,11 +579,14 @@ const OccasionCircle = ({ bg, text, label, onClick }) => {
 // MAIN APP
 // ─────────────────────────────────────────────────────────────────────────────
 export default function PostcardStudio() {
+  const navigate = useNavigate();
   const [activeTab,    setActiveTab]    = useState("greeting");
   const [activeFilter, setActiveFilter] = useState("all");
   const [modal,        setModal]        = useState(null);
   const [toast,        setToast]        = useState({ show:false, msg:"" });
   const [visible,      setVisible]      = useState(new Set());
+  const [hovAnn,       setHovAnn]       = useState(null);
+  const [hovStep,      setHovStep]      = useState(null);
 
   const showToast = (msg) => {
     setToast({ show:true, msg });
@@ -689,8 +693,8 @@ export default function PostcardStudio() {
           ))}
         </div>
         <div style={{ display:"flex", gap:10 }}>
-          <button style={{ padding:"8px 20px", border:"1.5px solid #1a1714", background:"transparent", fontFamily:"inherit", fontSize:11, fontWeight:600, letterSpacing:"0.06em", textTransform:"uppercase", cursor:"pointer", color:"#1a1714", transition:"all 0.2s" }} onMouseEnter={e=>{e.currentTarget.style.background="#1a1714";e.currentTarget.style.color="white";}} onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color="#1a1714";}}>Log in</button>
-          <button style={{ padding:"8px 20px", background:"#1a1714", border:"1.5px solid #1a1714", color:"white", fontFamily:"inherit", fontSize:11, fontWeight:600, letterSpacing:"0.06em", textTransform:"uppercase", cursor:"pointer", transition:"all 0.2s" }} onMouseEnter={e=>e.currentTarget.style.background="#c98b8b"} onMouseLeave={e=>e.currentTarget.style.background="#1a1714"}>Sign up</button>
+          <button onClick={()=>navigate('/auth')} style={{ padding:"8px 20px", border:"1.5px solid #1a1714", background:"transparent", fontFamily:"inherit", fontSize:11, fontWeight:600, letterSpacing:"0.06em", textTransform:"uppercase", cursor:"pointer", color:"#1a1714", transition:"all 0.2s" }} onMouseEnter={e=>{e.currentTarget.style.background="#1a1714";e.currentTarget.style.color="white";}} onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color="#1a1714";}}>Log in</button>
+          <button onClick={()=>navigate('/auth')} style={{ padding:"8px 20px", background:"#1a1714", border:"1.5px solid #1a1714", color:"white", fontFamily:"inherit", fontSize:11, fontWeight:600, letterSpacing:"0.06em", textTransform:"uppercase", cursor:"pointer", transition:"all 0.2s" }} onMouseEnter={e=>e.currentTarget.style.background="#c98b8b"} onMouseLeave={e=>e.currentTarget.style.background="#1a1714"}>Sign up</button>
         </div>
       </nav>
 
@@ -919,17 +923,14 @@ export default function PostcardStudio() {
               { bg:"linear-gradient(135deg,#c0dce8,#7ab0c8)", text:"Hello,<br/>World!",  color:"white",   label:"Birth"      },
               { bg:"linear-gradient(135deg,#f0c0a0,#c07840)", text:"We<br/>Moved!",      color:"white",   label:"Moving"     },
               { bg:"linear-gradient(135deg,#f5f0e8,#d4c0a0)", text:"Save<br/>the<br/>Date", color:"#3a2a18", label:"Wedding" },
-            ].map(a=>{
-              const [hov,setHov]=useState(false);
-              return (
-                <div key={a.label} onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)} onClick={()=>showToast(`Browsing ${a.label} announcements...`)} style={{ cursor:"pointer", transform:hov?"translateY(-6px)":"translateY(0)", boxShadow:hov?"0 20px 50px rgba(0,0,0,0.18)":"0 6px 20px rgba(0,0,0,0.1)", transition:"all 0.35s ease", borderRadius:2, overflow:"hidden" }}>
-                  <div style={{ background:a.bg, aspectRatio:"3/4", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                    <div style={{ fontFamily:"'Playfair Display',serif", fontSize:24, fontWeight:700, color:a.color, textAlign:"center", lineHeight:1.2 }} dangerouslySetInnerHTML={{__html:a.text}}/>
-                  </div>
-                  <div style={{ padding:"12px 0", textAlign:"center", fontSize:10, fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", color:"#1a1714" }}>{a.label}</div>
+            ].map((a,i)=>(
+              <div key={a.label} onMouseEnter={()=>setHovAnn(i)} onMouseLeave={()=>setHovAnn(null)} onClick={()=>showToast(`Browsing ${a.label} announcements...`)} style={{ cursor:"pointer", transform:hovAnn===i?"translateY(-6px)":"translateY(0)", boxShadow:hovAnn===i?"0 20px 50px rgba(0,0,0,0.18)":"0 6px 20px rgba(0,0,0,0.1)", transition:"all 0.35s ease", borderRadius:2, overflow:"hidden" }}>
+                <div style={{ background:a.bg, aspectRatio:"3/4", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                  <div style={{ fontFamily:"'Playfair Display',serif", fontSize:24, fontWeight:700, color:a.color, textAlign:"center", lineHeight:1.2 }} dangerouslySetInnerHTML={{__html:a.text}}/>
                 </div>
-              );
-            })}
+                <div style={{ padding:"12px 0", textAlign:"center", fontSize:10, fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", color:"#1a1714" }}>{a.label}</div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -948,16 +949,13 @@ export default function PostcardStudio() {
               { n:"2", title:"Customize It",    desc:"Add your personal message, choose colors, fonts, and envelope liners." },
               { n:"3", title:"Add Recipients",  desc:"Send to one person or hundreds. Import contacts or enter emails manually." },
               { n:"4", title:"Send Instantly",  desc:"Deliver via email or text immediately or schedule for a future date." },
-            ].map((step,i)=>{
-              const [hov,setHov]=useState(false);
-              return (
-                <div key={step.n} style={{ textAlign:"center" }} onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}>
-                  <div style={{ width:64, height:64, borderRadius:"50%", margin:"0 auto 20px", background:hov?"#1a1714":"#f5f1e8", border:`1.5px solid ${hov?"#1a1714":"rgba(184,169,154,0.4)"}`, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"'Playfair Display',serif", fontSize:22, fontWeight:700, color:hov?"#faf8f3":"#1a1714", position:"relative", zIndex:1, transform:hov?"scale(1.12)":"scale(1)", transition:"all 0.3s ease" }}>{step.n}</div>
-                  <div style={{ fontSize:15, fontWeight:600, marginBottom:8, color:"#1a1714" }}>{step.title}</div>
-                  <div style={{ fontSize:13, color:"#6b6560", lineHeight:1.65 }}>{step.desc}</div>
-                </div>
-              );
-            })}
+            ].map((step,i)=>(
+              <div key={step.n} style={{ textAlign:"center" }} onMouseEnter={()=>setHovStep(i)} onMouseLeave={()=>setHovStep(null)}>
+                <div style={{ width:64, height:64, borderRadius:"50%", margin:"0 auto 20px", background:hovStep===i?"#1a1714":"#f5f1e8", border:`1.5px solid ${hovStep===i?"#1a1714":"rgba(184,169,154,0.4)"}`, display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"'Playfair Display',serif", fontSize:22, fontWeight:700, color:hovStep===i?"#faf8f3":"#1a1714", position:"relative", zIndex:1, transform:hovStep===i?"scale(1.12)":"scale(1)", transition:"all 0.3s ease" }}>{step.n}</div>
+                <div style={{ fontSize:15, fontWeight:600, marginBottom:8, color:"#1a1714" }}>{step.title}</div>
+                <div style={{ fontSize:13, color:"#6b6560", lineHeight:1.65 }}>{step.desc}</div>
+              </div>
+            ))}
           </div>
         </div>
       </section>

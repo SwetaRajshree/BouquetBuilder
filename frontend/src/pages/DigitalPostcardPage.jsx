@@ -1,3 +1,1 @@
-export default function DigitalPostcardPage() {
-  return null;
-}
+export { default } from './PostcardPage';
