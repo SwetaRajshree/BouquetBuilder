@@ -825,6 +825,7 @@ function HandloomSection() {
   );
 }
 
+
 function PaintingsSection() {
   const ref=useRef(null);const visible=useIntersection(ref);
   const [paintingItems,setPaintingItems]=useState([]);
