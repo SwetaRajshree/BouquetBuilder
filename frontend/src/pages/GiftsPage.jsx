@@ -131,7 +131,7 @@ function PromoBanner() {
 }
 
 /* ─── HERO CARD ─────────────────────────────────────────────── */
-function HeroCard({ title, sub, cta, gradient, accentColor, btnGrad, emoji, onClick }) {
+function HeroCard({ title, sub, cta, gradient, accentColor, btnGrad, emoji, onClick, floatingEmojis }) {
   const [hov,setHov] = useState(false);
   return (
     <div onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)} onClick={onClick}
@@ -140,12 +140,20 @@ function HeroCard({ title, sub, cta, gradient, accentColor, btnGrad, emoji, onCl
         transition:"transform 0.22s,box-shadow 0.22s",
         transform:hov?"translateY(-5px)":"none",
         boxShadow:hov?`0 20px 52px ${accentColor}28`:`0 4px 18px ${accentColor}12` }}>
-      <div style={{ fontSize:58, position:"absolute", right:16, top:10, opacity:0.22, lineHeight:1, filter:"saturate(0.7)" }}>{emoji}</div>
+      {floatingEmojis&&floatingEmojis.map((e,i)=>(
+        <span key={i} style={{ position:"absolute", fontSize:e.size||16, pointerEvents:"none", userSelect:"none",
+          top:e.top, left:e.left, opacity:hov?0.75:0.28,
+          animation:`hcFloat${i%3} ${e.dur||3}s ease-in-out ${e.delay||0}s infinite`,
+          transition:"opacity 0.3s" }}>{e.emoji}</span>
+      ))}
+      <div style={{ fontSize:58, position:"absolute", right:16, top:10, opacity:0.22, lineHeight:1, filter:"saturate(0.7)",
+        animation:"hcBob 3.5s ease-in-out infinite" }}>{emoji}</div>
       <div style={{ width:36, height:2.5, background:btnGrad, borderRadius:2, marginBottom:12 }} />
       <h2 style={{ margin:"0 0 10px", fontSize:22, fontWeight:900, color:C.ink, lineHeight:1.2, whiteSpace:"pre-line" }}>{title}</h2>
       <p style={{ margin:"0 0 22px", fontSize:12.5, color:C.inkMid, lineHeight:1.65, opacity:0.85 }}>{sub}</p>
       <button onClick={e=>{e.stopPropagation();onClick();}}
-        style={{ background:btnGrad, color:"#fff", border:"none", borderRadius:10, padding:"10px 22px", fontSize:12.5, fontWeight:800, cursor:"pointer", letterSpacing:0.3, boxShadow:`0 4px 14px ${accentColor}40` }}>
+        style={{ background:btnGrad, color:"#fff", border:"none", borderRadius:10, padding:"10px 22px", fontSize:12.5, fontWeight:800, cursor:"pointer", letterSpacing:0.3,
+          boxShadow:`0 4px 14px ${accentColor}40`, transition:"transform 0.2s", transform:hov?"scale(1.05)":"scale(1)" }}>
         {cta} →
       </button>
     </div>
@@ -435,6 +443,10 @@ export default function GiftSection() {
     <div style={{ fontFamily:"'Segoe UI',system-ui,-apple-system,sans-serif", background:C.pageBg, minHeight:"100vh" }}>
       <style>{`
         @keyframes ticker{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes hcBob{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-8px) rotate(1deg)}}
+        @keyframes hcFloat0{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-12px) rotate(8deg)}}
+        @keyframes hcFloat1{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-9px) rotate(-6deg)}}
+        @keyframes hcFloat2{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-14px) rotate(5deg)}}
       `}</style>
 
       {/* ── Promo Strip ── */}
@@ -470,10 +482,70 @@ export default function GiftSection() {
         </div>
 
         {/* ── Hero Banners ── */}
-        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))", gap:18, marginBottom:48 }}>
-          <HeroCard title={"Birthday Joy,\nGift-Wrapped"} sub="Curated blooms, cakes & keepsakes for thoughtful celebrations" cta="Shop Birthday" gradient={C.heroGrad1} accentColor={C.champagne} btnGrad={C.goldGrad} emoji="🎂" onClick={()=>setCat("customize")} />
-          <HeroCard title={"Jewellery She'll\nTreasure Forever"} sub="18K gold plated · Personalised engraving · Gift-ready packaging" cta="Explore Jewellery" gradient={C.heroGrad2} accentColor={C.sage} btnGrad={C.btnSageGrad} emoji="💍" onClick={()=>setCat("jewellery")} />
-          <HeroCard title={"Need It Fast?\nInstant Gifts"} sub="Same-day & express delivery across 100+ cities" cta="Order Now" gradient={C.heroGrad3} accentColor={C.rose} btnGrad={C.btnGrad} emoji="⚡" onClick={()=>setCat("instant")} />
+        <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))", gap:18, marginBottom:48 }}>
+          <HeroCard
+            title={"Gift Hampers,\nCurated with Love"}
+            sub="Luxury hampers with chocolates, candles, spa sets & more — perfect for every occasion"
+            cta="Shop Hampers"
+            gradient={C.heroGrad1}
+            accentColor={C.champagne}
+            btnGrad={C.goldGrad}
+            emoji="🧺"
+            onClick={()=>setCat("customize")}
+            floatingEmojis={[
+              {emoji:"🎁", top:"12%", left:"8%",  size:18, dur:3.2, delay:0},
+              {emoji:"🍫", top:"55%", left:"6%",  size:14, dur:2.8, delay:0.5},
+              {emoji:"🕯️", top:"25%", left:"72%", size:15, dur:3.5, delay:0.3},
+              {emoji:"🌸", top:"70%", left:"68%", size:13, dur:2.5, delay:0.8},
+            ]}
+          />
+          <HeroCard
+            title={"Jewellery She'll\nTreasure Forever"}
+            sub="18K gold plated · Personalised engraving · Gift-ready packaging"
+            cta="Explore Jewellery"
+            gradient={C.heroGrad2}
+            accentColor={C.sage}
+            btnGrad={C.btnSageGrad}
+            emoji="💍"
+            onClick={()=>setCat("jewellery")}
+            floatingEmojis={[
+              {emoji:"💎", top:"10%", left:"10%", size:16, dur:3,   delay:0},
+              {emoji:"✨", top:"60%", left:"8%",  size:13, dur:2.6, delay:0.6},
+              {emoji:"💛", top:"20%", left:"70%", size:14, dur:3.2, delay:0.2},
+            ]}
+          />
+          <HeroCard
+            title={"Need It Fast?\nInstant Gifts"}
+            sub="Same-day & express delivery across 100+ cities"
+            cta="Order Now"
+            gradient={C.heroGrad3}
+            accentColor={C.rose}
+            btnGrad={C.btnGrad}
+            emoji="⚡"
+            onClick={()=>setCat("instant")}
+            floatingEmojis={[
+              {emoji:"🚀", top:"12%", left:"8%",  size:16, dur:2.8, delay:0},
+              {emoji:"⏱️", top:"58%", left:"7%",  size:14, dur:3.1, delay:0.4},
+              {emoji:"🎀", top:"22%", left:"68%", size:13, dur:2.5, delay:0.7},
+            ]}
+          />
+          <HeroCard
+            title={"Forever Flowers,\nAlways Blooming"}
+            sub="Preserved roses & dried florals that last for years — no water needed, always beautiful"
+            cta="Shop Forever Flowers"
+            gradient="linear-gradient(135deg, #fff0f5 0%, #fde8f0 50%, #f8e0f8 100%)"
+            accentColor={C.rose}
+            btnGrad={C.btnGrad}
+            emoji="🌹"
+            onClick={()=>setCat("customize")}
+            floatingEmojis={[
+              {emoji:"🌸", top:"10%", left:"8%",  size:18, dur:3.4, delay:0},
+              {emoji:"🌺", top:"55%", left:"6%",  size:15, dur:2.9, delay:0.5},
+              {emoji:"🌷", top:"25%", left:"70%", size:16, dur:3.1, delay:0.2},
+              {emoji:"🌼", top:"68%", left:"65%", size:13, dur:2.6, delay:0.9},
+              {emoji:"💐", top:"40%", left:"75%", size:14, dur:3.6, delay:0.4},
+            ]}
+          />
         </div>
 
         {/* ── Jewellery Strip ── */}
