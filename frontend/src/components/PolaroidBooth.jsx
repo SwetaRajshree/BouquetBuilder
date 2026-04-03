@@ -778,7 +778,7 @@ function LayoutIcon({ id }) {
 ───────────────────────────────────────────── */
 function Nav({ onBack, showBack = true }) {
   return (
-    <nav style={{ position: "sticky", top: 0, zIndex: 100, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 24px", background: P.nav, backdropFilter: "blur(16px)", borderBottom: `1px solid ${P.border}` }}>
+    <nav style={{ position: "sticky", top: 114, zIndex: 100, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 24px", background: P.nav, backdropFilter: "blur(16px)", borderBottom: `1px solid ${P.border}` }}>
       {showBack
         ? <button onClick={onBack} style={{ fontSize: 13, color: P.accent, background: "rgba(244,115,154,0.07)", border: `1px solid ${P.border}`, borderRadius: 20, padding: "6px 14px", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>← Back</button>
         : <div style={{ width: 80 }} />}
