@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useCartContext } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
+import { useNavigate } from 'react-router-dom';
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -380,6 +381,7 @@ function CartDrawer({ cart, onClose, onRemove }) {
 export default function GiftSection() {
   const { addToCart, cartItems } = useCartContext();
   const { wishlist: globalWishlist, toggle: toggleWishlistGlobal } = useWishlist();
+  const navigate = useNavigate();
   const [cat,setCat]           = useState("all");
   const [jewelleryItems, setJewelleryItems] = useState([]);
   const [jewellerySubCat, setJewellerySubCat] = useState("all");
@@ -507,7 +509,7 @@ export default function GiftSection() {
             accentColor={C.sage}
             btnGrad={C.btnSageGrad}
             emoji="💍"
-            onClick={()=>setCat("jewellery")}
+            onClick={()=>navigate('/collection')}
             floatingEmojis={[
               {emoji:"💎", top:"10%", left:"10%", size:16, dur:3,   delay:0},
               {emoji:"✨", top:"60%", left:"8%",  size:13, dur:2.6, delay:0.6},
