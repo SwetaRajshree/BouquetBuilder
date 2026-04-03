@@ -896,29 +896,51 @@ function SpotriSection() {
 
 function WoodSection() {
   const ref=useRef(null);const visible=useIntersection(ref);
+  const [woodItems, setWoodItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`${API_URL}/api/wooden-sculptures`)
+      .then(r => r.json())
+      .then(data => setWoodItems(Array.isArray(data) ? data : []))
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
+
+  const featured = woodItems[0];
+  const rest = woodItems.slice(1);
+
   return (
     <section className="section wood-section"><div className="section-inner" ref={ref}>
       <div className={`section-header fade-up${visible?" visible":""}`}>
         <div><div className="section-label">Master Craft</div><h2 className="section-title" style={{color:"#6b4020"}}>Wooden Sculpting</h2></div>
         <button className="btn-explore" style={{borderColor:"#c49a6c",color:"#8b5e3c"}}>Explore All →</button>
       </div>
-      <div className={`wood-split fade-up fade-up-delay-1${visible?" visible":""}`}>
-        <div className="wood-featured">
-          <div className="wood-featured-emoji">{woodProducts[0].emoji}</div>
-          <div className="wood-featured-badge">
-            <h3>{woodProducts[0].name}</h3><p>{woodProducts[0].desc}</p>
-            <div className="price">{woodProducts[0].price}</div>
+      {loading && <p style={{color:"#8b5e3c",fontSize:"0.9rem"}}>Loading sculptures...</p>}
+      {!loading && featured && (
+        <div className={`wood-split fade-up fade-up-delay-1${visible?" visible":""}`}>
+          <div className="wood-featured" style={{backgroundImage:`url(${featured.image})`,backgroundSize:"cover",backgroundPosition:"center"}}>
+            <div style={{position:"absolute",inset:0,background:"rgba(0,0,0,0.25)",borderRadius:22}}/>
+            <div className="wood-featured-badge">
+              <h3>{featured.name}</h3>
+              <p>{featured.material} &bull; ⭐ {featured.rating}</p>
+              <div className="price">₹{featured.price.toLocaleString()}</div>
+            </div>
+          </div>
+          <div className="wood-list">
+            {rest.map(p=>(
+              <div key={p._id} className="wood-item">
+                <div className="wood-thumb" style={{backgroundImage:`url(${p.image})`,backgroundSize:"cover",backgroundPosition:"center",fontSize:0}}/>
+                <div className="wood-item-info">
+                  <h4>{p.name}</h4>
+                  <p>{p.material}</p>
+                  <div className="wood-price">₹{p.price.toLocaleString()}</div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-        <div className="wood-list">
-          {woodProducts.map(p=>(
-            <div key={p.id} className="wood-item">
-              <div className="wood-thumb">{p.emoji}</div>
-              <div className="wood-item-info"><h4>{p.name}</h4><p>{p.desc}</p><div className="wood-price">{p.price}</div></div>
-            </div>
-          ))}
-        </div>
-      </div>
+      )}
       <div className="wood-divider"/>
     </div></section>
   );
