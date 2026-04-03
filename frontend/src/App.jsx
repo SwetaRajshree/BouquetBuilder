@@ -47,16 +47,18 @@ function ScrollToTop() {
 }
 
 // Pages that have their own full-height panel layout (no standard Footer gap)
-const NO_FOOTER_PAGES = [];
+const NO_FOOTER_PAGES = ['/handcraft'];
+const NO_NAVBAR_PAGES = ['/handcraft'];
 
 export default function App() {
   const { pathname } = useLocation();
-  const showFooter   = !NO_FOOTER_PAGES.includes(pathname);
+  const showFooter = !NO_FOOTER_PAGES.includes(pathname);
+  const showNavbar  = !NO_NAVBAR_PAGES.includes(pathname);
 
   return (
     <div className="min-h-screen flex flex-col">
       <ScrollToTop />
-      <Navbar />
+      {showNavbar && <Navbar />}
 
       <main className="flex-1">
         <Routes>
