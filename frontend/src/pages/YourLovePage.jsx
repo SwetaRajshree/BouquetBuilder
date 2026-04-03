@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";`nconst API = import.meta.env.VITE_API_URL;
 
 // ─── DATA ────────────────────────────────────────────────────────────────────
 const BASE_REVIEWS = [
@@ -68,37 +68,7 @@ const seededRand = (seed) => {
   };
 };
 
-const generateReviews = () =>
-  Array.from({ length: 500 }, (_, i) => {
-    const base = BASE_REVIEWS[i % BASE_REVIEWS.length];
-    const suffix = String.fromCharCode(65 + (i % 26));
-    return { ...base, id: i + 1, color: PAPER_COLORS[i % PAPER_COLORS.length], name: i < 50 ? base.name : `${base.name.split(" ")[0]} ${suffix}.` };
-  });
-
-const ALL_REVIEWS = generateReviews();
-
-const HEART_PROPS = ALL_REVIEWS.map((_, i) => {
-  const rand = seededRand(i * 31 + 7);
-  const cols = 20;
-  const rows = Math.ceil(500 / cols);
-  const col = i % cols;
-  const row = Math.floor(i / cols);
-  const xBase = (col / cols) * 80 + 8;
-  const yBase = 5 + (row / rows) * 87;
-  const x = Math.max(3, Math.min(93, xBase + (rand() - 0.5) * 9));
-  const y = Math.max(2, Math.min(94, yBase + (rand() - 0.5) * 7));
-  const size = 19 + rand() * 15;
-  const rotation = (rand() - 0.5) * 75;
-  const zIdx = Math.floor(rand() * 22);
-  const color = PAPER_COLORS[Math.floor(rand() * PAPER_COLORS.length)];
-  const floatDuration = 3.2 + rand() * 4.5;
-  const floatDelay = rand() * 6;
-  const swayX = (rand() - 0.5) * 7;
-  const swayY = (rand() - 0.5) * 5;
-  const rotateSway = (rand() - 0.5) * 14;
-  const shadow = 0.07 + rand() * 0.15;
-  return { x, y, size, rotation, zIdx, color, floatDuration, floatDelay, swayX, swayY, rotateSway, shadow };
-});
+const FALLBACK_REVIEWS = [`n  { _id:"1", name:"Ananya", text:"My mom cried when she received the flowers. Best gift I ever gave.", rating:5 },`n  { _id:"2", name:"Rahul",  text:"It made long distance feel a little closer. Thank you BouquetBuilder.", rating:5 },`n  { _id:"3", name:"Sneha",  text:"Knowing farmers are supported made every petal feel more special.", rating:5 },`n];`n`nconst buildHeartProps = (reviews) => reviews.map((_, i) => {`n  const rand = seededRand(i * 31 + 7);`n  const cols = Math.min(reviews.length, 10);`n  const rows = Math.ceil(reviews.length / cols);`n  const col = i % cols; const row = Math.floor(i / cols);`n  const x = Math.max(3, Math.min(93, (col/cols)*80+8 + (rand()-0.5)*9));`n  const y = Math.max(2, Math.min(94, 5+(row/rows)*87 + (rand()-0.5)*7));`n  return { x, y, size:19+rand()*15, rotation:(rand()-0.5)*75, zIdx:Math.floor(rand()*22),`n    color:PAPER_COLORS[Math.floor(rand()*PAPER_COLORS.length)],`n    floatDuration:3.2+rand()*4.5, floatDelay:rand()*6,`n    swayX:(rand()-0.5)*7, swayY:(rand()-0.5)*5, rotateSway:(rand()-0.5)*14, shadow:0.07+rand()*0.15 };`n});
 
 // ─── PAPER HEART SVG ─────────────────────────────────────────────────────────
 const PaperHeart = ({ size, color, rotation, style = {} }) => {
@@ -172,7 +142,7 @@ const FloatUp = ({ x, delay, duration, color }) => (
 );
 
 // ─── MAIN ─────────────────────────────────────────────────────────────────────
-export default function HeartJarReviews() {
+export default function HeartJarReviews() {`n  const [reviews, setReviews] = useState(FALLBACK_REVIEWS);`n  const [heartProps, setHeartProps] = useState(() => buildHeartProps(FALLBACK_REVIEWS));`n`n  useEffect(() => {`n    fetch(`${API}/api/reviews`)`n      .then(r => r.json())`n      .then(data => {`n        if (Array.isArray(data) && data.length > 0) {`n          setReviews(data);`n          setHeartProps(buildHeartProps(data));`n        }`n      })`n      .catch(() => {});`n  }, []);
   const [isOpen, setIsOpen]       = useState(false);
   const [isOpening, setIsOpening] = useState(false);
   const [hoveredId, setHoveredId] = useState(null);
@@ -332,7 +302,7 @@ export default function HeartJarReviews() {
           animation:"sPulse 3.2s ease-in-out infinite",
         }}>
           <span style={{fontSize:"14px"}}>❤️</span>
-          <span style={{color:"#8B1A1A",fontWeight:"700",fontSize:"13px"}}>500 Happy Customers</span>
+          <span style={{color:"#8B1A1A",fontWeight:"700",fontSize:"13px"}}>`${reviews.length}+ Happy Customers</span>
           <span style={{fontSize:"14px"}}>❤️</span>
         </div>
       </div>
@@ -487,13 +457,13 @@ export default function HeartJarReviews() {
             clipPath:"polygon(17.5% 2.5%, 82.5% 2.5%, 99.5% 100%, 0.5% 100%)",
             overflow:"hidden",
           }}>
-            {ALL_REVIEWS.map((review, i) => {
-              const hp = HEART_PROPS[i];
-              const isHov = hoveredId === review.id;
+            {reviews.map((review, i) => {
+              const hp = heartProps[i];
+              const isHov = hoveredId === (review._id || review.id);
               return (
                 <div
-                  key={review.id}
-                  onMouseEnter={() => isOpen && setHoveredId(review.id)}
+                  key={(review._id || review.id)}
+                  onMouseEnter={() => isOpen && setHoveredId((review._id || review.id))}
                   onMouseLeave={() => setHoveredId(null)}
                   onClick={e => handleHeartClick(e, review)}
                   style={{
@@ -601,7 +571,7 @@ export default function HeartJarReviews() {
                 </div>
               </div>
               <div style={{fontSize:"11px",color:"#4A1010",lineHeight:"1.55",fontStyle:"italic"}}>
-                "{clicked.comment}"
+                "{clicked.text}"
               </div>
               <div style={{textAlign:"right",marginTop:"5px",fontSize:"13px"}}>
                 {["💌","💝","💖","💗","♥️"][clicked.id%5]}
@@ -659,7 +629,7 @@ export default function HeartJarReviews() {
 
       {/* Hover bar */}
       {hoveredId && isOpen && (() => {
-        const r = ALL_REVIEWS.find(rv=>rv.id===hoveredId);
+        const r = reviews.find(rv=>(rv._id||rv.id)===hoveredId);
         if (!r) return null;
         return (
           <div style={{
@@ -687,3 +657,7 @@ export default function HeartJarReviews() {
     </div>
   );
 }
+
+
+
+
