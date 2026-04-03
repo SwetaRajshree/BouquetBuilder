@@ -8,8 +8,11 @@ const GIFT_SHOPS = [
     desc: 'Beautifully curated gift hampers with flowers, chocolates & personal touches.',
     emoji: '🎀',
     ig: 'https://www.instagram.com/heartartbysweta?igsh=eXQ0eHJ0c3RsOGdk',
-    bg: 'linear-gradient(135deg,#ffe8ed,#ffd0d8)',
-    accent: '#c04060',
+    headerBg: 'linear-gradient(135deg,#2c1a00,#4a3000)',
+    avatarBg: 'linear-gradient(135deg,#c9a84c,#a8863a)',
+    shopLabel: '🧺 Shop Hampers',
+    shopRoute: '/gift-hampers',
+    handle: '@heartartbysweta',
     reels: [
       { url: 'https://www.instagram.com/reel/DPtTDvPE-gn/?igsh=OWdtMWh0d2xvNG4z', emoji: '🌹', label: 'Rose Hamper' },
       { url: 'https://www.instagram.com/reel/DRhiPyZk4pR/?igsh=djJkajk2eWJ4dWZz', emoji: '🌸', label: 'Floral Box' },
@@ -19,15 +22,26 @@ const GIFT_SHOPS = [
       { url: 'https://www.instagram.com/reel/DVqpn0fjAOb/?igsh=MWY5YWgydDJtcDYyMw==', emoji: '🪷', label: 'Lotus Craft' },
     ],
   },
-];
-
-const CATEGORIES = [
-  { emoji: '🍫', label: 'Chocolate Hampers', desc: 'Premium chocolates with floral arrangements' },
-  { emoji: '🕯️', label: 'Spa & Candle Sets', desc: 'Relaxation kits with scented candles & bath salts' },
-  { emoji: '🌸', label: 'Floral Gift Boxes', desc: 'Fresh flowers paired with curated gifts' },
-  { emoji: '🎂', label: 'Birthday Hampers', desc: 'Celebration boxes for every birthday' },
-  { emoji: '💍', label: 'Anniversary Sets', desc: 'Romantic hampers for special milestones' },
-  { emoji: '🧸', label: 'Cute & Aesthetic', desc: 'Kawaii-style gift sets with plushies & sweets' },
+  {
+    name: 'Jewellery Studio',
+    tag: 'Fine Jewellery & Accessories',
+    desc: 'Handcrafted jewellery pieces — rings, necklaces, earrings & more, made with love.',
+    emoji: '💎',
+    ig: 'https://www.instagram.com/',
+    headerBg: 'linear-gradient(135deg,#1a0a2e,#2d1b3d)',
+    avatarBg: 'linear-gradient(135deg,#a855f7,#7c3aed)',
+    shopLabel: '💎 Shop Jewellery',
+    shopRoute: '/collection',
+    handle: '@jewellery',
+    reels: [
+      { url: 'https://www.instagram.com/reel/DVyX-OTD4TO/?igsh=MTUwZmt4aWZmb3VzbQ==', emoji: '💍', label: 'Ring Collection' },
+      { url: 'https://www.instagram.com/p/DQT9H5Ikp0j/?img_index=3&igsh=ZWtheXQ5ajZnbmdi', emoji: '📿', label: 'Necklaces' },
+      { url: 'https://www.instagram.com/reel/DOvpbLukv3T/?igsh=MTYwbWtobXBnYnprbg==', emoji: '✨', label: 'New Arrivals' },
+      { url: 'https://www.instagram.com/p/DVyte8DEwGx/?img_index=1&igsh=Z3J5b3Vkb3B5cmJo', emoji: '💛', label: 'Gold Pieces' },
+      { url: 'https://www.instagram.com/p/DRJqu6SEnIM/?igsh=MWw4YzVhNzVxMzd4Yw==', emoji: '🌸', label: 'Floral Jewels' },
+      { url: 'https://www.instagram.com/p/DRCpeNGEsO-/?img_index=2&igsh=djZxZGx6NDdjbWM4', emoji: '💜', label: 'Statement Pieces' },
+    ],
+  },
 ];
 
 export default function GiftShopsPage() {
@@ -75,22 +89,6 @@ export default function GiftShopsPage() {
 
       <div style={{ maxWidth:1160, margin:'0 auto', padding:'48px 22px 80px' }}>
 
-        {/* Categories */}
-        <div style={{ marginBottom:56 }}>
-          <h2 style={{ fontSize:'clamp(1.4rem,3vw,1.9rem)', fontWeight:900, color:'#2c1a2e', marginBottom:6 }}>🎁 Shop by Category</h2>
-          <p style={{ fontSize:13, color:'#9a8a94', marginBottom:28 }}>Find the perfect hamper for every occasion</p>
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(160px,1fr))', gap:16 }}>
-            {CATEGORIES.map((cat, i) => (
-              <div key={i} className="cat-card" style={{ background:'#fff', animationDelay:`${i*0.08}s`, animation:'fadeIn 0.5s ease both' }}
-                onClick={() => navigate('/gift-hampers')}>
-                <div style={{ fontSize:36, marginBottom:10 }}>{cat.emoji}</div>
-                <h4 style={{ margin:'0 0 6px', fontSize:13, fontWeight:800, color:'#2c1a2e' }}>{cat.label}</h4>
-                <p style={{ margin:0, fontSize:11, color:'#9a8a94', lineHeight:1.5 }}>{cat.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
         {/* Featured Shops */}
         <div>
           <h2 style={{ fontSize:'clamp(1.4rem,3vw,1.9rem)', fontWeight:900, color:'#2c1a2e', marginBottom:6 }}>🏪 Featured Gift Studios</h2>
@@ -98,15 +96,14 @@ export default function GiftShopsPage() {
 
           {GIFT_SHOPS.map((shop, si) => (
             <div key={si} className="shop-card" style={{ background:'#fff', border:'1.5px solid #f0e8eb', marginBottom:32 }}>
-              {/* Shop header */}
-              <div style={{ background:'linear-gradient(135deg,#2c1a00,#4a3000)', padding:'28px 28px 24px', display:'flex', alignItems:'center', gap:16 }}>
-                <div style={{ width:60, height:60, borderRadius:'50%', background:'linear-gradient(135deg,#c9a84c,#a8863a)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:28, flexShrink:0 }}>
+              <div style={{ background:shop.headerBg, padding:'28px 28px 24px', display:'flex', alignItems:'center', gap:16 }}>
+                <div style={{ width:60, height:60, borderRadius:'50%', background:shop.avatarBg, display:'flex', alignItems:'center', justifyContent:'center', fontSize:28, flexShrink:0 }}>
                   {shop.emoji}
                 </div>
                 <div style={{ flex:1 }}>
                   <h3 style={{ margin:'0 0 4px', fontSize:20, fontWeight:900, color:'#fff' }}>{shop.name}</h3>
-                  <p style={{ margin:'0 0 6px', fontSize:12, color:'#f0d898', fontWeight:700, letterSpacing:1, textTransform:'uppercase' }}>{shop.tag}</p>
-                  <p style={{ margin:0, fontSize:13, color:'rgba(253,248,240,0.7)', lineHeight:1.6 }}>{shop.desc}</p>
+                  <p style={{ margin:'0 0 6px', fontSize:12, color:'rgba(255,255,255,0.6)', fontWeight:700, letterSpacing:1, textTransform:'uppercase' }}>{shop.tag}</p>
+                  <p style={{ margin:0, fontSize:13, color:'rgba(255,255,255,0.6)', lineHeight:1.6 }}>{shop.desc}</p>
                 </div>
                 <a href={shop.ig} target="_blank" rel="noreferrer"
                   style={{ flexShrink:0, padding:'10px 20px', background:'linear-gradient(135deg,#f09433,#dc2743,#bc1888)', color:'white', border:'none', borderRadius:40, fontSize:12, fontWeight:700, cursor:'pointer', textDecoration:'none', whiteSpace:'nowrap' }}>
@@ -114,19 +111,18 @@ export default function GiftShopsPage() {
                 </a>
               </div>
 
-              {/* Reels */}
               <div style={{ padding:'24px 28px' }}>
-                <p style={{ margin:'0 0 14px', fontSize:12, fontWeight:700, color:'#9a8a94', letterSpacing:1, textTransform:'uppercase' }}>✨ Latest Reels</p>
+                <p style={{ margin:'0 0 14px', fontSize:12, fontWeight:700, color:'#9a8a94', letterSpacing:1, textTransform:'uppercase' }}>✨ Latest Posts & Reels</p>
                 <div style={{ display:'flex', gap:12, overflowX:'auto', paddingBottom:8, scrollbarWidth:'none' }}>
                   {shop.reels.map((reel, i) => (
                     <a key={i} href={reel.url} target="_blank" rel="noreferrer" className="reel-card">
-                      <div style={{ width:'100%', aspectRatio:'9/16', background:`linear-gradient(135deg,hsl(${300+i*20},60%,20%),hsl(${320+i*15},70%,30%))`, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:6 }}>
+                      <div style={{ width:'100%', aspectRatio:'9/16', background:`linear-gradient(135deg,hsl(${260+i*20},60%,20%),hsl(${280+i*15},70%,30%))`, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:6 }}>
                         <span style={{ fontSize:30, animation:`shimmer ${2+i*0.3}s ease-in-out infinite` }}>{reel.emoji}</span>
-                        <span style={{ fontSize:9, color:'rgba(255,255,255,0.5)', fontFamily:'sans-serif', letterSpacing:1 }}>▶ REEL</span>
+                        <span style={{ fontSize:9, color:'rgba(255,255,255,0.5)', fontFamily:'sans-serif', letterSpacing:1 }}>▶ VIEW</span>
                       </div>
-                      <div style={{ padding:'8px 10px', background:'rgba(44,26,0,0.95)' }}>
+                      <div style={{ padding:'8px 10px', background:'rgba(20,10,40,0.95)' }}>
                         <p style={{ margin:0, fontSize:10, color:'rgba(255,255,255,0.85)', fontWeight:600 }}>{reel.label}</p>
-                        <p style={{ margin:'2px 0 0', fontSize:9, color:'rgba(255,255,255,0.4)' }}>@heartartbysweta</p>
+                        <p style={{ margin:'2px 0 0', fontSize:9, color:'rgba(255,255,255,0.4)' }}>{shop.handle}</p>
                       </div>
                     </a>
                   ))}
@@ -137,9 +133,9 @@ export default function GiftShopsPage() {
                     style={{ padding:'11px 24px', background:'linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)', color:'white', border:'none', borderRadius:40, fontSize:13, fontWeight:700, cursor:'pointer', textDecoration:'none', boxShadow:'0 4px 16px rgba(220,39,67,0.35)' }}>
                     📸 View Instagram Profile
                   </a>
-                  <button onClick={() => navigate('/gift-hampers')}
-                    style={{ padding:'11px 24px', background:'linear-gradient(135deg,#c9a84c,#a8863a)', color:'white', border:'none', borderRadius:40, fontSize:13, fontWeight:700, cursor:'pointer', boxShadow:'0 4px 16px rgba(201,168,76,0.35)' }}>
-                    🧺 Shop Hampers
+                  <button onClick={() => navigate(shop.shopRoute)}
+                    style={{ padding:'11px 24px', background:shop.avatarBg, color:'white', border:'none', borderRadius:40, fontSize:13, fontWeight:700, cursor:'pointer', boxShadow:'0 4px 16px rgba(100,50,200,0.25)' }}>
+                    {shop.shopLabel}
                   </button>
                 </div>
               </div>
