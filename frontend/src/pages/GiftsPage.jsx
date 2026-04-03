@@ -553,6 +553,8 @@ export default function GiftSection() {
             btnGrad={C.btnGrad}
             emoji="⚡"
             onClick={()=>navigate('/instant-gifts')}
+            shopBtn="Find Shops"
+            onShopClick={()=>navigate('/shops')}
             floatingEmojis={[
               {emoji:"🚀", top:"12%", left:"8%",  size:16, dur:2.8, delay:0},
               {emoji:"⏱️", top:"58%", left:"7%",  size:14, dur:3.1, delay:0.4},
@@ -568,6 +570,8 @@ export default function GiftSection() {
             btnGrad={C.btnGrad}
             emoji="🌹"
             onClick={()=>navigate('/forever-flowers')}
+            shopBtn="Find Shops"
+            onShopClick={()=>navigate('/shops')}
             floatingEmojis={[
               {emoji:"🌸", top:"10%", left:"8%",  size:18, dur:3.4, delay:0},
               {emoji:"🌺", top:"55%", left:"6%",  size:15, dur:2.9, delay:0.5},
