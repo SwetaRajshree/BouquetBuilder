@@ -885,8 +885,12 @@ export default function CakePage() {
     setActiveCategory(cat);
     setTab('cakes');
     setTimeout(() => {
-      document.getElementById('cake-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 100);
+      const el = document.getElementById('cake-grid');
+      if (el) {
+        const top = el.getBoundingClientRect().top + window.scrollY - 70;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+    }, 150);
   };
 
   const handleCustomizeComplete = () => {
