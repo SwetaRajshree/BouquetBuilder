@@ -10,12 +10,10 @@ const LINKS = [
   { to: '/cake',      label: '🎂 Cake'     },
   { to: '/gifts',     label: '🎁 Gifts'    },
   { to: '/digital-gifting', label: '💌 DigiLove' },
-  { to: '/shops',     label: 'Shops'       },
   { to: '/calendar',  label: 'My Calendar' },
   { to: '/tracking',  label: '📦 Orders'   },
   { to: '/story',     label: 'Our Story'   },
   { to: '/handcraft',  label: '🧵 Handcraft' },
-  { to: '/collection',  label: '💎 Collection' },
 ];
 
 export default function Navbar() {

@@ -3,12 +3,14 @@ import FlowersPage        from './FlowersPage';
 import PlantShop          from './PlantShop';
 import AIPage             from './AIPage';
 import FlashSalePage      from './FlashSalePage';
+import ShopsPage          from './ShopsPage';
 
 const TABS = [
   { id: 'flowers',    label: '🌸 Flowers'       },
   { id: 'plants',     label: '🌿 Plants'        },
   { id: 'flora-ai',   label: '🤖 Flora AI'      },
   { id: 'flash-sale', label: '🔥 Flash Sale'    },
+  { id: 'shops',      label: '🏪 Shops'          },
 ];
 
 export default function BuyPage() {
@@ -41,6 +43,7 @@ export default function BuyPage() {
         {active === 'plants'     && <PlantShop />}
         {active === 'flora-ai'   && <AIPage />}
         {active === 'flash-sale' && <FlashSalePage />}
+        {active === 'shops'      && <ShopsPage />}
       </div>
     </div>
   );
