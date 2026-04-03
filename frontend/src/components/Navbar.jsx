@@ -5,15 +5,12 @@ import { useCartContext } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 
 const LINKS = [
-  { to: '/',             label: 'Home' },
-  { to: '/sale',         label: '🔥 Flash Sale' },
-  { to: '/shops',        label: 'Shops' },
-  { to: '/flowers',      label: '🌸 Flowers' },
-  { to: '/plants',       label: '🌿 Plants' },
-  { to: '/ai',           label: 'Flora AI 🌸' },
-  { to: '/calendar',     label: 'My Calendar' },
-  { to: '/tracking',     label: '📦 Orders' },
-  { to: '/story',        label: 'Our Story' },
+  { to: '/',         label: 'Home'        },
+  { to: '/buy',      label: '🛍️ Buy'      },
+  { to: '/shops',    label: 'Shops'       },
+  { to: '/calendar', label: 'My Calendar' },
+  { to: '/tracking', label: '📦 Orders'   },
+  { to: '/story',    label: 'Our Story'   },
 ];
 
 export default function Navbar() {

@@ -6,17 +6,14 @@ import Navbar           from './components/Navbar';
 import Footer           from './components/Footer';
 
 import HomePage         from './pages/HomePage';
-import FlashSalePage    from './pages/FlashSalePage';
 import ShopsPage        from './pages/ShopsPage';
 import ShopPage         from './pages/ShopPage';
 import SubscriptionPage from './pages/SubscriptionPage';
 import SchedulePage     from './pages/SchedulePage';
-import AIPage           from './pages/AIPage';
 import CalendarPage     from './pages/CalanderPage';
 import PaymentPage      from './pages/PaymentPage';
 import CartPage         from './pages/CartPage';
 import TrackingPage     from './pages/TrackingPage';
-import FlowersPage     from './pages/FlowersPage';
 import AuthPage        from './pages/AuthPage';
 import OccasionPage    from './pages/OccasionPage';
 import OurStoryPage     from './pages/OurStoryPage';
@@ -28,8 +25,9 @@ import DigitalCardPage    from './pages/DigitalCardPage';
 import ViewBouquetPage   from './pages/ViewBouquetPage';
 import BouquetCustomizePage from './pages/BouquetCustomizePage';
 import PostcardPage      from './pages/PostcardPage';
-import PlantShop         from './pages/PlantShop';
+
 import DigitalGiftingPage from './pages/DigitalGiftingPage';
+import BuyPage            from './pages/BuyPage';
 import SharedGardenPage  from './pages/SharedGardenPage';
 import SharedPolaroidPage from './pages/SharedPolaroidPage';
 
@@ -55,15 +53,16 @@ export default function App() {
       <main className="flex-1">
         <Routes>
           <Route path="/"             element={<HomePage />}         />
-          <Route path="/sale"         element={<FlashSalePage />}    />
+          <Route path="/sale"         element={<Navigate to="/buy" replace />} />
+          <Route path="/flowers"      element={<Navigate to="/buy" replace />} />
+          <Route path="/plants"       element={<Navigate to="/buy" replace />} />
+          <Route path="/ai"           element={<Navigate to="/buy" replace />} />
           <Route path="/shops"        element={<ShopsPage />}        />
           <Route path="/shop/:id"     element={<ShopPage />}         />
-          <Route path="/flowers"      element={<FlowersPage />}       />
           <Route path="/auth"         element={<AuthPage />}          />
           <Route path="/occasion/:slug" element={<OccasionPage />}    />
           <Route path="/subscription" element={<SubscriptionPage />} />
           <Route path="/schedule"     element={<SchedulePage />}     />
-          <Route path="/ai"           element={<AIPage />}           />
           <Route path="/calendar"     element={<CalendarPage />}     />
           <Route path="/payment"      element={<PaymentPage />}      />
           <Route path="/cart"         element={<CartPage />}         />
@@ -77,10 +76,11 @@ export default function App() {
           <Route path="/view-bouquet/:id" element={<ViewBouquetPage />}  />
           <Route path="/bouquet-customize" element={<BouquetCustomizePage />} />
           <Route path="/postcard"           element={<PostcardPage />} />
-          <Route path="/plants"             element={<PlantShop />}    />
+
           <Route path="/digital-gifting"     element={<DigitalGiftingPage />} />
           <Route path="/shared-garden/:id"   element={<SharedGardenPage />} />
           <Route path="/shared-polaroid/:id"  element={<SharedPolaroidPage />} />
+          <Route path="/buy"               element={<BuyPage />}                              />
           <Route path="/digital-bouquet"   element={<Navigate to="/bouquet-builder" replace />} />
           {/* Fallback */}
           <Route path="*"             element={<HomePage />}         />

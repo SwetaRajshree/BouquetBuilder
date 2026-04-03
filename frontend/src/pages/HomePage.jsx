@@ -14,7 +14,7 @@ const OCCASIONS = [
 
 const HOW_STEPS = [
   { n: '1', icon: '🗺️', title: 'Find a Shop',  desc: 'Browse florists near you and discover their specialties, ratings & opening hours.', route: '/shops' },
-  { n: '2', icon: '✏️', title: 'Customize',    desc: 'Build your dream bouquet step-by-step — flowers, colors, wrapping, message card & more.', route: '/flowers' },
+  { n: '2', icon: '✏️', title: 'Customize',    desc: 'Build your dream bouquet step-by-step — flowers, colors, wrapping, message card & more.', route: '/buy' },
   { n: '3', icon: '💐', title: 'Deliver',      desc: 'Schedule same-day or future delivery right to their doorstep, with live tracking.', route: '/calendar' },
 ];
 
