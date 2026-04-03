@@ -24,7 +24,8 @@ import BouquetBuilderPage from './pages/BouquetBuilderPage';
 import DigitalCardPage    from './pages/DigitalCardPage';
 import ViewBouquetPage   from './pages/ViewBouquetPage';
 import BouquetCustomizePage from './pages/BouquetCustomizePage';
-import PostcardPage      from './pages/PostcardPage';
+import PostcardPage           from './pages/PostcardPage';
+import DigitalPostcardPage    from './pages/DigitalPostcardPage';
 
 import DigitalGiftingPage from './pages/DigitalGiftingPage';
 import BuyPage            from './pages/BuyPage';
@@ -80,6 +81,7 @@ export default function App() {
           <Route path="/view-bouquet/:id" element={<ViewBouquetPage />}  />
           <Route path="/bouquet-customize" element={<BouquetCustomizePage />} />
           <Route path="/postcard"           element={<PostcardPage />} />
+          <Route path="/digital-postcard"    element={<DigitalPostcardPage />} />
 
           <Route path="/your-love"     element={<YourLovePage />}       />
           <Route path="/cake"          element={<CakePage />}           />

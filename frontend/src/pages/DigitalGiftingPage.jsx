@@ -31,7 +31,7 @@ export default function DigitalGiftingPage() {
 
   const handleSelect = (id) => {
     setMenuOpen(false);
-    if (id === 'postcard') navigate('/postcard');
+    if (id === 'postcard') navigate('/digital-postcard');
     else if (id === 'digitalbouquet') navigate('/bouquet-builder');
     else setActiveMenu(id);
   };
