@@ -854,6 +854,8 @@ function NearbyBakers({ onSelect }) {
     </div>
   );
 }
+
+function Toast({ msg }) {
   return (
     <div style={{ position: "fixed", bottom: 32, right: 32, zIndex: 9999, background: "#2e7d32", color: "#fff", borderRadius: 14, padding: "16px 28px", fontFamily: "'Poppins',sans-serif", fontSize: 14, fontWeight: 600, boxShadow: "0 8px 32px rgba(0,0,0,0.2)", display: "flex", alignItems: "center", gap: 10, animation: "fadeUp 0.4s ease" }}>
       <span style={{ fontSize: 22 }}>🎉</span> {msg}

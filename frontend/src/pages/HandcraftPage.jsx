@@ -773,7 +773,7 @@ function HomePage({setPage,setCart,wishlist,toggleWish,toast,onOpenDetail}){
           </div>
           <div style={{display:"flex",gap:10,marginBottom:32,flexWrap:"wrap",justifyContent:"center"}}>
             {Object.keys(SUB_CATS).map(cat=>{const c=CATS.find(x=>x.name===cat);return(
-              <button key={cat} onClick={()=>setActiveCat(cat)} style={{padding:"10px 20px",borderRadius:30,border:"none",background:activeCat===cat?c?.color||"#f59e0b":"#111117",color:activeCat===cat?"#fff":"rgba(255,255,255,0.6)",fontWeight:600,cursor:"pointer",fontSize:13,transition:"all .2s",fontFamily:"'Outfit',sans-serif",border:`1.5px solid ${activeCat===cat?c?.color||"#f59e0b":"#1e1e2e"}`}}>{c?.icon} {cat}</button>
+              <button key={cat} onClick={()=>setActiveCat(cat)} style={{padding:"10px 20px",borderRadius:30,background:activeCat===cat?c?.color||"#f59e0b":"#111117",color:activeCat===cat?"#fff":"rgba(255,255,255,0.6)",fontWeight:600,cursor:"pointer",fontSize:13,transition:"all .2s",fontFamily:"'Outfit',sans-serif",border:`1.5px solid ${activeCat===cat?c?.color||"#f59e0b":"#1e1e2e"}`}}>{c?.icon} {cat}</button>
             );})}
           </div>
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(130px,1fr))",gap:14}}>
