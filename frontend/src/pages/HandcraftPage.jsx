@@ -853,7 +853,7 @@ function ShopPage({cart,setCart,wishlist,toggleWish,toast,onOpenDetail,initialSe
         </div>
         <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:20}}>
           {["All",...CATS.map(c=>c.name)].map(f=>(
-            <button key={f} onClick={()=>setFilter(f)} style={{padding:"8px 16px",borderRadius:20,border:"none",background:filter===f?"#f59e0b":"#111117",color:filter===f?"#000":"rgba(255,255,255,0.6)",fontWeight:600,cursor:"pointer",fontSize:12,transition:"all .2s",fontFamily:"'Outfit',sans-serif",border:`1px solid ${filter===f?"#f59e0b":"#1e1e2e"}`}}>{f}</button>
+            <button key={f} onClick={()=>setFilter(f)} style={{padding:"8px 16px",borderRadius:20,background:filter===f?"#f59e0b":"#111117",color:filter===f?"#000":"rgba(255,255,255,0.6)",fontWeight:600,cursor:"pointer",fontSize:12,transition:"all .2s",fontFamily:"'Outfit',sans-serif",border:`1px solid ${filter===f?"#f59e0b":"#1e1e2e"}`}}>{f}</button>
           ))}
         </div>
         <div style={{marginBottom:16,fontSize:13,color:"rgba(255,255,255,0.4)"}}>Showing {filtered.length} of {PRODUCTS.length} products</div>

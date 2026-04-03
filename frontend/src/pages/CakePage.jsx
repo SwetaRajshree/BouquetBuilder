@@ -678,7 +678,7 @@ function BakerModal({ shop, accentColor, onClose }) {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(180px,1fr))', gap: 16 }}>
           {cakes.map(cake => (
-            <div key={cake._id} style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0f0f0', overflow: 'hidden', boxShadow: '0 2px 10px rgba(0,0,0,0.06)', transition: 'all 0.2s' }}
+            <div key={cake._id} style={{ borderRadius: 16, border: '1.5px solid #f0f0f0', overflow: 'hidden', boxShadow: '0 2px 10px rgba(0,0,0,0.06)', transition: 'all 0.2s' }}
               onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.borderColor = accentColor; e.currentTarget.style.boxShadow = `0 8px 24px ${accentColor}22`; }}
               onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.borderColor = '#f0f0f0'; e.currentTarget.style.boxShadow = '0 2px 10px rgba(0,0,0,0.06)'; }}>
               <div style={{ height: 130, background: '#fff5f5', overflow: 'hidden' }}>
@@ -828,7 +828,7 @@ function NearbyBakers({ onSelect }) {
           )}
           {filtered.map((shop, i) => (
             <div key={shop._id} onClick={() => setActiveShop(shop)}
-              style={{ background: '#fff', borderRadius: 16, border: `2px solid ${activeShop?._id === shop._id ? accentColor : '#f0f0f0'}`, padding: '16px 20px', cursor: 'pointer', transition: 'all 0.2s',
+              style={{ borderRadius: 16, border: `2px solid ${activeShop?._id === shop._id ? accentColor : '#f0f0f0'}`, padding: '16px 20px', cursor: 'pointer', transition: 'all 0.2s',
                 boxShadow: activeShop?._id === shop._id ? `0 4px 16px ${accentColor}22` : '0 2px 8px rgba(0,0,0,0.04)',
                 background: activeShop?._id === shop._id ? `${accentColor}08` : '#fff' }}
               onMouseEnter={e => { e.currentTarget.style.borderColor = accentColor; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.1)'; }}
