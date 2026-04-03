@@ -34,6 +34,7 @@ const reviewRoutes       = require("./routes/reviewRoutes");
 const gardenRoutes       = require("./routes/gardenRoutes");
 const collectionRoutes   = require("./routes/collectionRoutes");
 const cakeRoutes         = require("./routes/cakeRoutes");
+const giftRoutes         = require("./routes/giftRoutes");
 
 app.use("/api/auth",       authRoutes);
 app.use("/api/flowers",    flowerRoutes);
@@ -49,6 +50,7 @@ app.use("/api/reviews",   reviewRoutes);
 app.use("/api/gardens",    gardenRoutes);
 app.use("/api/collection", collectionRoutes);
 app.use("/api/cakes",      cakeRoutes);
+app.use("/api/gifts",      giftRoutes);
 
 // Test Route
 app.get("/", (req, res) => {

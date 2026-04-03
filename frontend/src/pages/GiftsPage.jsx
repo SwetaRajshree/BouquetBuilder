@@ -385,6 +385,7 @@ export default function GiftSection() {
   const [cat,setCat]           = useState("all");
   const [jewelleryItems, setJewelleryItems] = useState([]);
   const [jewellerySubCat, setJewellerySubCat] = useState("all");
+  const [foreverFlowers, setForeverFlowers] = useState([]);
   const [occasion,setOccasion] = useState(null);
   const [search,setSearch]     = useState("");
   const [sortBy,setSortBy]     = useState("default");
@@ -404,6 +405,13 @@ export default function GiftSection() {
       .catch(() => {});
   }, [jewellerySubCat]);
 
+  useEffect(() => {
+    fetch(`${API}/api/gifts?category=Flowers`)
+      .then(r => r.json())
+      .then(data => setForeverFlowers(Array.isArray(data) ? data : []))
+      .catch(() => {});
+  }, []);
+
   // Map API jewellery items to the same shape as PRODUCTS for the grid
   const jewelleryAsProducts = jewelleryItems.map(j => ({
     id: j._id, cat: 'jewellery',
@@ -418,7 +426,19 @@ export default function GiftSection() {
     reviews: j.reviews,
   }));
 
-  const allProducts = cat === 'jewellery' ? jewelleryAsProducts : [...PRODUCTS, ...jewelleryAsProducts];
+  const flowersAsProducts = foreverFlowers.map(f => ({
+    id: f._id, cat: 'flowers',
+    name: f.name, sub: f.description || '',
+    price: f.price, was: null,
+    badge: f.rating >= 4.9 ? 'Top Rated' : null,
+    badgeColor: f.rating >= 4.9 ? 'rose' : null,
+    tag: f.rating >= 4.9 ? 'Bestseller' : null,
+    img: f.image, rating: f.rating, reviews: Math.floor(f.rating * 30),
+  }));
+
+  const allProducts = cat === 'jewellery' ? jewelleryAsProducts
+    : cat === 'flowers' ? flowersAsProducts
+    : [...PRODUCTS, ...jewelleryAsProducts, ...flowersAsProducts];
 
   const products = allProducts.filter(p=>{
     if(cat!=="all" && p.cat!==cat) return false;
