@@ -374,13 +374,15 @@ function CartDrawer({ cart, onClose, onRemove }) {
 ═══════════════════════════════════════════════ */
 export default function GiftSection() {
   const { addToCart, cartItems } = useCartContext();
-  const { wishlist: globalWishlist, toggle: toggleWishlistGlobal, has: inWishlist } = useWishlist();
-  const [cat,setCat] = useState("all");
+  const { wishlist: globalWishlist, toggle: toggleWishlistGlobal } = useWishlist();
+  const [cat,setCat]         = useState("all");
   const [occasion,setOccasion] = useState(null);
-  const [search,setSearch] = useState("");
-  const [sortBy,setSortBy] = useState("default");
-  const [cart,setCart] = useState([]);
+  const [search,setSearch]   = useState("");
+  const [sortBy,setSortBy]   = useState("default");
+  const [cart,setCart]       = useState([]);
   const [cartOpen,setCartOpen] = useState(false);
+
+  const inWishlist = (id) => globalWishlist.some(w => w._id === id);
 
   const products = PRODUCTS.filter(p=>{
     if(cat!=="all" && p.cat!==cat) return false;
@@ -404,13 +406,9 @@ export default function GiftSection() {
   };
 
   return (
-    <div style={{ fontFamily:"'Segoe UI',system-ui,-apple-system,sans-serif", background:C.pageBg, minHeight:"100vh", backgroundAttachment:"fixed" }}>
+    <div style={{ fontFamily:"'Segoe UI',system-ui,-apple-system,sans-serif", background:C.pageBg, minHeight:"100vh" }}>
       <style>{`
         @keyframes ticker{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
-        *{box-sizing:border-box}
-        ::-webkit-scrollbar{width:5px}
-        ::-webkit-scrollbar-track{background:${C.petal}}
-        ::-webkit-scrollbar-thumb{background:${C.roseMid};border-radius:4px}
       `}</style>
 
       {/* ── Promo Strip ── */}
