@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import { useState, lazy, Suspense } from 'react';
-import FallingPetals from '../components/FallingPetals';
 
 const GardenOfFlowers    = lazy(() => import('../components/GardenOfFlowers'));
 const PolaroidBooth      = lazy(() => import('../components/PolaroidBooth'));
@@ -90,28 +89,6 @@ export default function DigitalGiftingPage() {
 
   return (
     <div className="page-enter overflow-x-hidden">
-
-      {/* Hero */}
-      <section className="relative overflow-hidden text-center px-4 py-24 bg-gradient-to-br from-[#ffe8ed] via-[#f0e0ff] to-[#daefd4]">
-        <FallingPetals count={16} />
-        <div className="relative z-10 max-w-[680px] mx-auto">
-          <div className="inline-block bg-white/60 backdrop-blur-sm text-roseD text-[.78rem] font-semibold px-4 py-1.5 rounded-full border border-blush/40 mb-5 tracking-wide">
-            ✨ Digital Gifting · No Delivery Needed · Instant Joy
-          </div>
-          <h1 className="font-playfair font-extrabold text-roseDD leading-[1.15] text-[clamp(2.3rem,5.5vw,3.8rem)] mb-4">
-            Gift Love Digitally 💌
-          </h1>
-          <p className="text-[1.05rem] text-textM mb-8 font-light leading-relaxed">
-            Send beautiful digital bouquets, postcards, voice notes & more — instantly, from anywhere in the world.
-          </p>
-          <button
-            onClick={() => navigate('/bouquet-builder')}
-            className="bg-gradient-to-br from-rose to-[#e09099] text-white font-semibold px-8 py-3.5 rounded-full text-[.9rem] hover:-translate-y-0.5 hover:shadow-soft-l transition-all"
-          >
-            Start Gifting 🌸
-          </button>
-        </div>
-      </section>
 
       {/* Menu Bar */}
       <section className="bg-white border-b border-blush/20 sticky top-[62px] z-40">
