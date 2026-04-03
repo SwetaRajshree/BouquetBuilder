@@ -227,14 +227,14 @@ export default function HeartJarReviews() {
         }
         @keyframes sCapLift {
           0%{transform:translate(-50%,0px) rotate(0deg);}
-          35%{transform:translate(-50%,-44px) rotate(-20deg);}
-          65%{transform:translate(-50%,-85px) rotate(-10deg);}
-          100%{transform:translate(-50%,-110px) rotate(-3deg);}
+          35%{transform:translate(-30%,-44px) rotate(-20deg);}
+          65%{transform:translate(-10%,-85px) rotate(-10deg);}
+          100%{transform:translate(10%,-110px) rotate(15deg);}
         }
         @keyframes sCapFloat {
-          0%,100%{transform:translate(-50%,-110px) rotate(-3deg);}
-          33%{transform:translate(-52%,-128px) rotate(4deg);}
-          66%{transform:translate(-48%,-118px) rotate(-5deg);}
+          0%,100%{transform:translate(10%,-110px) rotate(15deg);}
+          33%{transform:translate(14%,-128px) rotate(20deg);}
+          66%{transform:translate(8%,-118px) rotate(12deg);}
         }
         @keyframes sCapShake {
           0%,100%{transform:translate(-50%,0) rotate(0deg);}
@@ -322,7 +322,7 @@ export default function HeartJarReviews() {
             : isOpening
             ? "sCapLift 1.15s cubic-bezier(0.25,0.46,0.45,0.94) forwards"
             : "sCapShake 7s 2s ease-in-out infinite",
-          transform: isOpen ? "translate(-50%,-110px) rotate(-3deg)" : "translate(-50%,0)",
+          transform: isOpen ? "translate(10%,-110px) rotate(15deg)" : "translate(-50%,0)",
           willChange:"transform",
         }}>
           {/* Bow */}
