@@ -93,7 +93,7 @@ function CakeGrid({ activeCategory, setActiveCategory }) {
   };
 
   return (
-    <div style={{ padding: '32px 48px', background: '#fafafa', fontFamily: "'Poppins',sans-serif" }}>
+    <div id="cake-grid" style={{ padding: '32px 48px', background: '#fafafa', fontFamily: "'Poppins',sans-serif" }}>
       {/* Filter bar */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 32 }}>
         {CATEGORIES.map(cat => (
@@ -884,6 +884,9 @@ export default function CakePage() {
   const handleSetCategory = (cat) => {
     setActiveCategory(cat);
     setTab('cakes');
+    setTimeout(() => {
+      document.getElementById('cake-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
   };
 
   const handleCustomizeComplete = () => {
