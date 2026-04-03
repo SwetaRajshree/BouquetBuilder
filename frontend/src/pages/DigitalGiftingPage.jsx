@@ -1,10 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { useState, lazy, Suspense } from 'react';
 
-const GardenOfFlowers    = lazy(() => import('../components/GardenOfFlowers'));
-const PolaroidBooth      = lazy(() => import('../components/PolaroidBooth'));
-const MagazinePage       = lazy(() => import('../components/MagazinePage'));
-const VoiceNoteKeepsake  = lazy(() => import('../components/VoiceNoteKeepsake'));
+const GardenOfFlowers   = lazy(() => import('../components/GardenOfFlowers'));
+const PolaroidBooth     = lazy(() => import('../components/PolaroidBooth'));
+const MagazinePage      = lazy(() => import('../components/MagazinePage'));
+const VoiceNoteKeepsake = lazy(() => import('../components/VoiceNoteKeepsake'));
 
 function LoadingSpinner() {
   return (
@@ -15,171 +15,178 @@ function LoadingSpinner() {
   );
 }
 
-const MENU_OPTIONS = [
-  { id: 'digitalbouquet', label: 'Digital Bouquet', icon: '💐' },
-  { id: 'postcard', label: 'Postcard', icon: '💌' },
-  { id: 'cassette', label: 'Cassette', icon: '📼' },
-  { id: 'magazine', label: 'Magazine', icon: '📖' },
-  { id: 'garden', label: 'Garden', icon: '🌻' },
-  { id: 'polaroid', label: 'Polaroid', icon: '📸' },
-];
-
-const GIFTS = [
-  {
-    icon: '💐',
-    title: 'Digital Bouquet',
-    desc: 'Build a stunning digital bouquet with hand-drawn flowers, arrange layers & send with a heartfelt message.',
-    route: '/bouquet-builder',
-    bg: 'from-[#ffe8ed] to-[#ffd0d8]',
-    btn: 'Build Now',
-    color: '#a86870',
-  },
-  {
-    icon: '💌',
-    title: 'Digital Postcard',
-    desc: 'Create a beautiful personalised postcard with your message, stickers and a custom design.',
-    route: '/postcard',
-    bg: 'from-[#e8d5ff] to-[#d8c0ff]',
-    btn: 'Create Card',
-    color: '#7a5a9a',
-  },
-  {
-    icon: '🎵',
-    title: 'Bouquet + Song',
-    desc: 'Send a digital bouquet paired with their favourite Spotify song for the ultimate romantic gesture.',
-    route: '/bouquet-builder',
-    bg: 'from-[#d4f0d4] to-[#c0e8c0]',
-    btn: 'Send with Music',
-    color: '#3a7a3a',
-  },
-  {
-    icon: '🎙️',
-    title: 'Voice Note Bouquet',
-    desc: 'Record a personal voice message and attach it to your digital bouquet — your voice, their heart.',
-    route: '/bouquet-builder',
-    bg: 'from-[#fff0d0] to-[#ffe4b0]',
-    btn: 'Record & Send',
-    color: '#8a6020',
-  },
+const OPTIONS = [
+  { id: 'digitalbouquet', label: 'Digital Bouquet',   icon: '💐', desc: 'Build a stunning digital bouquet with hand-drawn flowers & send with a heartfelt message.',  bg: 'linear-gradient(135deg,#ffe8ed,#ffd0d8)', accent: '#a86870' },
+  { id: 'postcard',       label: 'Postcard',           icon: '💌', desc: 'Create a beautiful personalised postcard with your message, stickers and a custom design.',    bg: 'linear-gradient(135deg,#e8d5ff,#d8c0ff)', accent: '#7a5a9a' },
+  { id: 'cassette',       label: 'Voice Keepsake',     icon: '🎙️', desc: 'Record a heartfelt voice message and attach it to your bouquet — your voice, their heart.',    bg: 'linear-gradient(135deg,#fff0d0,#ffe4b0)', accent: '#8a6020' },
+  { id: 'magazine',       label: 'Magazine',           icon: '📖', desc: 'Design a gorgeous magazine-style page filled with your photos, flowers and love notes.',        bg: 'linear-gradient(135deg,#fce8ff,#f0d0ff)', accent: '#8a30a0' },
+  { id: 'garden',         label: 'Garden of Flowers',  icon: '🌻', desc: 'Plant a virtual garden of flowers and share the link with someone special to brighten their day.', bg: 'linear-gradient(135deg,#d4f0d4,#c0e8c0)', accent: '#3a7a3a' },
+  { id: 'polaroid',       label: 'Polaroid Booth',     icon: '📸', desc: 'Design a cute polaroid-style photo card with flowers, stickers and a personal message.',       bg: 'linear-gradient(135deg,#d0f0ff,#b8e4ff)', accent: '#1060a0' },
 ];
 
 export default function DigitalGiftingPage() {
   const navigate = useNavigate();
-  const [activeMenu, setActiveMenu] = useState('digitalbouquet');
+  const [activeMenu, setActiveMenu] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
-  const handleMenuClick = (menuId) => {
-    setActiveMenu(menuId);
-    // Add navigation logic here based on menuId if needed
-    switch(menuId) {
-      case 'digitalbouquet':
-        // Stay on current page or navigate to bouquet builder
-        break;
-      case 'postcard':
-        navigate('/postcard');
-        break;
-      case 'garden':
-      case 'polaroid':
-      case 'magazine':
-      case 'cassette':
-        break;
-      default:
-        break;
-    }
+  const handleSelect = (id) => {
+    setActiveMenu(id);
+    setMenuOpen(false);
+    if (id === 'postcard') navigate('/postcard');
   };
 
-  return (
-    <div className="page-enter overflow-x-hidden">
+  const activeOption = OPTIONS.find(o => o.id === activeMenu);
 
-      {/* Menu Bar */}
-      <section className="bg-white border-b border-blush/20 sticky top-[62px] z-40">
-        <div className="max-w-[1200px] mx-auto px-4">
-          <div className="flex items-center justify-center gap-1 py-3 overflow-x-auto">
-            {MENU_OPTIONS.map((option) => (
-              <button
-                key={option.id}
-                onClick={() => handleMenuClick(option.id)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
-                  activeMenu === option.id
-                    ? 'bg-gradient-to-br from-rose to-[#e09099] text-white shadow-soft-s'
-                    : 'text-textM hover:bg-blush/20 hover:text-roseD'
-                }`}
+  return (
+    <div style={{ minHeight: '100vh', background: '#fff8f8' }}>
+
+      {/* ── Top bar with title + hamburger ── */}
+      <div style={{
+        position: 'sticky', top: 62, zIndex: 40,
+        background: 'white', borderBottom: '1px solid #f0d0d8',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '0 24px', height: 52,
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {activeMenu && (
+            <button onClick={() => setActiveMenu(null)}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 18, color: '#a86870', padding: '4px 8px' }}>
+              ←
+            </button>
+          )}
+          <span style={{ fontFamily: "'Playfair Display', serif", fontWeight: 700, fontSize: 16, color: '#8a5560' }}>
+            {activeOption ? `${activeOption.icon} ${activeOption.label}` : '💌 DigiLove'}
+          </span>
+        </div>
+
+        {/* Hamburger button */}
+        <div style={{ position: 'relative' }}>
+          <button
+            onClick={() => setMenuOpen(v => !v)}
+            style={{
+              background: menuOpen ? '#a86870' : '#fff0f2',
+              border: '1.5px solid #f0c0c8', borderRadius: 10,
+              width: 40, height: 40, cursor: 'pointer',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 5,
+              transition: 'all 0.2s',
+            }}>
+            {[0,1,2].map(i => (
+              <span key={i} style={{
+                display: 'block', width: 18, height: 2, borderRadius: 2,
+                background: menuOpen ? 'white' : '#a86870',
+                transition: 'all 0.2s',
+                transform: menuOpen
+                  ? i === 0 ? 'rotate(45deg) translate(5px,5px)'
+                  : i === 2 ? 'rotate(-45deg) translate(5px,-5px)'
+                  : 'scaleX(0)'
+                  : 'none',
+              }}/>
+            ))}
+          </button>
+
+          {/* Dropdown menu */}
+          {menuOpen && (
+            <>
+              <div onClick={() => setMenuOpen(false)}
+                style={{ position: 'fixed', inset: 0, zIndex: 49 }} />
+              <div style={{
+                position: 'absolute', right: 0, top: 48, zIndex: 50,
+                background: 'white', borderRadius: 16,
+                boxShadow: '0 8px 32px rgba(168,104,112,0.2)',
+                border: '1px solid #f0d0d8', overflow: 'hidden', minWidth: 200,
+                animation: 'dropIn 0.2s ease both',
+              }}>
+                <style>{`@keyframes dropIn { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }`}</style>
+                {OPTIONS.map(opt => (
+                  <button key={opt.id} onClick={() => handleSelect(opt.id)}
+                    style={{
+                      width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+                      padding: '11px 16px', border: 'none', cursor: 'pointer', textAlign: 'left',
+                      background: activeMenu === opt.id ? '#fff0f2' : 'white',
+                      borderLeft: activeMenu === opt.id ? `3px solid ${opt.accent}` : '3px solid transparent',
+                      transition: 'all 0.15s',
+                      fontSize: 13, fontWeight: activeMenu === opt.id ? 600 : 400,
+                      color: activeMenu === opt.id ? opt.accent : '#6b5060',
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.background = '#fff0f2'}
+                    onMouseLeave={e => e.currentTarget.style.background = activeMenu === opt.id ? '#fff0f2' : 'white'}
+                  >
+                    <span style={{ fontSize: 18 }}>{opt.icon}</span>
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* ── All 6 option cards (shown when no active menu) ── */}
+      {!activeMenu && (
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '40px 24px' }}>
+          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(1.5rem,3vw,2rem)', fontWeight: 700, color: '#8a5560', marginBottom: 8, textAlign: 'center' }}>
+            Choose Your Digital Gift 🎁
+          </h2>
+          <p style={{ textAlign: 'center', color: '#9a7d88', fontSize: 14, marginBottom: 36 }}>
+            Pick the perfect way to express your feelings
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 20 }}>
+            {OPTIONS.map(opt => (
+              <div key={opt.id}
+                onClick={() => handleSelect(opt.id)}
+                style={{
+                  background: opt.bg, borderRadius: 20, padding: '28px 24px',
+                  cursor: 'pointer', border: '2px solid transparent',
+                  transition: 'all 0.25s', boxShadow: '0 2px 12px rgba(168,104,112,0.08)',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-6px)'; e.currentTarget.style.boxShadow = `0 16px 40px ${opt.accent}30`; e.currentTarget.style.borderColor = opt.accent + '60'; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 2px 12px rgba(168,104,112,0.08)'; e.currentTarget.style.borderColor = 'transparent'; }}
               >
-                <span className="text-base">{option.icon}</span>
-                <span>{option.label}</span>
-              </button>
+                <div style={{ fontSize: 48, marginBottom: 14 }}>{opt.icon}</div>
+                <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, fontWeight: 700, color: opt.accent, marginBottom: 8 }}>{opt.label}</h3>
+                <p style={{ fontSize: 13, color: '#6b5060', lineHeight: 1.7, marginBottom: 18 }}>{opt.desc}</p>
+                <button style={{
+                  background: opt.accent, color: 'white', border: 'none',
+                  borderRadius: 40, padding: '8px 20px', fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                }}>
+                  Open →
+                </button>
+              </div>
             ))}
           </div>
         </div>
-      </section>
+      )}
 
-      {/* Gift Options */}
+      {/* ── Active content ── */}
       {activeMenu === 'digitalbouquet' && (
-        <section className="bg-white py-16 px-4">
-          <div className="max-w-[1100px] mx-auto">
-            <h2 className="font-playfair font-bold text-[clamp(1.6rem,3vw,2.1rem)] text-roseDD text-center mb-2">Choose Your Gift 🎁</h2>
-            <p className="text-center text-textL text-sm mb-10">Pick the perfect way to express your feelings</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {GIFTS.map((g, i) => (
-                <div key={g.title}
-                  className={`bg-gradient-to-br ${g.bg} rounded-2xl p-8 border-2 border-transparent hover:border-blush/40 hover:-translate-y-1.5 hover:shadow-soft-m transition-all cursor-pointer group`}
-                  onClick={() => navigate(g.route)}
-                  style={{ animationDelay: `${i * 0.1}s` }}
-                >
-                  <div className="text-[3.5rem] mb-4 group-hover:scale-110 transition-transform duration-200">{g.icon}</div>
-                  <h3 className="font-playfair font-bold text-xl mb-2" style={{ color: g.color }}>{g.title}</h3>
-                  <p className="text-textM text-[.88rem] leading-relaxed mb-5">{g.desc}</p>
-                  <button
-                    onClick={e => { e.stopPropagation(); navigate(g.route); }}
-                    className="text-white text-sm font-semibold px-6 py-2.5 rounded-full transition-all hover:brightness-110"
-                    style={{ background: g.color }}
-                  >
-                    {g.btn} →
-                  </button>
-                </div>
-              ))}
-            </div>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '40px 24px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 20 }}>
+            {[
+              { icon: '💐', title: 'Build a Bouquet',    desc: 'Pick flowers, foliage & layout — then send with a card.',        route: '/bouquet-builder', accent: '#a86870', bg: 'linear-gradient(135deg,#ffe8ed,#ffd0d8)' },
+              { icon: '🎵', title: 'Bouquet + Song',     desc: 'Pair your bouquet with a Spotify song for the ultimate gesture.', route: '/bouquet-builder', accent: '#3a7a3a', bg: 'linear-gradient(135deg,#d4f0d4,#c0e8c0)' },
+              { icon: '🎙️', title: 'Bouquet + Voice',    desc: 'Record a voice note and attach it to your digital bouquet.',      route: '/bouquet-builder', accent: '#8a6020', bg: 'linear-gradient(135deg,#fff0d0,#ffe4b0)' },
+              { icon: '💌', title: 'Bouquet + Card',     desc: 'Add a beautiful digital card with stickers & your message.',      route: '/digital-card',   accent: '#7a5a9a', bg: 'linear-gradient(135deg,#e8d5ff,#d8c0ff)' },
+            ].map(g => (
+              <div key={g.title} onClick={() => navigate(g.route)}
+                style={{ background: g.bg, borderRadius: 20, padding: '28px 24px', cursor: 'pointer', transition: 'all 0.25s' }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.boxShadow = `0 14px 36px ${g.accent}30`; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}>
+                <div style={{ fontSize: 44, marginBottom: 12 }}>{g.icon}</div>
+                <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 17, fontWeight: 700, color: g.accent, marginBottom: 8 }}>{g.title}</h3>
+                <p style={{ fontSize: 13, color: '#6b5060', lineHeight: 1.6, marginBottom: 16 }}>{g.desc}</p>
+                <button style={{ background: g.accent, color: 'white', border: 'none', borderRadius: 40, padding: '8px 18px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+                  Start →
+                </button>
+              </div>
+            ))}
           </div>
-        </section>
+        </div>
       )}
 
       {activeMenu === 'garden'   && <Suspense fallback={<LoadingSpinner />}><GardenOfFlowers /></Suspense>}
       {activeMenu === 'polaroid' && <Suspense fallback={<LoadingSpinner />}><PolaroidBooth /></Suspense>}
       {activeMenu === 'magazine' && <Suspense fallback={<LoadingSpinner />}><MagazinePage /></Suspense>}
       {activeMenu === 'cassette' && <Suspense fallback={<LoadingSpinner />}><VoiceNoteKeepsake /></Suspense>}
-
-      {/* How it works — only show on digitalbouquet tab */}
-      {activeMenu === 'digitalbouquet' && (
-        <section className="py-16 px-4 bg-gradient-to-br from-[#fff8f0] to-[#f3eaff]">
-          <div className="max-w-[800px] mx-auto text-center">
-            <h2 className="font-playfair font-bold text-[clamp(1.5rem,3vw,2rem)] text-roseDD mb-10">How Digital Gifting Works 🌸</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[
-                ['🎨', 'Create', 'Pick your gift type and personalise it with flowers, messages, music or voice.'],
-                ['🔗', 'Share', 'Get a unique link to share via WhatsApp, Instagram, email or any platform.'],
-                ['💕', 'They Receive', 'They open a beautiful page with your gift — no app needed, works on any device.'],
-              ].map(([icon, title, desc]) => (
-                <div key={title} className="bg-white rounded-2xl p-7 shadow-soft-s border border-blush/10">
-                  <div className="text-[2.5rem] mb-3">{icon}</div>
-                  <h4 className="font-playfair font-semibold text-base text-roseDD mb-2">{title}</h4>
-                  <p className="text-textL text-[.82rem] leading-relaxed">{desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* CTA — only show on digitalbouquet tab */}
-      {activeMenu === 'digitalbouquet' && (
-        <section className="bg-roseDD py-16 text-center px-4">
-          <h2 className="font-playfair font-bold text-[clamp(1.5rem,3vw,2rem)] text-white mb-3">Ready to Make Someone Smile? 💐</h2>
-          <p className="text-white/80 mb-7 font-light">Create your first digital gift in under 2 minutes.</p>
-          <button onClick={() => navigate('/bouquet-builder')}
-            className="bg-white text-roseDD font-bold px-8 py-3.5 rounded-full text-[.9rem] hover:-translate-y-0.5 hover:shadow-soft-l transition-all">
-            Build a Digital Bouquet 🌸
-          </button>
-        </section>
-      )}
     </div>
   );
 }
