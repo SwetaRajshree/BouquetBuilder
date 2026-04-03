@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useCartContext } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
+import { useNavigate } from 'react-router-dom';
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -88,6 +89,7 @@ function ProductCard({ item, onAdd, inCart, wished, onWish }) {
 export default function ForeverFlowersPage() {
   const { addToCart, cartItems } = useCartContext();
   const { wishlist, toggle: toggleWish } = useWishlist();
+  const navigate = useNavigate();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTag, setActiveTag] = useState('All');
@@ -124,6 +126,12 @@ export default function ForeverFlowersPage() {
 
       {/* Hero */}
       <div style={{ background: 'linear-gradient(135deg,#2c1a2e,#4a1030,#2d1a2e)', padding: '60px 24px 48px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+        <button onClick={() => navigate(-1)} style={{ position: 'absolute', top: 20, left: 24, display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 10, padding: '8px 16px', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer', backdropFilter: 'blur(8px)', transition: 'all 0.2s' }}
+          onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
+          onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+        >
+          ← Back
+        </button>
         <div style={{ position: 'absolute', top: -60, left: '20%', width: 300, height: 300, background: 'rgba(232,71,106,0.15)', borderRadius: '50%', filter: 'blur(60px)' }} />
         <div style={{ position: 'absolute', bottom: -40, right: '15%', width: 200, height: 200, background: 'rgba(201,168,76,0.12)', borderRadius: '50%', filter: 'blur(50px)' }} />
         <p style={{ margin: '0 0 10px', fontSize: 11, fontWeight: 900, color: '#f7b8c8', letterSpacing: 4, textTransform: 'uppercase' }}>Handcrafted with Love</p>
