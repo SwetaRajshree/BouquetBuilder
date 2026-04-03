@@ -625,14 +625,6 @@ const handloomProducts = [
   {id:5,emoji:"🧺",name:"Ikat Weave Table Cloth",artist:"Lakshmi Rao",region:"Odisha, India",price:"₹2,100",original:"₹2,800"},
   {id:6,emoji:"🪴",name:"Kashmiri Wool Carpet",artist:"Mohammad Ali",region:"Kashmir, India",price:"₹28,000",original:"₹35,000"},
 ];
-const paintingProducts = [
-  {id:1,emoji:"🎨",name:"Madhubani Forest Scene",artist:"Kamla Singh",region:"Bihar, India",price:"₹8,500",original:"₹11,000"},
-  {id:2,emoji:"🖼️",name:"Warli Tribal Dance",artist:"Jyoti Hait",region:"Maharashtra",price:"₹4,200",original:"₹5,500"},
-  {id:3,emoji:"🌊",name:"Watercolour Coastline",artist:"Ana Silva",region:"Goa, India",price:"₹6,800",original:"₹9,000"},
-  {id:4,emoji:"🌸",name:"Floral Oil Painting",artist:"Preethi Nair",region:"Kerala, India",price:"₹15,000",original:"₹19,000"},
-  {id:5,emoji:"🦚",name:"Peacock Glass Painting",artist:"Anjali Mehta",region:"Gujarat, India",price:"₹3,500",original:"₹4,800"},
-  {id:6,emoji:"✏️",name:"Charcoal Portrait Sketch",artist:"Rahul Das",region:"Kolkata, India",price:"₹2,800",original:"₹3,800"},
-];
 const potteryProducts = [
   {id:1,emoji:"🏺",name:"Blue Pottery Vase",artist:"Ramesh Kumhar",region:"Jaipur, India",price:"₹2,200",original:"₹3,000"},
   {id:2,emoji:"🫖",name:"Terracotta Tea Set",artist:"Meena Devi",region:"Rajasthan, India",price:"₹1,800",original:"₹2,500"},
@@ -790,17 +782,20 @@ function ProductCarousel({products}) {
         onMouseUp={()=>{drag.current.active=false;}}
         onMouseLeave={()=>{drag.current.active=false;}}
         onMouseMove={e=>{if(!drag.current.active)return;e.preventDefault();trackRef.current.scrollLeft=drag.current.scrollLeft-(e.pageX-trackRef.current.offsetLeft-drag.current.startX)*1.4;}}>
-        {products.map(p=>(
-          <div key={p.id} className="product-card">
+        {products.map((p,i)=>(
+          <div key={p._id||p.id||i} className="product-card">
             <div className="product-img-wrap">
-              <div className="product-emoji">{p.emoji}</div>
+              {p.image
+                ? <img src={p.image} alt={p.name} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                : <div className="product-emoji">{p.emoji||"🎨"}</div>
+              }
               <button className="add-to-cart">Add to Cart</button>
             </div>
             <div className="product-info">
-              <div className="product-region">{p.region}</div>
+              <div className="product-region">{p.category||p.region}</div>
               <div className="product-name">{p.name}</div>
-              <div className="product-artist">by {p.artist}</div>
-              <div className="product-price">{p.price}<span>{p.original}</span></div>
+              <div className="product-artist">{p.rating ? `⭐ ${p.rating}` : p.artist ? `by ${p.artist}` : ""}</div>
+              <div className="product-price">{p.price ? `₹${p.price.toLocaleString()}` : p.price}<span>{p.original}</span></div>
             </div>
           </div>
         ))}
@@ -832,17 +827,30 @@ function HandloomSection() {
 
 function PaintingsSection() {
   const ref=useRef(null);const visible=useIntersection(ref);
-  const pills=["Watercolour","Oil Painting","Acrylic","Madhubani","Glass Painting","Sketch","Digital Art"];
+  const [paintingItems,setPaintingItems]=useState([]);
+  const [loading,setLoading]=useState(true);
   const [active,setActive]=useState(0);
+
+  useEffect(()=>{
+    fetch(`${API_URL}/api/paintings`)
+      .then(r=>r.json())
+      .then(data=>setPaintingItems(Array.isArray(data)?data:[]))
+      .catch(console.error)
+      .finally(()=>setLoading(false));
+  },[]);
+
+  const allTags=[...new Set(paintingItems.flatMap(p=>p.tags||[]))];
+
   return (
     <section className="section paintings-section"><div className="section-inner" ref={ref}>
       <div className={`section-header fade-up${visible?" visible":""}`}>
         <div><div className="section-label">Fine Arts</div><h2 className="section-title">Paintings</h2></div>
         <button className="btn-explore">Explore All →</button>
       </div>
+      {loading && <p style={{color:"var(--text-muted)",fontSize:"0.9rem"}}>Loading paintings...</p>}
       <div className={`fade-up fade-up-delay-1${visible?" visible":""}`}>
-        <ProductCarousel products={paintingProducts}/>
-        <div className="pill-row">{pills.map((p,i)=><button key={p} className={`pill${i===active?" active":""}`} onClick={()=>setActive(i)}>{p}</button>)}</div>
+        <ProductCarousel products={paintingItems}/>
+        <div className="pill-row">{allTags.slice(0,8).map((t,i)=><button key={t} className={`pill${i===active?" active":""}`} onClick={()=>setActive(i)}>{t}</button>)}</div>
       </div>
     </div></section>
   );
