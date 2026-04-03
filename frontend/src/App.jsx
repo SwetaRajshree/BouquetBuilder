@@ -28,6 +28,9 @@ import PostcardPage      from './pages/PostcardPage';
 
 import DigitalGiftingPage from './pages/DigitalGiftingPage';
 import BuyPage            from './pages/BuyPage';
+import CakePage           from './pages/CakePage';
+import GiftsPage          from './pages/GiftsPage';
+import DigiLovePage       from './pages/DigiLovePage';
 import SharedGardenPage  from './pages/SharedGardenPage';
 import SharedPolaroidPage from './pages/SharedPolaroidPage';
 
@@ -77,6 +80,9 @@ export default function App() {
           <Route path="/bouquet-customize" element={<BouquetCustomizePage />} />
           <Route path="/postcard"           element={<PostcardPage />} />
 
+          <Route path="/cake"          element={<CakePage />}           />
+          <Route path="/gifts"         element={<GiftsPage />}          />
+          <Route path="/digilove"      element={<DigiLovePage />}       />
           <Route path="/digital-gifting"     element={<DigitalGiftingPage />} />
           <Route path="/shared-garden/:id"   element={<SharedGardenPage />} />
           <Route path="/shared-polaroid/:id"  element={<SharedPolaroidPage />} />
