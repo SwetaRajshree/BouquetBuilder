@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useCartContext } from '../context/CartContext';
 
+const API = import.meta.env.VITE_API_URL;
+
 const nearbyBakers = [
   { id: 1, name: "Sweet Alchemy Bakery", rating: 4.9, reviews: 312, distance: "0.8 km", minOrder: 399, deliveryTime: "45–60 min", tags: ["Custom", "Fondant", "Wedding"], open: true, specialty: "Designer cakes", avatar: "SA", color: "#e53935" },
   { id: 2, name: "The Cake Studio", rating: 4.8, reviews: 189, distance: "1.2 km", minOrder: 499, deliveryTime: "50–70 min", tags: ["Photo Cakes", "Theme", "Birthday"], open: true, specialty: "Photo & theme cakes", avatar: "TC", color: "#8b4513" },
@@ -33,6 +35,83 @@ const chatFlow = [
 
 function StarRating({ rating }) {
   return <span style={{ color: "#f59e0b", fontSize: 13 }}>{"★".repeat(Math.floor(rating))}{"☆".repeat(5 - Math.floor(rating))}</span>;
+}
+
+function BrowseCakes() {
+  const { addToCart, cartItems } = useCartContext();
+  const [cakes, setCakes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState('All');
+  const [toast, setToast] = useState('');
+
+  useEffect(() => {
+    fetch(`${API}/api/cakes`)
+      .then(r => r.json())
+      .then(data => setCakes(data))
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
+
+  const categories = ['All', ...new Set(cakes.map(c => c.category).filter(Boolean))];
+  const filtered = activeCategory === 'All' ? cakes : cakes.filter(c => c.category === activeCategory);
+
+  const handleAdd = (cake) => {
+    addToCart({ _id: cake._id, name: cake.name, pricePerStem: cake.price, image: cake.image, category: 'cake' });
+    setToast(cake.name);
+    setTimeout(() => setToast(''), 3000);
+  };
+
+  return (
+    <div style={{ padding: '40px 48px', background: '#fafafa', fontFamily: "'Poppins',sans-serif" }}>
+      <h2 style={{ fontSize: 32, fontWeight: 700, color: '#222', fontFamily: "'Playfair Display',serif", marginBottom: 6 }}>🎂 Browse Cakes</h2>
+      <p style={{ color: '#888', fontSize: 14, marginBottom: 28 }}>Pick your favourite from our curated collection</p>
+
+      {/* Category filters */}
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 32 }}>
+        {categories.map(cat => (
+          <button key={cat} onClick={() => setActiveCategory(cat)}
+            style={{ padding: '8px 20px', borderRadius: 20, border: '1.5px solid', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'Poppins',sans-serif", transition: 'all 0.2s',
+              borderColor: activeCategory === cat ? '#e53935' : '#e0e0e0',
+              background: activeCategory === cat ? '#e53935' : '#fff',
+              color: activeCategory === cat ? '#fff' : '#555' }}>
+            {cat}
+          </button>
+        ))}
+      </div>
+
+      {loading && <p style={{ color: '#e53935', fontSize: 14 }}>🎂 Loading cakes...</p>}
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(220px,1fr))', gap: 24 }}>
+        {filtered.map(cake => (
+          <div key={cake._id} style={{ background: '#fff', borderRadius: 18, border: '1.5px solid #f0f0f0', overflow: 'hidden', boxShadow: '0 4px 16px rgba(0,0,0,0.06)', transition: 'all 0.25s', cursor: 'pointer' }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.boxShadow = '0 12px 32px rgba(229,57,53,0.15)'; e.currentTarget.style.borderColor = '#e53935'; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.06)'; e.currentTarget.style.borderColor = '#f0f0f0'; }}>
+            <div style={{ height: 180, overflow: 'hidden', background: '#fff5f5' }}>
+              {cake.image
+                ? <img src={cake.image} alt={cake.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 48 }}>🎂</div>}
+            </div>
+            <div style={{ padding: '14px 16px' }}>
+              <p style={{ fontSize: 13, color: '#e53935', fontWeight: 600, marginBottom: 4 }}>{cake.category}</p>
+              <h3 style={{ fontSize: 15, fontWeight: 700, color: '#222', marginBottom: 6, fontFamily: "'Playfair Display',serif" }}>{cake.name}</h3>
+              {cake.rating && <p style={{ fontSize: 12, color: '#f59e0b', marginBottom: 6 }}>{'★'.repeat(Math.floor(cake.rating))} <span style={{ color: '#aaa' }}>{cake.rating}</span></p>}
+              <p style={{ fontSize: 15, fontWeight: 700, color: '#e53935', marginBottom: 12 }}>₹{cake.price}</p>
+              <button onClick={() => handleAdd(cake)}
+                style={{ width: '100%', background: cartItems.find(i => i._id === cake._id) ? '#2e7d32' : '#e53935', color: '#fff', border: 'none', borderRadius: 10, padding: '10px 0', fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: "'Poppins',sans-serif", transition: 'background 0.2s' }}>
+                {cartItems.find(i => i._id === cake._id) ? '✓ In Cart 🛒' : 'Add to Cart 🛒'}
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {toast && (
+        <div style={{ position: 'fixed', bottom: 32, left: '50%', transform: 'translateX(-50%)', background: '#2e7d32', color: '#fff', borderRadius: 30, padding: '14px 28px', fontSize: 14, fontWeight: 600, zIndex: 9999, boxShadow: '0 8px 32px rgba(0,0,0,0.2)', display: 'flex', alignItems: 'center', gap: 8 }}>
+          🛒 {toast} added to cart!
+        </div>
+      )}
+    </div>
+  );
 }
 
 function CakeSubNav({ onNav, active }) {
@@ -704,6 +783,7 @@ export default function CakePage() {
               </button>
             </div>
           </div>
+          <BrowseCakes />
           <div ref={bakerRef}>
             <NearbyBakers orderDetails={null} onSelect={handleBakerSelect} />
           </div>
