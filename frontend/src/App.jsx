@@ -82,7 +82,7 @@ export default function App() {
 
           <Route path="/cake"          element={<CakePage />}           />
           <Route path="/gifts"         element={<GiftsPage />}          />
-          <Route path="/digilove"      element={<DigiLovePage />}       />
+          <Route path="/digilove"      element={<Navigate to="/digital-gifting" replace />} />
           <Route path="/digital-gifting"     element={<DigitalGiftingPage />} />
           <Route path="/shared-garden/:id"   element={<SharedGardenPage />} />
           <Route path="/shared-polaroid/:id"  element={<SharedPolaroidPage />} />
