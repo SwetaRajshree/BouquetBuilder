@@ -107,16 +107,25 @@ export default function HeartJarReviews() {
   const [reviews, setReviews] = useState(FALLBACK_REVIEWS);
   const [heartProps, setHeartProps] = useState(() => buildHeartProps(FALLBACK_REVIEWS));
 
-  useEffect(() => {
+  const fetchReviews = () => {
     fetch(`${API}/api/reviews`)
       .then(r => r.json())
       .then(data => {
         if (Array.isArray(data) && data.length > 0) {
-          setReviews(data);
-          setHeartProps(buildHeartProps(data));
+          setReviews(prev => {
+            if (prev.length === data.length && prev[0]?._id === data[0]?._id) return prev;
+            setHeartProps(buildHeartProps(data));
+            return data;
+          });
         }
       })
       .catch(() => {});
+  };
+
+  useEffect(() => {
+    fetchReviews();
+    const interval = setInterval(fetchReviews, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   const [isOpen, setIsOpen]       = useState(false);

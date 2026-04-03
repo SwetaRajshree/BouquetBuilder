@@ -68,12 +68,18 @@ function FloralDivider() {
 export default function HomePage() {
   const navigate = useNavigate();
   const [shops, setShops] = useState([]);
+  const [reviewCount, setReviewCount] = useState(0);
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/api/shops`)
       .then((r) => r.json())
       .then((data) => setShops(data))
       .catch(console.error);
+
+    fetch(`${import.meta.env.VITE_API_URL}/api/reviews`)
+      .then((r) => r.json())
+      .then((data) => Array.isArray(data) && setReviewCount(data.length))
+      .catch(() => {});
   }, []);
 
   return (
@@ -267,11 +273,16 @@ export default function HomePage() {
                       opacity: 0.85,
                     }}>{h}</span>
                 ))}
+                {reviewCount > 0 && (
+                  <div className="absolute -bottom-2 -right-2 bg-rose text-white text-[.65rem] font-bold w-6 h-6 rounded-full flex items-center justify-center shadow-soft-s">
+                    {reviewCount > 99 ? '99+' : reviewCount}
+                  </div>
+                )}
               </div>
 
               <div className="flex-1 text-center md:text-left">
                 <div className="inline-block bg-white/60 backdrop-blur-sm text-roseD text-[.75rem] font-semibold px-3 py-1 rounded-full border border-blush/40 mb-3 tracking-wide">
-                  💌 Real stories from real customers
+                  💌 {reviewCount > 0 ? `${reviewCount} real stories from real customers` : 'Real stories from real customers'}
                 </div>
                 <h2 className="font-playfair font-bold text-[clamp(1.5rem,3vw,2.1rem)] text-roseDD mb-3">
                   Your Love 💝
