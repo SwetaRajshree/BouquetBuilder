@@ -651,7 +651,7 @@ function Navbar({page,setPage,cartCount,wishCount,user,setUser,onSearch,searchQu
       <div style={{maxWidth:1280,margin:"0 auto",padding:"0 24px",display:"flex",alignItems:"center",gap:16,height:68}}>
         <div onClick={()=>setPage("home")} style={{display:"flex",alignItems:"center",gap:10,cursor:"pointer",flexShrink:0}}>
           <div style={{width:36,height:36,borderRadius:10,background:"linear-gradient(135deg,#f59e0b,#d97706)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,flexShrink:0}}>🎨</div>
-          <span style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:22,color:"#fff",letterSpacing:"-0.5px"}}>Craft<span style={{color:"#f59e0b"}}>Baazar</span></span>
+          <span style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:22,color:"#fff",letterSpacing:"-0.5px"}}>Artisan<span style={{color:"#f59e0b"}}>World</span></span>
         </div>
 
         <div style={{flex:1,maxWidth:480,position:"relative"}}>
@@ -1287,7 +1287,7 @@ function Footer({setPage}){
           <div>
             <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16}}>
               <div style={{width:36,height:36,borderRadius:10,background:"linear-gradient(135deg,#f59e0b,#d97706)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>🎨</div>
-              <span style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:22,color:"#fff"}}>Craft<span style={{color:"#f59e0b"}}>Baazar</span></span>
+              <span style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:22,color:"#fff"}}>Artisan<span style={{color:"#f59e0b"}}>World</span></span>
             </div>
             <p style={{fontSize:13,color:"rgba(255,255,255,0.35)",lineHeight:1.9,maxWidth:280}}>India's premier marketplace for handmade artisan products. Connecting creators with craft lovers since 2024.</p>
             <div style={{display:"flex",gap:10,marginTop:20}}>
