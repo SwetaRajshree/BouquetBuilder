@@ -299,7 +299,7 @@ export default function GardenOfFlowers() {
 
       {/* ── Title ── */}
       <h1 style={{
-        margin: "32px 0 24px",
+        margin: "0 0 24px",
         fontSize: "clamp(1.6rem,3.5vw,2.4rem)",
         fontWeight: 700,
         color: "#2d5a1e",
