@@ -1,14 +1,16 @@
 import { useState } from 'react';
-import FlowersPage  from './FlowersPage';
-import PlantShop    from './PlantShop';
-import AIPage       from './AIPage';
-import FlashSalePage from './FlashSalePage';
+import FlowersPage        from './FlowersPage';
+import PlantShop          from './PlantShop';
+import AIPage             from './AIPage';
+import FlashSalePage      from './FlashSalePage';
+import DigitalGiftingPage from './DigitalGiftingPage';
 
 const TABS = [
-  { id: 'flowers',    label: '🌸 Flowers'    },
-  { id: 'plants',     label: '🌿 Plants'     },
-  { id: 'flora-ai',   label: '🤖 Flora AI'   },
-  { id: 'flash-sale', label: '🔥 Flash Sale' },
+  { id: 'flowers',    label: '🌸 Flowers'       },
+  { id: 'plants',     label: '🌿 Plants'        },
+  { id: 'flora-ai',   label: '🤖 Flora AI'      },
+  { id: 'flash-sale', label: '🔥 Flash Sale'    },
+  { id: 'digital',    label: '💌 Digital Gifts' },
 ];
 
 export default function BuyPage() {
@@ -41,6 +43,7 @@ export default function BuyPage() {
         {active === 'plants'     && <PlantShop />}
         {active === 'flora-ai'   && <AIPage />}
         {active === 'flash-sale' && <FlashSalePage />}
+        {active === 'digital'    && <DigitalGiftingPage />}
       </div>
     </div>
   );

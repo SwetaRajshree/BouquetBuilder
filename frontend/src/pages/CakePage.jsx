@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from 'react-router-dom';
 import { useCartContext } from '../context/CartContext';
 
 const nearbyBakers = [
@@ -36,43 +35,21 @@ function StarRating({ rating }) {
   return <span style={{ color: "#f59e0b", fontSize: 13 }}>{"★".repeat(Math.floor(rating))}{"☆".repeat(5 - Math.floor(rating))}</span>;
 }
 
-function Navbar({ cartCount, onNav, active }) {
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    const fn = () => setScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", fn);
-    return () => window.removeEventListener("scroll", fn);
-  }, []);
+function CakeSubNav({ onNav, active }) {
   const navItems = ["Cakes", "Theme Cakes", "By Relationship", "Desserts", "Birthday", "Hampers", "Anniversary", "Occasions", "Customized Cakes"];
   return (
-    <nav style={{ position: "sticky", top: 0, zIndex: 1000, boxShadow: scrolled ? "0 4px 20px rgba(0,0,0,0.15)" : "0 1px 4px rgba(0,0,0,0.06)", transition: "box-shadow 0.3s", fontFamily: "'Poppins',sans-serif" }}>
-      <div style={{ background: "#e53935", padding: "10px 32px", display: "flex", alignItems: "center", gap: 20, justifyContent: "space-between" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-          <span onClick={() => onNav("home")} style={{ fontFamily: "'Pacifico',cursive", color: "#fff", fontSize: 28, cursor: "pointer" }}>bakeyum</span>
-          <span style={{ color: "rgba(255,255,255,0.85)", fontSize: 13, cursor: "pointer" }}>📍 Bhubaneswar ▾</span>
-        </div>
-        <div style={{ flex: 1, maxWidth: 460, margin: "0 20px" }}>
-          <div style={{ background: "#fff", borderRadius: 24, display: "flex", alignItems: "center", padding: "8px 16px", gap: 8 }}>
-            <span style={{ color: "#999", fontSize: 14 }}>🔍</span>
-            <input placeholder="Search cakes, flavours, occasions…" style={{ border: "none", outline: "none", width: "100%", fontSize: 13, background: "transparent" }} />
-          </div>
-        </div>
-        <div style={{ display: "flex, gap: 22 }}>
- <div onClick={() => window.location.href = /tracking} style={{ color: #fff, textAlign: center, cursor: pointer, fontSize: 12 }}><div style={{ fontSize: 18 }}>??</div>Track</div>
- </div>
-      <div style={{ background: "#fff", borderBottom: "1px solid #f0f0f0", overflowX: "auto", whiteSpace: "nowrap" }}>
-        <div style={{ display: "inline-flex", padding: "0 20px" }}>
-          {navItems.map(item => (
-            <button key={item} onClick={() => { if (item === "Customized Cakes") onNav("customize"); else if (item === "Cakes") onNav("home"); }}
-              style={{ background: "none", border: "none", padding: "13px 16px", fontSize: 13.5, fontWeight: active === "customize" && item === "Customized Cakes" ? 600 : 500, color: active === "customize" && item === "Customized Cakes" ? "#e53935" : "#333", cursor: "pointer", fontFamily: "'Poppins',sans-serif", borderBottom: active === "customize" && item === "Customized Cakes" ? "2px solid #e53935" : "2px solid transparent", transition: "all 0.2s" }}
-              onMouseEnter={e => e.currentTarget.style.color = "#e53935"}
-              onMouseLeave={e => e.currentTarget.style.color = active === "customize" && item === "Customized Cakes" ? "#e53935" : "#333"}>
-              {item}{item === "Hampers" && <span style={{ background: "#e53935", color: "#fff", fontSize: 9, padding: "1px 5px", borderRadius: 8, marginLeft: 4 }}>NEW</span>}
-            </button>
-          ))}
-        </div>
+    <div style={{ background: "#fff", borderBottom: "1px solid #f0f0f0", overflowX: "auto", whiteSpace: "nowrap", fontFamily: "'Poppins',sans-serif" }}>
+      <div style={{ display: "inline-flex", padding: "0 20px" }}>
+        {navItems.map(item => (
+          <button key={item} onClick={() => { if (item === "Customized Cakes") onNav("customize"); else if (item === "Cakes") onNav("home"); }}
+            style={{ background: "none", border: "none", padding: "13px 16px", fontSize: 13.5, fontWeight: active === "customize" && item === "Customized Cakes" ? 600 : 500, color: active === "customize" && item === "Customized Cakes" ? "#e53935" : "#333", cursor: "pointer", fontFamily: "'Poppins',sans-serif", borderBottom: active === "customize" && item === "Customized Cakes" ? "2px solid #e53935" : "2px solid transparent", transition: "all 0.2s" }}
+            onMouseEnter={e => e.currentTarget.style.color = "#e53935"}
+            onMouseLeave={e => e.currentTarget.style.color = active === "customize" && item === "Customized Cakes" ? "#e53935" : "#333"}>
+            {item}{item === "Hampers" && <span style={{ background: "#e53935", color: "#fff", fontSize: 9, padding: "1px 5px", borderRadius: 8, marginLeft: 4 }}>NEW</span>}
+          </button>
+        ))}
       </div>
-    </nav>
+    </div>
   );
 }
 
@@ -673,9 +650,8 @@ function Toast({ msg }) {
   );
 }
 
-export default function App() {
-  const navigate = useNavigate();
-  const { addToCart, cartCount } = useCartContext();
+export default function CakePage() {
+  const { addToCart } = useCartContext();
   const [section, setSection] = useState("home");
   const [orderDetails, setOrderDetails] = useState(null);
   const [toast, setToast] = useState(null);
@@ -696,9 +672,8 @@ export default function App() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "#fafafa" }}>
-      <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Playfair+Display:ital,wght@0,700;1,700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
-      <Navbar cartCount={cartCount} onNav={setSection} active={section} />
+    <div style={{ background: "#fafafa" }}>
+      <CakeSubNav onNav={setSection} active={section} />
 
       {section === "home" && (
         <>
@@ -759,28 +734,7 @@ export default function App() {
         </>
       )}
 
-      {/* Footer */}
-      <div style={{ background: "#111", color: "#ccc", padding: "48px", fontFamily: "'Poppins',sans-serif", fontSize: 13 }}>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 40, justifyContent: "space-between", maxWidth: 1100, margin: "0 auto 28px" }}>
-          <div>
-            <div style={{ fontFamily: "'Pacifico',cursive", color: "#e53935", fontSize: 26, marginBottom: 10 }}>bakeyum</div>
-            <p style={{ maxWidth: 230, lineHeight: 1.8, color: "#777", fontSize: 13 }}>Connecting cake lovers with the best local bakers. Fresh. Fast. Delicious.</p>
-          </div>
-          {[
-            { title: "For Customers", links: ["How it Works", "Track Order", "My Orders", "Gift Cards"] },
-            { title: "For Bakers", links: ["Join as Baker", "Baker Dashboard", "Pricing Plans", "Baker Support"] },
-            { title: "Support", links: ["Help Center", "Contact Us", "Return Policy", "Privacy Policy"] },
-          ].map(col => (
-            <div key={col.title}>
-              <h4 style={{ color: "#fff", marginBottom: 14, fontSize: 13, fontWeight: 600 }}>{col.title}</h4>
-              {col.links.map(l => <div key={l} style={{ marginBottom: 8, cursor: "pointer", color: "#888", transition: "color 0.2s" }} onMouseEnter={e => e.target.style.color = "#e53935"} onMouseLeave={e => e.target.style.color = "#888"}>{l}</div>)}
-            </div>
-          ))}
-        </div>
-        <div style={{ borderTop: "1px solid #222", paddingTop: 18, textAlign: "center", color: "#444", fontSize: 12, maxWidth: 1100, margin: "0 auto" }}>
-          © 2025 Bakeyum · Baked with ❤️ for every occasion · Made in India 🇮🇳
-        </div>
-      </div>
+
 
       {toast && <Toast msg={toast} />}
     </div>

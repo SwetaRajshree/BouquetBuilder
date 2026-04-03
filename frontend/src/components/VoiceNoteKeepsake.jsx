@@ -219,7 +219,7 @@ const css = `
   .vnk-spool-label{position:absolute;right:2px;top:50%;transform:translateY(-50%) rotate(90deg);font-size:.58rem;letter-spacing:.22em;color:#444;white-space:nowrap;pointer-events:none}
 
 /* HANDLE - small, to the right of spool */
-  .vnk-handle-assembly{display:flex;flex-direction:column;align-items:center;cursor:grab;user-select:none;transform-origin:50% 0%;will-change:transform;flex-shrink:0;margin-top:4px;}
+  .vnk-handle-assembly{display:flex;flex-direction:column;align-items:center;cursor:pointer;user-select:none;transform-origin:50% 0%;will-change:transform;flex-shrink:0;margin-top:16px;}
   .vnk-handle-assembly:active{cursor:grabbing}
   .vnk-h-cap{width:11px;height:7px;background:linear-gradient(180deg,#d8d8d8,#aaa);border-radius:6px 6px 0 0;box-shadow:0 -1px 3px rgba(0,0,0,.3);}
   .vnk-h-bar{width:7px;height:40px;background:linear-gradient(90deg,#888,#e8e8e8 35%,#d0d0d0 60%,#888);border-radius:4px 4px 2px 2px;box-shadow:1px 1px 5px rgba(0,0,0,.4);position:relative;}
@@ -575,77 +575,38 @@ function PlayerScreen({ data, onNewMemory }) {
   },[waveData]);
 
   useEffect(()=>{
-    const el=handleAssRef.current; if(!el) return;
-    let startAngle=0;
-    const getCenter=()=>{ const r=el.getBoundingClientRect(); return{x:r.left+r.width/2, y:r.top+window.scrollY}; };
-    const angle=(cx,cy,ex,ey)=>Math.atan2(ey-cy,ex-cx)*180/Math.PI;
+  const playingRef = useRef(false);
+  const rafRef = useRef(null);
 
-    const onDown=(e)=>{
-      e.preventDefault();
-      draggingRef.current=true;
-      setShowHint(false);
-      const pt=e.touches?e.touches[0]:e;
-      const c=getCenter();
-      startAngle=angle(c.x,c.y,pt.clientX,pt.clientY+window.scrollY)-accRotRef.current;
-      document.addEventListener('mousemove',onMove);
-      document.addEventListener('touchmove',onMove,{passive:false});
-      document.addEventListener('mouseup',onUp);
-      document.addEventListener('touchend',onUp);
-    };
-
-    const onMove=(e)=>{
-      if(!draggingRef.current) return;
-      e.preventDefault();
-      const pt=e.touches?e.touches[0]:e;
-      const c=getCenter();
-      const ang=angle(c.x,c.y,pt.clientX,pt.clientY+window.scrollY);
-      let delta=ang-startAngle-accRotRef.current;
-      while(delta>180) delta-=360;
-      while(delta<-180) delta+=360;
-      if(Math.abs(delta)>0.5){
-        accRotRef.current+=delta;
-        setHandleAngle(accRotRef.current);
-        // move film directly
-        const track=filmTrackRef.current;
+  const handleClick = useCallback(()=>{
+    const aud = audioRef.current; if(!aud) return;
+    setShowHint(false);
+    if(playingRef.current){
+      playingRef.current = false;
+      aud.pause();
+      cancelAnimationFrame(rafRef.current);
+    } else {
+      playingRef.current = true;
+      aud.play().catch(()=>{});
+      const tick = ()=>{
+        if(!playingRef.current) return;
+        if(!aud.duration) { rafRef.current=requestAnimationFrame(tick); return; }
+        const pct = aud.currentTime / aud.duration;
+        accRotRef.current = pct * 720;
+        setHandleAngle(pct * 720);
+        const track = filmTrackRef.current;
         if(track){
-          const maxScroll=Math.max(0,track.scrollWidth-track.parentElement.clientWidth);
-          const pct=Math.min(1,Math.max(0,accRotRef.current/720));
-          track.style.transform=`translateX(-${pct*maxScroll}px)`;
-          // sync audio
-          const aud=audioRef.current;
-          if(aud?.duration){
-            aud.currentTime=pct*aud.duration;
-            if(delta>0 && aud.paused) aud.play().catch(()=>{});
-            if(delta<0 && !aud.paused) aud.pause();
-            drawProgress(pct);
-            setPlayPos(aud.currentTime);
-          }
+          const maxScroll = Math.max(0, track.scrollWidth - track.parentElement.clientWidth);
+          track.style.transform = `translateX(-${pct*maxScroll}px)`;
         }
-      }
-      startAngle=ang-accRotRef.current;
-    };
-
-    const onUp=()=>{
-      draggingRef.current=false;
-      const aud=audioRef.current;
-      if(aud && !aud.paused) aud.pause();
-      document.removeEventListener('mousemove',onMove);
-      document.removeEventListener('touchmove',onMove);
-      document.removeEventListener('mouseup',onUp);
-      document.removeEventListener('touchend',onUp);
-    };
-
-    el.addEventListener('mousedown',onDown);
-    el.addEventListener('touchstart',onDown,{passive:false});
-    return()=>{
-      el.removeEventListener('mousedown',onDown);
-      el.removeEventListener('touchstart',onDown);
-      document.removeEventListener('mousemove',onMove);
-      document.removeEventListener('touchmove',onMove);
-      document.removeEventListener('mouseup',onUp);
-      document.removeEventListener('touchend',onUp);
-    };
-  },[]);
+        drawProgress(pct);
+        setPlayPos(aud.currentTime);
+        if(aud.currentTime < aud.duration) rafRef.current = requestAnimationFrame(tick);
+        else { playingRef.current = false; }
+      };
+      rafRef.current = requestAnimationFrame(tick);
+    }
+  },[drawProgress]);
 
   const share=()=>{
     const msg='Check out this voice note keepsake!';
@@ -693,7 +654,7 @@ function PlayerScreen({ data, onNewMemory }) {
 
         <div
           className="vnk-handle-assembly"
-          ref={handleAssRef}
+          onClick={handleClick}
           style={{transform:`rotate(${handleAngle}deg)`,transformOrigin:'50% 0%'}}
         >
           <div className="vnk-h-cap"/>
@@ -706,7 +667,7 @@ function PlayerScreen({ data, onNewMemory }) {
         </div>
       </div>
 
-      {showHint&&<p className="vnk-handle-hint">Turn the handle clockwise to play &#8635;</p>}
+      {showHint&&<p className="vnk-handle-hint">Click the handle to play &#9654;</p>}
       <div className={`vnk-toast${toastVisible?' show':''}`}>Copied to clipboard!</div>
     </div>
   );

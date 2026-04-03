@@ -109,80 +109,13 @@ export default function HomePage() {
           </p>
           <div className="flex justify-center mt-2">
             <button
-              onClick={() => navigate('/digital-gifting')}
-              className="group relative overflow-hidden px-10 py-4 rounded-full text-white font-bold text-[1rem] tracking-wide shadow-[0_8px_36px_rgba(75,0,130,.45)] transition-all hover:-translate-y-2 hover:shadow-[0_16px_56px_rgba(75,0,130,.65)] active:scale-95 animate-[purpleGlow_3s_ease-in-out_infinite]"
-              style={{ 
-                background: 'linear-gradient(135deg, #4B0082, #663399, #8A2BE2, #4B0082)', 
-                backgroundSize: '400% 400%', 
-                animation: 'purpleShift 4s ease infinite, purpleFloat 6s ease-in-out infinite'
-              }}
+              onClick={() => navigate('/buy')}
+              className="flex items-center gap-2 px-8 py-3.5 rounded-full text-white font-semibold text-[.95rem] transition-all hover:-translate-y-0.5 hover:shadow-soft-l active:scale-95"
+              style={{ background: 'linear-gradient(135deg, #7c3aed, #a855f7)' }}
             >
-              {/* Enhanced shimmer effect */}
-              <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                style={{ 
-                  background: 'linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.8) 50%, transparent 70%)', 
-                  backgroundSize: '200% 100%', 
-                  animation: 'shimmer 1s ease infinite' 
-                }} />
-              
-              {/* Floating sparkles */}
-              <span className="absolute top-0 left-2 text-xs animate-[sparkFloat_2s_ease-in-out_infinite] opacity-80">✨</span>
-              <span className="absolute top-1 right-3 text-xs animate-[sparkFloat_2.5s_ease-in-out_0.5s_infinite] opacity-70">⭐</span>
-              <span className="absolute bottom-0 left-6 text-xs animate-[sparkFloat_2.2s_ease-in-out_1s_infinite] opacity-75">💫</span>
-              <span className="absolute bottom-1 right-8 text-xs animate-[sparkFloat_1.8s_ease-in-out_1.5s_infinite] opacity-80">✨</span>
-              <span className="absolute top-2 left-1/2 text-xs animate-[sparkFloat_2.3s_ease-in-out_0.8s_infinite] opacity-65">🌟</span>
-              
-              {/* Pulsing border effect */}
-              <span className="absolute inset-0 rounded-full border-2 border-purple-300 opacity-0 group-hover:opacity-60 animate-[borderPulse_1.5s_ease-in-out_infinite]" />
-              
-              <span className="relative z-10 flex items-center gap-2">
-                <span className="text-xl animate-[giftBob_2s_ease-in-out_infinite] group-hover:animate-[giftSpin_0.8s_ease-in-out]">💌</span>
-                Send a Digital Gift
-                <span className="text-xl animate-[giftBob_2s_ease-in-out_0.5s_infinite] group-hover:animate-[flowerSpin_0.8s_ease-in-out_0.2s]">🌸</span>
-              </span>
+              💌 Gift Something Beautiful
             </button>
           </div>
-          <style>{`
-            @keyframes shimmer { 
-              0%{background-position:200% 0} 
-              100%{background-position:-200% 0} 
-            }
-            @keyframes purpleShift {
-              0%, 100% { background-position: 0% 50%; }
-              50% { background-position: 100% 50%; }
-            }
-            @keyframes purpleFloat {
-              0%, 100% { transform: translateY(0px) rotate(0deg); }
-              33% { transform: translateY(-3px) rotate(1deg); }
-              66% { transform: translateY(2px) rotate(-1deg); }
-            }
-            @keyframes purpleGlow {
-              0%, 100% { box-shadow: 0 8px 36px rgba(75,0,130,.45), 0 0 20px rgba(138,43,226,.3); }
-              50% { box-shadow: 0 12px 48px rgba(75,0,130,.65), 0 0 30px rgba(138,43,226,.5); }
-            }
-            @keyframes sparkFloat {
-              0%, 100% { transform: translateY(0px) scale(1) rotate(0deg); opacity: 0.8; }
-              50% { transform: translateY(-8px) scale(1.2) rotate(180deg); opacity: 1; }
-            }
-            @keyframes borderPulse {
-              0%, 100% { transform: scale(1); opacity: 0; }
-              50% { transform: scale(1.05); opacity: 0.6; }
-            }
-            @keyframes giftBob {
-              0%, 100% { transform: translateY(0px) rotate(0deg); }
-              50% { transform: translateY(-4px) rotate(5deg); }
-            }
-            @keyframes giftSpin {
-              0% { transform: rotate(0deg) scale(1); }
-              50% { transform: rotate(180deg) scale(1.1); }
-              100% { transform: rotate(360deg) scale(1); }
-            }
-            @keyframes flowerSpin {
-              0% { transform: rotate(0deg) scale(1); }
-              50% { transform: rotate(-180deg) scale(1.1); }
-              100% { transform: rotate(-360deg) scale(1); }
-            }
-          `}</style>
 
           {/* Quick stats */}
           <div className="flex justify-center gap-6 mt-8 flex-wrap">
@@ -384,103 +317,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Floating Bouquet Builder Button ── */}
-      <style>{`
-        @keyframes slideAcross {
-          0%   { transform: translateX(0) translateY(0); }
-          50%  { transform: translateX(calc(-100vw + 130px)) translateY(-7px); }
-          100% { transform: translateX(0) translateY(0); }
-        }
-        @keyframes bouquetBob {
-          0%,100% { transform: translateY(0); }
-          50%     { transform: translateY(-7px); }
-        }
-        @keyframes sparkPop {
-          0%   { opacity:0; transform: translate(-50%,-50%) scale(0.3); }
-          40%  { opacity:1; }
-          100% { opacity:0; transform: translate(-50%,-50%) scale(1.6) translateY(-20px); }
-        }
-        @keyframes trailFade {
-          0%,100% { opacity:0; letter-spacing:4px; }
-          30%,70% { opacity:1; letter-spacing:6px; }
-        }
-        .bb-wrap {
-          position: fixed;
-          top: 75vh;
-          right: 24px;
-          z-index: 9999;
-          display: flex;
-          align-items: center;
-          animation: slideAcross 40s ease-in-out infinite;
-        }
-        .bb-trail {
-          position: relative;
-          margin-right: 10px;
-          display: flex;
-          align-items: center;
-        }
-        .bb-trail-text {
-          font-family: Georgia, serif;
-          font-size: 12px;
-          font-weight: 700;
-          letter-spacing: 4px;
-          color: #2a6030;
-          text-shadow: 0 0 8px #80f080, 0 0 20px #c0ffc0, 0 0 4px white;
-          animation: trailFade 3s ease-in-out infinite;
-          white-space: nowrap;
-          pointer-events: none;
-        }
-        .bb-spark {
-          position: absolute;
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          pointer-events: none;
-          animation: sparkPop 1.6s ease-out infinite;
-        }
-      `}</style>
 
-      <div className="bb-wrap">
-        {/* Trail + sparks */}
-        <div className="bb-trail">
-          <span className="bb-trail-text">✨ SEND SOME LOVE ✨</span>
-          {[
-            { top:'50%', left:'10%',  color:'#f0d040', delay:'0s'   },
-            { top:'20%', left:'25%',  color:'#80f080', delay:'0.3s' },
-            { top:'80%', left:'40%',  color:'#f080c0', delay:'0.6s' },
-            { top:'30%', left:'55%',  color:'#80c0ff', delay:'0.9s' },
-            { top:'70%', left:'70%',  color:'#f0d040', delay:'0.2s' },
-            { top:'15%', left:'85%',  color:'#c080ff', delay:'0.5s' },
-            { top:'60%', left:'95%',  color:'#80f080', delay:'0.8s' },
-          ].map((s, i) => (
-            <span key={i} className="bb-spark" style={{
-              top: s.top, left: s.left,
-              background: s.color,
-              boxShadow: `0 0 8px 3px ${s.color}`,
-              animationDelay: s.delay,
-            }}/>
-          ))}
-        </div>
-
-        {/* Button */}
-        <div
-          onClick={() => navigate('/digital-gifting')}
-          title="Send a Digital Gift"
-          style={{
-            width: 86, height: 86, borderRadius: '50%', flexShrink: 0,
-            background: 'linear-gradient(135deg,#c8e8c8,#a8d8a8)',
-            boxShadow: '0 8px 28px rgba(60,100,48,0.45), 0 0 22px rgba(100,220,100,0.35)',
-            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            border: '3px solid rgba(90,140,80,0.45)',
-          }}
-        >
-          <img
-            src="https://res.cloudinary.com/deixioyzo/image/upload/v1774807029/anemone_fjaadv.webp"
-            alt="Build Bouquet"
-            style={{ width:60, height:60, objectFit:'contain', filter:'drop-shadow(0 2px 8px rgba(0,0,0,0.18))' }}
-          />
-        </div>
-      </div>
 
     </div>
   );
