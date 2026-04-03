@@ -37,23 +37,14 @@ function StarRating({ rating }) {
   return <span style={{ color: "#f59e0b", fontSize: 13 }}>{"★".repeat(Math.floor(rating))}{"☆".repeat(5 - Math.floor(rating))}</span>;
 }
 
-// category map: subnav label -> DB category value (null = show all)
-const NAV_CATEGORY_MAP = {
-  "Cakes":            null,
-  "Wedding":          "Wedding",
-  "Birthday":         "Birthday",
-  "Anniversary":      "Anniversary",
-  "Desserts":         "Dessert",
-  "Occasions":        "Occasion",
-  "Theme Cakes":      null,
-  "By Relationship":  null,
-  "Customized Cakes": "customize",
-};
+const CATEGORIES = ['All', 'Wedding', 'Birthday', 'Anniversary', 'Dessert', 'Occasion'];
 
-function CakeGrid({ filterCategory }) {
+function CakeGrid() {
   const { addToCart, cartItems } = useCartContext();
   const [cakes, setCakes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState('All');
+  const [sortBy, setSortBy] = useState('recommended');
   const [toast, setToast] = useState('');
 
   useEffect(() => {
@@ -64,7 +55,13 @@ function CakeGrid({ filterCategory }) {
       .finally(() => setLoading(false));
   }, []);
 
-  const filtered = filterCategory ? cakes.filter(c => c.category === filterCategory) : cakes;
+  const filtered = activeCategory === 'All' ? cakes : cakes.filter(c => c.category === activeCategory);
+  const sorted = [...filtered].sort((a, b) => {
+    if (sortBy === 'price_asc') return a.price - b.price;
+    if (sortBy === 'price_desc') return b.price - a.price;
+    if (sortBy === 'rating') return (b.rating || 0) - (a.rating || 0);
+    return 0;
+  });
 
   const handleAdd = (cake) => {
     addToCart({ _id: cake._id, name: cake.name, pricePerStem: cake.price, image: cake.image, category: 'cake' });
@@ -73,17 +70,34 @@ function CakeGrid({ filterCategory }) {
   };
 
   return (
-    <div style={{ padding: '40px 48px', background: '#fafafa', fontFamily: "'Poppins',sans-serif" }}>
-      <h2 style={{ fontSize: 32, fontWeight: 700, color: '#222', fontFamily: "'Playfair Display',serif", marginBottom: 6 }}>
-        🎂 {filterCategory ? filterCategory + ' Cakes' : 'All Cakes'}
-      </h2>
-      <p style={{ color: '#888', fontSize: 14, marginBottom: 28 }}>Pick your favourite from our curated collection</p>
+    <div style={{ padding: '32px 48px', background: '#fafafa', fontFamily: "'Poppins',sans-serif" }}>
+      {/* Filter bar */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 32 }}>
+        {CATEGORIES.map(cat => (
+          <button key={cat} onClick={() => setActiveCategory(cat)}
+            style={{ padding: '8px 20px', borderRadius: 20, border: '1.5px solid', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'Poppins',sans-serif", transition: 'all 0.2s',
+              borderColor: activeCategory === cat ? '#e53935' : '#e0e0e0',
+              background: activeCategory === cat ? '#e53935' : '#fff',
+              color: activeCategory === cat ? '#fff' : '#555' }}>
+            {cat}
+          </button>
+        ))}
+        <div style={{ marginLeft: 'auto' }}>
+          <select value={sortBy} onChange={e => setSortBy(e.target.value)}
+            style={{ padding: '8px 16px', borderRadius: 20, border: '1.5px solid #e0e0e0', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'Poppins',sans-serif", outline: 'none', background: '#fff', color: '#555' }}>
+            <option value="recommended">⭐ Recommended</option>
+            <option value="rating">🏆 Top Rated</option>
+            <option value="price_asc">₹ Low to High</option>
+            <option value="price_desc">₹ High to Low</option>
+          </select>
+        </div>
+      </div>
 
       {loading && <p style={{ color: '#e53935', fontSize: 14 }}>🎂 Loading cakes...</p>}
-      {!loading && filtered.length === 0 && <p style={{ color: '#aaa', fontSize: 14 }}>No cakes found in this category.</p>}
+      {!loading && sorted.length === 0 && <p style={{ color: '#aaa', fontSize: 14 }}>No cakes found in this category.</p>}
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(220px,1fr))', gap: 24 }}>
-        {filtered.map(cake => (
+        {sorted.map(cake => (
           <div key={cake._id} style={{ background: '#fff', borderRadius: 18, border: '1.5px solid #f0f0f0', overflow: 'hidden', boxShadow: '0 4px 16px rgba(0,0,0,0.06)', transition: 'all 0.25s', cursor: 'pointer' }}
             onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.boxShadow = '0 12px 32px rgba(229,57,53,0.15)'; e.currentTarget.style.borderColor = '#e53935'; }}
             onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.06)'; e.currentTarget.style.borderColor = '#f0f0f0'; }}>
@@ -115,23 +129,15 @@ function CakeGrid({ filterCategory }) {
   );
 }
 
-function CakeSubNav({ active, onNav }) {
-  const navItems = Object.keys(NAV_CATEGORY_MAP);
+function MainTabs({ active, onNav }) {
   return (
-    <div style={{ background: "#fff", borderBottom: "1px solid #f0f0f0", overflowX: "auto", whiteSpace: "nowrap", fontFamily: "'Poppins',sans-serif" }}>
-      <div style={{ display: "inline-flex", padding: "0 20px" }}>
-        {navItems.map(item => {
-          const isActive = active === item;
-          return (
-            <button key={item} onClick={() => onNav(item)}
-              style={{ background: "none", border: "none", padding: "13px 16px", fontSize: 13.5, fontWeight: isActive ? 600 : 500, color: isActive ? "#e53935" : "#333", cursor: "pointer", fontFamily: "'Poppins',sans-serif", borderBottom: isActive ? "2px solid #e53935" : "2px solid transparent", transition: "all 0.2s" }}
-              onMouseEnter={e => e.currentTarget.style.color = "#e53935"}
-              onMouseLeave={e => e.currentTarget.style.color = isActive ? "#e53935" : "#333"}>
-              {item}{item === "Hampers" && <span style={{ background: "#e53935", color: "#fff", fontSize: 9, padding: "1px 5px", borderRadius: 8, marginLeft: 4 }}>NEW</span>}
-            </button>
-          );
-        })}
-      </div>
+    <div style={{ background: '#fff', borderBottom: '1px solid #f0f0f0', fontFamily: "'Poppins',sans-serif", padding: '0 48px', display: 'flex', gap: 4 }}>
+      {[['cakes', '🎂 Cakes'], ['bakers', '🏪 Choose Your Baker']].map(([key, label]) => (
+        <button key={key} onClick={() => onNav(key)}
+          style={{ background: 'none', border: 'none', padding: '14px 20px', fontSize: 14, fontWeight: active === key ? 700 : 500, color: active === key ? '#e53935' : '#555', cursor: 'pointer', fontFamily: "'Poppins',sans-serif", borderBottom: active === key ? '2.5px solid #e53935' : '2.5px solid transparent', transition: 'all 0.2s' }}>
+          {label}
+        </button>
+      ))}
     </div>
   );
 }
@@ -735,20 +741,15 @@ function Toast({ msg }) {
 
 export default function CakePage() {
   const { addToCart } = useCartContext();
-  const [section, setSection] = useState("Cakes");
+  const [tab, setTab] = useState('cakes');
   const [orderDetails, setOrderDetails] = useState(null);
   const [toast, setToast] = useState(null);
   const bakerRef = useRef(null);
 
-  const handleNav = (item) => {
-    if (NAV_CATEGORY_MAP[item] === 'customize') setSection('customize');
-    else setSection(item);
-  };
-
   const handleCustomizeComplete = (order) => {
     setOrderDetails(order);
-    setSection("bakers");
-    setTimeout(() => bakerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 300);
+    setTab('bakers');
+    setTimeout(() => bakerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
   };
 
   const handleBakerSelect = (baker) => {
@@ -759,72 +760,61 @@ export default function CakePage() {
     setTimeout(() => setToast(null), 4000);
   };
 
-  const isHome = section === 'Cakes';
-  const isCategoryView = section !== 'Cakes' && section !== 'customize' && section !== 'bakers';
-
   return (
-    <div style={{ background: "#fafafa" }}>
-      <CakeSubNav onNav={handleNav} active={section} />
+    <div style={{ background: '#fafafa' }}>
+      <MainTabs active={tab} onNav={setTab} />
 
-      {/* Home: hero + all cakes + how it works + bakers */}
-      {isHome && (
+      {tab === 'cakes' && (
         <>
-          <HeroSlider onCustomize={() => setSection("customize")} />
-          <CakeGrid filterCategory={null} />
-          {/* How it works */}
-          <div style={{ padding: "60px 48px", background: "#fff", fontFamily: "'Poppins',sans-serif" }}>
-            <h2 style={{ textAlign: "center", fontSize: 34, fontWeight: 700, color: "#222", fontFamily: "'Playfair Display',serif", marginBottom: 8 }}>How It Works</h2>
-            <p style={{ textAlign: "center", color: "#888", marginBottom: 48, fontSize: 15 }}>3 simple steps to your dream cake</p>
-            <div style={{ display: "flex", gap: 24, justifyContent: "center", flexWrap: "wrap", maxWidth: 900, margin: "0 auto" }}>
+          <HeroSlider onCustomize={() => setTab('customize')} />
+          <CakeGrid />
+          <div style={{ padding: '60px 48px', background: '#fff', fontFamily: "'Poppins',sans-serif" }}>
+            <h2 style={{ textAlign: 'center', fontSize: 34, fontWeight: 700, color: '#222', fontFamily: "'Playfair Display',serif", marginBottom: 8 }}>How It Works</h2>
+            <p style={{ textAlign: 'center', color: '#888', marginBottom: 48, fontSize: 15 }}>3 simple steps to your dream cake</p>
+            <div style={{ display: 'flex', gap: 24, justifyContent: 'center', flexWrap: 'wrap', maxWidth: 900, margin: '0 auto' }}>
               {[
-                { n: "1", icon: "💬", title: "Chat & Customise", desc: "Describe your dream cake in our WhatsApp-style chat. Flavour, design, occasion — anything goes." },
-                { n: "2", icon: "🏪", title: "Pick a Local Baker", desc: "Browse nearby bakers & cloud kitchens. Compare ratings, prices, and delivery time." },
-                { n: "3", icon: "🚀", title: "Delivered Fresh", desc: "Your baker crafts it fresh and delivers right to your door. Track in real-time." },
+                { n: '1', icon: '💬', title: 'Chat & Customise', desc: 'Describe your dream cake in our WhatsApp-style chat. Flavour, design, occasion — anything goes.' },
+                { n: '2', icon: '🏪', title: 'Pick a Local Baker', desc: 'Browse nearby bakers & cloud kitchens. Compare ratings, prices, and delivery time.' },
+                { n: '3', icon: '🚀', title: 'Delivered Fresh', desc: 'Your baker crafts it fresh and delivers right to your door. Track in real-time.' },
               ].map(s => (
-                <div key={s.n} style={{ flex: "1 1 240px", maxWidth: 280, textAlign: "center" }}>
-                  <div style={{ position: "relative", width: 72, height: 72, margin: "0 auto 20px" }}>
-                    <div style={{ width: 72, height: 72, borderRadius: "50%", background: "#fff5f5", border: "2px solid #ffcdd2", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32 }}>{s.icon}</div>
-                    <div style={{ position: "absolute", top: -6, right: -6, width: 26, height: 26, background: "#e53935", color: "#fff", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700 }}>{s.n}</div>
+                <div key={s.n} style={{ flex: '1 1 240px', maxWidth: 280, textAlign: 'center' }}>
+                  <div style={{ position: 'relative', width: 72, height: 72, margin: '0 auto 20px' }}>
+                    <div style={{ width: 72, height: 72, borderRadius: '50%', background: '#fff5f5', border: '2px solid #ffcdd2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 32 }}>{s.icon}</div>
+                    <div style={{ position: 'absolute', top: -6, right: -6, width: 26, height: 26, background: '#e53935', color: '#fff', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700 }}>{s.n}</div>
                   </div>
-                  <h4 style={{ fontSize: 17, fontWeight: 700, color: "#222", marginBottom: 10 }}>{s.title}</h4>
-                  <p style={{ fontSize: 14, color: "#888", lineHeight: 1.7 }}>{s.desc}</p>
+                  <h4 style={{ fontSize: 17, fontWeight: 700, color: '#222', marginBottom: 10 }}>{s.title}</h4>
+                  <p style={{ fontSize: 14, color: '#888', lineHeight: 1.7 }}>{s.desc}</p>
                 </div>
               ))}
             </div>
-            <div style={{ textAlign: "center", marginTop: 40 }}>
-              <button onClick={() => setSection("customize")} style={{ background: "#e53935", color: "#fff", border: "none", borderRadius: 8, padding: "16px 48px", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: "'Poppins',sans-serif", boxShadow: "0 6px 24px rgba(229,57,53,0.35)", animation: "pulse2 2.5s ease infinite" }}>
+            <div style={{ textAlign: 'center', marginTop: 40 }}>
+              <button onClick={() => setTab('customize')} style={{ background: '#e53935', color: '#fff', border: 'none', borderRadius: 8, padding: '16px 48px', fontSize: 15, fontWeight: 700, cursor: 'pointer', fontFamily: "'Poppins',sans-serif", boxShadow: '0 6px 24px rgba(229,57,53,0.35)', animation: 'pulse2 2.5s ease infinite' }}>
                 Start Customising 🎂
               </button>
             </div>
           </div>
-          <div ref={bakerRef}>
-            <NearbyBakers orderDetails={null} onSelect={handleBakerSelect} />
-          </div>
         </>
       )}
 
-      {/* Category filtered view */}
-      {isCategoryView && <CakeGrid filterCategory={NAV_CATEGORY_MAP[section]} />}
-
-      {section === "customize" && (
-        <div style={{ background: "linear-gradient(180deg,#fff5f5,#fce4ec)", paddingTop: 48, fontFamily: "'Poppins',sans-serif" }}>
-          <div style={{ textAlign: "center", marginBottom: 40, padding: "0 24px" }}>
-            <div style={{ display: "inline-block", background: "#e8f5e9", color: "#2e7d32", borderRadius: 20, padding: "6px 20px", fontSize: 13, fontWeight: 600, marginBottom: 14 }}>🎂 Dream Cake Builder</div>
-            <h1 style={{ fontSize: 38, fontFamily: "'Playfair Display',serif", fontStyle: "italic", color: "#880e4f", marginBottom: 8 }}>Your Dream Cake, Just a Chat Away!</h1>
-            <p style={{ fontSize: 15, color: "#888", maxWidth: 520, margin: "0 auto" }}>Have a design in mind? Chat with us and let our local bakers craft the perfect custom cake for your special moment.</p>
+      {tab === 'customize' && (
+        <div style={{ background: 'linear-gradient(180deg,#fff5f5,#fce4ec)', paddingTop: 48, fontFamily: "'Poppins',sans-serif" }}>
+          <div style={{ textAlign: 'center', marginBottom: 40, padding: '0 24px' }}>
+            <div style={{ display: 'inline-block', background: '#e8f5e9', color: '#2e7d32', borderRadius: 20, padding: '6px 20px', fontSize: 13, fontWeight: 600, marginBottom: 14 }}>🎂 Dream Cake Builder</div>
+            <h1 style={{ fontSize: 38, fontFamily: "'Playfair Display',serif", fontStyle: 'italic', color: '#880e4f', marginBottom: 8 }}>Your Dream Cake, Just a Chat Away!</h1>
+            <p style={{ fontSize: 15, color: '#888', maxWidth: 520, margin: '0 auto' }}>Have a design in mind? Chat with us and let our local bakers craft the perfect custom cake for your special moment.</p>
           </div>
           <ChatCustomizer onComplete={handleCustomizeComplete} />
         </div>
       )}
 
-      {section === "bakers" && (
+      {tab === 'bakers' && (
         <>
           <div ref={bakerRef}>
             <NearbyBakers orderDetails={orderDetails} onSelect={handleBakerSelect} />
           </div>
-          <div style={{ textAlign: "center", padding: "0 0 40px" }}>
-            <button onClick={() => setSection("customize")} style={{ background: "none", border: "1.5px solid #e53935", color: "#e53935", borderRadius: 8, padding: "12px 32px", fontSize: 14, cursor: "pointer", fontFamily: "'Poppins',sans-serif" }}>
-              ← Redo My Order
+          <div style={{ textAlign: 'center', padding: '0 0 40px' }}>
+            <button onClick={() => setTab('customize')} style={{ background: 'none', border: '1.5px solid #e53935', color: '#e53935', borderRadius: 8, padding: '12px 32px', fontSize: 14, cursor: 'pointer', fontFamily: "'Poppins',sans-serif" }}>
+              ← Customise My Cake
             </button>
           </div>
         </>
