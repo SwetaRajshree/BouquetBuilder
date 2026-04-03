@@ -317,7 +317,33 @@ export default function HomePage() {
         </div>
       </section>
 
-
+      {/* ── Floating Digital Gift Button ── */}
+      <style>{`
+        @keyframes slideAcross {
+          0%   { transform: translateX(0); }
+          50%  { transform: translateX(calc(-100vw + 110px)); }
+          100% { transform: translateX(0); }
+        }
+      `}</style>
+      <div
+        onClick={() => navigate('/digital-gifting')}
+        title="Send a Digital Gift"
+        style={{
+          position: 'fixed', top: '75vh', right: 24, zIndex: 9999,
+          width: 80, height: 80, borderRadius: '50%',
+          background: 'linear-gradient(135deg,#c8e8c8,#a8d8a8)',
+          boxShadow: '0 8px 28px rgba(60,100,48,0.35)',
+          cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          border: '3px solid rgba(90,140,80,0.35)',
+          animation: 'slideAcross 40s ease-in-out infinite',
+        }}
+      >
+        <img
+          src="https://res.cloudinary.com/deixioyzo/image/upload/v1774807029/anemone_fjaadv.webp"
+          alt="Digital Gift"
+          style={{ width: 56, height: 56, objectFit: 'contain', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.18))' }}
+        />
+      </div>
 
     </div>
   );
