@@ -1,58 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from "react";`nconst API = import.meta.env.VITE_API_URL;
-
-// ─── DATA ────────────────────────────────────────────────────────────────────
-const BASE_REVIEWS = [
-  { name: "Aria M.",        comment: "Absolutely magical experience!", rating: 5 },
-  { name: "Priya S.",       comment: "Best purchase of my life, truly!", rating: 5 },
-  { name: "Lena K.",        comment: "Wonderful service, will return!", rating: 5 },
-  { name: "Maya R.",        comment: "Exceeded all my expectations!", rating: 5 },
-  { name: "Sofia D.",       comment: "Pure perfection from start to finish.", rating: 5 },
-  { name: "Zoe T.",         comment: "I recommend this to everyone I know!", rating: 5 },
-  { name: "Isla F.",        comment: "So lovely, so thoughtful, so good!", rating: 5 },
-  { name: "Emma L.",        comment: "A truly heartwarming experience.", rating: 5 },
-  { name: "Nora B.",        comment: "Can't stop smiling after this!", rating: 4 },
-  { name: "Ava C.",         comment: "The quality blew me away completely.", rating: 5 },
-  { name: "Mia H.",         comment: "Felt so special and taken care of.", rating: 5 },
-  { name: "Lily W.",        comment: "Will definitely be coming back soon!", rating: 4 },
-  { name: "Chloe A.",       comment: "Lovely little details everywhere!", rating: 5 },
-  { name: "Grace N.",       comment: "Genuinely the sweetest experience.", rating: 5 },
-  { name: "Ruby P.",        comment: "This changed how I see great service!", rating: 5 },
-  { name: "Bella J.",       comment: "Stunning, delightful, perfect!", rating: 5 },
-  { name: "Ella V.",        comment: "Every detail was carefully crafted.", rating: 4 },
-  { name: "Hannah G.",      comment: "I felt so valued and appreciated!", rating: 5 },
-  { name: "Amara O.",       comment: "Such a delightful surprise each time.", rating: 5 },
-  { name: "Scarlett U.",    comment: "10/10, absolutely recommend!", rating: 5 },
-  { name: "Violet Q.",      comment: "Like magic in every single moment!", rating: 5 },
-  { name: "Daisy X.",       comment: "Stunning work done with real heart.", rating: 5 },
-  { name: "Penelope Y.",    comment: "So charming and thoughtful overall.", rating: 4 },
-  { name: "Luna Z.",        comment: "A joy from beginning to end!", rating: 5 },
-  { name: "Freya E.",       comment: "Moved by how much care was shown.", rating: 5 },
-  { name: "Rosie I.",       comment: "Sweetness overload in the best way!", rating: 5 },
-  { name: "Aurora R.",      comment: "Pure love poured into every detail.", rating: 5 },
-  { name: "Hazel T.",       comment: "I'm obsessed, couldn't be happier.", rating: 5 },
-  { name: "Willow Y.",      comment: "So much heart behind everything!", rating: 4 },
-  { name: "Ivy U.",         comment: "Genuine care that really shows.", rating: 5 },
-  { name: "Stella I.",      comment: "I felt truly special the whole time.", rating: 5 },
-  { name: "Jasmine O.",     comment: "Never experienced anything like it!", rating: 5 },
-  { name: "Phoebe P.",      comment: "My heart is full! So grateful.", rating: 5 },
-  { name: "Celeste A.",     comment: "Bright, cheerful, absolutely perfect.", rating: 5 },
-  { name: "Seraphina S.",   comment: "Felt like a warm hug every step.", rating: 4 },
-  { name: "Ophelia D.",     comment: "Absolutely top tier, no question!", rating: 5 },
-  { name: "Cora F.",        comment: "I smiled the entire time, promise.", rating: 5 },
-  { name: "Adelaide G.",    comment: "Such a thoughtful, loving approach.", rating: 5 },
-  { name: "Beatrix H.",     comment: "Blown away by the attention to detail.", rating: 5 },
-  { name: "Evangeline J.",  comment: "Made me feel like the only customer!", rating: 5 },
-  { name: "Clementine K.",  comment: "Every interaction was pure gold.", rating: 4 },
-  { name: "Cordelia L.",    comment: "A genuinely wonderful experience!", rating: 5 },
-  { name: "Imogen M.",      comment: "This is what quality looks like.", rating: 5 },
-  { name: "Juliet N.",      comment: "Heartfelt, caring, and brilliant!", rating: 5 },
-  { name: "Lavender O.",    comment: "The warmth was absolutely contagious.", rating: 5 },
-  { name: "Magnolia P.",    comment: "Felt appreciated every single step.", rating: 5 },
-  { name: "Nadine Q.",      comment: "Couldn't have asked for anything more.", rating: 4 },
-  { name: "Octavia R.",     comment: "The whole experience was pure magic.", rating: 5 },
-  { name: "Persephone S.",  comment: "Thoroughly impressed, start to finish.", rating: 5 },
-  { name: "Rosalind T.",    comment: "Such a sweet, sweet experience!", rating: 5 },
-];
+import { useState, useEffect, useRef, useCallback } from "react";
+const API = import.meta.env.VITE_API_URL;
 
 const PAPER_COLORS = [
   "#C0392B","#E74C3C","#CB4335","#B03A2E","#D98880",
@@ -60,15 +7,29 @@ const PAPER_COLORS = [
   "#E8B4B8","#D4A5A5","#C9806E","#B85450",
 ];
 
+const FALLBACK_REVIEWS = [
+  { _id:"1", name:"Ananya", text:"My mom cried when she received the flowers. Best gift I ever gave.", rating:5 },
+  { _id:"2", name:"Rahul",  text:"It made long distance feel a little closer. Thank you BouquetBuilder.", rating:5 },
+  { _id:"3", name:"Sneha",  text:"Knowing farmers are supported made every petal feel more special.", rating:5 },
+];
+
 const seededRand = (seed) => {
   let s = (seed + 1) * 7919;
-  return () => {
-    s = Math.imul(s ^ (s >>> 13), 0x4f8f3a01) >>> 0;
-    return s / 0xffffffff;
-  };
+  return () => { s = Math.imul(s ^ (s >>> 13), 0x4f8f3a01) >>> 0; return s / 0xffffffff; };
 };
 
-const FALLBACK_REVIEWS = [`n  { _id:"1", name:"Ananya", text:"My mom cried when she received the flowers. Best gift I ever gave.", rating:5 },`n  { _id:"2", name:"Rahul",  text:"It made long distance feel a little closer. Thank you BouquetBuilder.", rating:5 },`n  { _id:"3", name:"Sneha",  text:"Knowing farmers are supported made every petal feel more special.", rating:5 },`n];`n`nconst buildHeartProps = (reviews) => reviews.map((_, i) => {`n  const rand = seededRand(i * 31 + 7);`n  const cols = Math.min(reviews.length, 10);`n  const rows = Math.ceil(reviews.length / cols);`n  const col = i % cols; const row = Math.floor(i / cols);`n  const x = Math.max(3, Math.min(93, (col/cols)*80+8 + (rand()-0.5)*9));`n  const y = Math.max(2, Math.min(94, 5+(row/rows)*87 + (rand()-0.5)*7));`n  return { x, y, size:19+rand()*15, rotation:(rand()-0.5)*75, zIdx:Math.floor(rand()*22),`n    color:PAPER_COLORS[Math.floor(rand()*PAPER_COLORS.length)],`n    floatDuration:3.2+rand()*4.5, floatDelay:rand()*6,`n    swayX:(rand()-0.5)*7, swayY:(rand()-0.5)*5, rotateSway:(rand()-0.5)*14, shadow:0.07+rand()*0.15 };`n});
+const buildHeartProps = (reviews) => reviews.map((_, i) => {
+  const rand = seededRand(i * 31 + 7);
+  const cols = Math.min(reviews.length, 10);
+  const rows = Math.ceil(reviews.length / cols);
+  const col = i % cols; const row = Math.floor(i / cols);
+  const x = Math.max(3, Math.min(93, (col/cols)*80+8 + (rand()-0.5)*9));
+  const y = Math.max(2, Math.min(94, 5+(row/rows)*87 + (rand()-0.5)*7));
+  return { x, y, size:19+rand()*15, rotation:(rand()-0.5)*75, zIdx:Math.floor(rand()*22),
+    color:PAPER_COLORS[Math.floor(rand()*PAPER_COLORS.length)],
+    floatDuration:3.2+rand()*4.5, floatDelay:rand()*6,
+    swayX:(rand()-0.5)*7, swayY:(rand()-0.5)*5, rotateSway:(rand()-0.5)*14, shadow:0.07+rand()*0.15 };
+});
 
 // ─── PAPER HEART SVG ─────────────────────────────────────────────────────────
 const PaperHeart = ({ size, color, rotation, style = {} }) => {
@@ -142,7 +103,22 @@ const FloatUp = ({ x, delay, duration, color }) => (
 );
 
 // ─── MAIN ─────────────────────────────────────────────────────────────────────
-export default function HeartJarReviews() {`n  const [reviews, setReviews] = useState(FALLBACK_REVIEWS);`n  const [heartProps, setHeartProps] = useState(() => buildHeartProps(FALLBACK_REVIEWS));`n`n  useEffect(() => {`n    fetch(`${API}/api/reviews`)`n      .then(r => r.json())`n      .then(data => {`n        if (Array.isArray(data) && data.length > 0) {`n          setReviews(data);`n          setHeartProps(buildHeartProps(data));`n        }`n      })`n      .catch(() => {});`n  }, []);
+export default function HeartJarReviews() {
+  const [reviews, setReviews] = useState(FALLBACK_REVIEWS);
+  const [heartProps, setHeartProps] = useState(() => buildHeartProps(FALLBACK_REVIEWS));
+
+  useEffect(() => {
+    fetch(`${API}/api/reviews`)
+      .then(r => r.json())
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          setReviews(data);
+          setHeartProps(buildHeartProps(data));
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   const [isOpen, setIsOpen]       = useState(false);
   const [isOpening, setIsOpening] = useState(false);
   const [hoveredId, setHoveredId] = useState(null);
@@ -302,7 +278,7 @@ export default function HeartJarReviews() {`n  const [reviews, setReviews] = use
           animation:"sPulse 3.2s ease-in-out infinite",
         }}>
           <span style={{fontSize:"14px"}}>❤️</span>
-          <span style={{color:"#8B1A1A",fontWeight:"700",fontSize:"13px"}}>`${reviews.length}+ Happy Customers</span>
+          <span style={{color:"#8B1A1A",fontWeight:"700",fontSize:"13px"}}>{reviews.length} Happy Customers</span>
           <span style={{fontSize:"14px"}}>❤️</span>
         </div>
       </div>
@@ -574,7 +550,7 @@ export default function HeartJarReviews() {`n  const [reviews, setReviews] = use
                 "{clicked.text}"
               </div>
               <div style={{textAlign:"right",marginTop:"5px",fontSize:"13px"}}>
-                {["💌","💝","💖","💗","♥️"][clicked.id%5]}
+                {["💌","💝","💖","💗","♥️"][0]}
               </div>
             </div>
           )}
@@ -657,6 +633,7 @@ export default function HeartJarReviews() {`n  const [reviews, setReviews] = use
     </div>
   );
 }
+
 
 
 
