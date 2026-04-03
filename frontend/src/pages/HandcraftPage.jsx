@@ -631,6 +631,14 @@ const paintingProducts = [
   {id:5,emoji:"🦚",name:"Peacock Glass Painting",artist:"Anjali Mehta",region:"Gujarat, India",price:"₹3,500",original:"₹4,800"},
   {id:6,emoji:"✏️",name:"Charcoal Portrait Sketch",artist:"Rahul Das",region:"Kolkata, India",price:"₹2,800",original:"₹3,800"},
 ];
+const potteryProducts = [
+  {id:1,emoji:"🏺",name:"Blue Pottery Vase",artist:"Ramesh Kumhar",region:"Jaipur, India",price:"₹2,200",original:"₹3,000"},
+  {id:2,emoji:"🫖",name:"Terracotta Tea Set",artist:"Meena Devi",region:"Rajasthan, India",price:"₹1,800",original:"₹2,500"},
+  {id:3,emoji:"🍶",name:"Khurja Ceramic Bowl",artist:"Suresh Prajapat",region:"Uttar Pradesh",price:"₹950",original:"₹1,400"},
+  {id:4,emoji:"🪔",name:"Handmade Diya Set",artist:"Anita Kumari",region:"Bihar, India",price:"₹450",original:"₹700"},
+  {id:5,emoji:"🌸",name:"Floral Ceramic Planter",artist:"Priya Sharma",region:"Pune, India",price:"₹1,200",original:"₹1,800"},
+  {id:6,emoji:"🎎",name:"Kondapalli Clay Doll",artist:"Lakshmi Rao",region:"Andhra Pradesh",price:"₹1,600",original:"₹2,200"},
+];
 const spotriProducts = [
   {id:1,emoji:"🛋️",name:"Kashmiri Embroidered Cushion",category:"Cushions",desc:"Hand-stitched floral patterns"},
   {id:2,emoji:"🎪",name:"Kantha Work Wall Hanging",category:"Wall Art",desc:"Traditional stitch art from Bengal"},
@@ -679,7 +687,7 @@ function Navbar() {
         ArtisanWorld
       </a>
       <ul className="nav-links">
-        {["Home","Handloom","Paintings","Spotri","Wooden Sculpting","Stone Art","More ▾"].map(l=>(
+        {["Home","Handloom","Paintings","Pottery","Wooden Sculpting","Stone Art","More ▾"].map(l=>(
           <li key={l}><a href="#">{l}</a></li>
         ))}
       </ul>
@@ -838,6 +846,24 @@ function PaintingsSection() {
       </div>
       <div className={`fade-up fade-up-delay-1${visible?" visible":""}`}>
         <ProductCarousel products={paintingProducts}/>
+        <div className="pill-row">{pills.map((p,i)=><button key={p} className={`pill${i===active?" active":""}`} onClick={()=>setActive(i)}>{p}</button>)}</div>
+      </div>
+    </div></section>
+  );
+}
+
+function PotterySection() {
+  const ref=useRef(null);const visible=useIntersection(ref);
+  const pills=["Vases","Tea Sets","Bowls","Diyas","Planters","Dolls"];
+  const [active,setActive]=useState(0);
+  return (
+    <section className="section" style={{background:"var(--bg2)"}}><div className="section-inner" ref={ref}>
+      <div className={`section-header fade-up${visible?" visible":""}`}>
+        <div><div className="section-label">Earth &amp; Fire</div><h2 className="section-title">Pottery</h2></div>
+        <button className="btn-explore">Explore All →</button>
+      </div>
+      <div className={`fade-up fade-up-delay-1${visible?" visible":""}`}>
+        <ProductCarousel products={potteryProducts}/>
         <div className="pill-row">{pills.map((p,i)=><button key={p} className={`pill${i===active?" active":""}`} onClick={()=>setActive(i)}>{p}</button>)}</div>
       </div>
     </div></section>
@@ -1063,7 +1089,7 @@ export default function HandcraftPage() {
       <OurStorySection/>
       <HandloomSection/>
       <PaintingsSection/>
-      <SpotriSection/>
+      <PotterySection/>
       <WoodSection/>
       <StoneSection/>
       <ArtistsSection/>

@@ -9,7 +9,9 @@ const TABS = [
   { key: 'addresses', icon: '📍', label: 'Addresses'    },
   { key: 'orders',    icon: '📦', label: 'My Orders'    },
   { key: 'wishlist',  icon: '💖', label: 'Wishlist'     },
+  { key: 'wallet',    icon: '👛', label: 'Wallet'       },
   { key: 'settings',  icon: '⚙️',  label: 'Settings'    },
+  { key: 'contact',   icon: '💬', label: 'Contact Us'   },
 ];
 
 const STATUS_COLORS = {
@@ -300,11 +302,141 @@ function WishlistTab({ user }) {
   );
 }
 
+// ── Wallet ──
+function WalletTab({ token, user }) {
+  const [wallet, setWallet]     = useState(null);
+  const [loading, setLoading]   = useState(true);
+  const [addAmount, setAddAmount] = useState('');
+  const [adding, setAdding]     = useState(false);
+  const [msg, setMsg]           = useState('');
+
+  const load = async () => {
+    try {
+      const res  = await fetch(`${API}/api/wallet`, { headers: { Authorization: `Bearer ${token}` } });
+      const data = await res.json();
+      setWallet(data);
+    } catch {
+      // fallback mock if endpoint not ready
+      setWallet({ balance: 0, transactions: [] });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const handleAddMoney = async (e) => {
+    e.preventDefault();
+    const amt = parseFloat(addAmount);
+    if (!amt || amt < 1) return setMsg('⚠️ Enter a valid amount.');
+    setAdding(true);
+    try {
+      const res  = await fetch(`${API}/api/wallet/add`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ amount: amt }),
+      });
+      const data = await res.json();
+      if (res.ok) { setMsg('✅ Money added successfully!'); setAddAmount(''); load(); }
+      else setMsg('⚠️ ' + data.message);
+    } catch {
+      setMsg('⚠️ Could not add money. Try again.');
+    }
+    setAdding(false);
+  };
+
+  const QUICK_AMOUNTS = [100, 250, 500, 1000];
+
+  const txnIcon = (type) => {
+    if (type === 'credit')   return '⬆️';
+    if (type === 'debit')    return '⬇️';
+    if (type === 'refund')   return '↩️';
+    return '💳';
+  };
+
+  if (loading) return <div className="text-center py-12 text-gray-400 text-sm">Loading wallet...</div>;
+
+  return (
+    <div className="flex flex-col gap-5">
+      {/* Balance Card */}
+      <div className="bg-gradient-to-br from-[#f8c8d4] via-[#f0d6f0] to-[#ddd0f7] rounded-2xl p-6 relative overflow-hidden">
+        <div className="absolute -top-6 -right-6 w-32 h-32 bg-white/10 rounded-full" />
+        <div className="absolute -bottom-8 -left-8 w-40 h-40 bg-white/10 rounded-full" />
+        <p className="text-xs font-semibold text-roseDD/70 uppercase tracking-widest mb-1 relative z-10">Wallet Balance</p>
+        <p className="font-playfair font-bold text-4xl text-roseDD relative z-10">
+          ₹{(wallet?.balance ?? 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+        </p>
+        <p className="text-xs text-roseDD/60 mt-2 relative z-10">👛 {user?.name}'s BouquetBuilder Wallet</p>
+      </div>
+
+      {/* Add Money */}
+      <div className="bg-white rounded-2xl border border-pink-100 p-6 shadow-soft-s">
+        <h3 className="font-playfair font-bold text-roseDD mb-4">➕ Add Money</h3>
+        <div className="flex gap-2 flex-wrap mb-4">
+          {QUICK_AMOUNTS.map(amt => (
+            <button key={amt} type="button"
+              onClick={() => setAddAmount(String(amt))}
+              className={`text-xs px-4 py-2 rounded-full border font-semibold transition-all ${addAmount === String(amt) ? 'bg-rose text-white border-rose' : 'border-pink-200 text-roseD hover:border-rose hover:bg-pink-50'}`}>
+              ₹{amt}
+            </button>
+          ))}
+        </div>
+        <form onSubmit={handleAddMoney} className="flex flex-col gap-3">
+          <Field label="Enter Amount" icon="₹">
+            <input
+              type="number"
+              min="1"
+              value={addAmount}
+              onChange={e => setAddAmount(e.target.value)}
+              placeholder="Enter custom amount"
+              className="flex-1 outline-none text-sm bg-transparent text-gray-700"
+            />
+          </Field>
+          {msg && <p className={`text-xs px-3 py-2 rounded-xl ${msg.startsWith('✅') ? 'bg-green-50 text-green-600' : 'bg-pink-50 text-roseD'}`}>{msg}</p>}
+          <button type="submit" disabled={adding}
+            className="self-start bg-gradient-to-br from-rose to-[#e09099] text-white text-sm font-semibold px-6 py-2.5 rounded-full hover:-translate-y-0.5 transition-all disabled:opacity-60">
+            {adding ? 'Processing...' : 'Add to Wallet 👛'}
+          </button>
+        </form>
+      </div>
+
+      {/* Transaction History */}
+      <div className="bg-white rounded-2xl border border-pink-100 p-6 shadow-soft-s">
+        <h3 className="font-playfair font-bold text-roseDD mb-4">🧾 Transaction History</h3>
+        {(!wallet?.transactions || wallet.transactions.length === 0) ? (
+          <div className="text-center py-8">
+            <p className="text-3xl mb-2">🧾</p>
+            <p className="text-sm text-gray-400">No transactions yet</p>
+          </div>
+        ) : (
+          <div className="flex flex-col divide-y divide-pink-50">
+            {wallet.transactions.slice().reverse().map((txn, i) => (
+              <div key={txn._id || i} className="flex items-center gap-3 py-3">
+                <div className={`w-9 h-9 rounded-full flex items-center justify-center text-base flex-shrink-0 ${txn.type === 'credit' || txn.type === 'refund' ? 'bg-green-50' : 'bg-red-50'}`}>
+                  {txnIcon(txn.type)}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-gray-700 truncate">{txn.description || 'Wallet transaction'}</p>
+                  <p className="text-xs text-gray-400">{txn.createdAt ? new Date(txn.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</p>
+                </div>
+                <p className={`text-sm font-bold flex-shrink-0 ${txn.type === 'credit' || txn.type === 'refund' ? 'text-green-600' : 'text-red-500'}`}>
+                  {txn.type === 'credit' || txn.type === 'refund' ? '+' : '-'}₹{txn.amount?.toLocaleString()}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ── Settings ──
 function SettingsTab({ token, onLogout }) {
   const [form, setForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
   const [saving, setSaving] = useState(false);
   const [msg, setMsg]       = useState({ text: '', ok: true });
+  const [showPass, setShowPass] = useState({ current: false, new: false, confirm: false });
 
   const changePass = async (e) => {
     e.preventDefault();
@@ -322,31 +454,259 @@ function SettingsTab({ token, onLogout }) {
     if (res.ok) setForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
   };
 
+  const passFields = [
+    { key: 'currentPassword', label: 'Current Password', showKey: 'current' },
+    { key: 'newPassword',     label: 'New Password',     showKey: 'new'     },
+    { key: 'confirmPassword', label: 'Confirm New Password', showKey: 'confirm' },
+  ];
+
   return (
     <div className="flex flex-col gap-5">
+      {/* Change Password */}
       <div className="bg-white rounded-2xl border border-pink-100 p-6 shadow-soft-s">
-        <h3 className="font-playfair font-bold text-roseDD mb-5">🔒 Change Password</h3>
+        <h3 className="font-playfair font-bold text-roseDD mb-1">🔒 Change Password</h3>
+        <p className="text-xs text-gray-400 mb-5">Keep your account secure by using a strong password.</p>
         <form onSubmit={changePass} className="flex flex-col gap-4">
-          {[['currentPassword','Current Password'],['newPassword','New Password'],['confirmPassword','Confirm New Password']].map(([k, lbl]) => (
-            <Field key={k} label={lbl} icon="🔒">
-              <input type="password" value={form[k]} onChange={e => setForm(f => ({ ...f, [k]: e.target.value }))}
-                placeholder="••••••••" className="flex-1 outline-none text-sm bg-transparent text-gray-700" />
-            </Field>
+          {passFields.map(({ key, label, showKey }) => (
+            <div key={key} className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{label}</label>
+              <div className="flex items-center gap-3 border-2 border-pink-100 rounded-xl px-4 py-3 focus-within:border-pink-400 transition-all bg-pink-50/30">
+                <span className="text-pink-300">🔒</span>
+                <input
+                  type={showPass[showKey] ? 'text' : 'password'}
+                  value={form[key]}
+                  onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
+                  placeholder="••••••••"
+                  className="flex-1 outline-none text-sm bg-transparent text-gray-700"
+                />
+                <button type="button"
+                  onClick={() => setShowPass(s => ({ ...s, [showKey]: !s[showKey] }))}
+                  className="text-gray-300 hover:text-gray-500 text-xs transition-colors flex-shrink-0">
+                  {showPass[showKey] ? '🙈' : '👁️'}
+                </button>
+              </div>
+            </div>
           ))}
           {msg.text && <p className={`text-xs px-3 py-2 rounded-xl ${msg.ok ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-500'}`}>{msg.text}</p>}
           <button type="submit" disabled={saving}
             className="self-start bg-gradient-to-br from-rose to-[#e09099] text-white text-sm font-semibold px-6 py-2.5 rounded-full hover:-translate-y-0.5 transition-all disabled:opacity-60">
-            {saving ? 'Updating...' : 'Update Password'}
+            {saving ? 'Updating...' : 'Update Password 🔐'}
           </button>
         </form>
       </div>
 
+      {/* Notification Preferences */}
+      <div className="bg-white rounded-2xl border border-pink-100 p-6 shadow-soft-s">
+        <h3 className="font-playfair font-bold text-roseDD mb-1">🔔 Notifications</h3>
+        <p className="text-xs text-gray-400 mb-4">Manage what updates you'd like to receive.</p>
+        <div className="flex flex-col gap-3">
+          {[
+            { label: 'Order updates & tracking', desc: 'Get notified when your order status changes', default: true },
+            { label: 'Offers & promotions',      desc: 'Exclusive discounts and seasonal deals',    default: true },
+            { label: 'Wishlist restock alerts',  desc: 'Know when wishlisted items are available',  default: false },
+          ].map(item => (
+            <NotifToggle key={item.label} label={item.label} desc={item.desc} defaultOn={item.default} />
+          ))}
+        </div>
+      </div>
+
+      {/* Sign Out */}
       <div className="bg-white rounded-2xl border border-red-100 p-6 shadow-soft-s">
         <h3 className="font-playfair font-bold text-red-500 mb-2">Account Actions</h3>
         <p className="text-xs text-gray-400 mb-4">Sign out from your account on this device.</p>
         <button onClick={onLogout} className="border-2 border-red-200 text-red-400 text-sm font-semibold px-5 py-2 rounded-full hover:bg-red-50 transition-all">
           🚪 Sign Out
         </button>
+      </div>
+    </div>
+  );
+}
+
+function NotifToggle({ label, desc, defaultOn }) {
+  const [on, setOn] = useState(defaultOn);
+  return (
+    <div className="flex items-center justify-between gap-4 py-2">
+      <div>
+        <p className="text-sm font-semibold text-gray-700">{label}</p>
+        <p className="text-xs text-gray-400">{desc}</p>
+      </div>
+      <button
+        onClick={() => setOn(v => !v)}
+        className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ${on ? 'bg-rose' : 'bg-gray-200'}`}>
+        <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${on ? 'translate-x-5' : 'translate-x-0'}`} />
+      </button>
+    </div>
+  );
+}
+
+// ── Contact Us ──
+const FAQS = [
+  {
+    q: 'How do I track my order?',
+    a: 'Go to My Orders and click on any order to view real-time tracking. You\'ll also receive SMS and email updates at every step of delivery.',
+  },
+  {
+    q: 'Can I cancel or modify my order?',
+    a: 'Orders can be cancelled or modified within 1 hour of placing them. After that, the flowers may already be in preparation. Contact us immediately if you need changes.',
+  },
+  {
+    q: 'What is the delivery time?',
+    a: 'We offer same-day delivery for orders placed before 2 PM. Standard delivery slots are morning (9 AM–1 PM) and evening (4 PM–8 PM). Express delivery is also available.',
+  },
+  {
+    q: 'How does the wallet work?',
+    a: 'Your BouquetBuilder wallet lets you store money for faster checkouts. You can add money anytime and use it to pay for orders. Refunds are also credited directly to your wallet.',
+  },
+  {
+    q: 'Are the flowers fresh?',
+    a: 'Absolutely! We source flowers daily from local farms and trusted suppliers. All bouquets are assembled fresh on the day of delivery to ensure maximum freshness.',
+  },
+  {
+    q: 'What if I receive damaged flowers?',
+    a: 'We\'re so sorry if that happened! Please take a photo and contact us within 24 hours of delivery. We\'ll arrange a replacement or full refund — no questions asked.',
+  },
+  {
+    q: 'Do you offer bulk or wedding orders?',
+    a: 'Yes! We specialize in wedding décor and bulk floral arrangements. Reach out to us via email or phone at least 5–7 days in advance for custom bulk orders.',
+  },
+  {
+    q: 'How do I use a promo code?',
+    a: 'During checkout, you\'ll find a "Apply Coupon" field. Enter your promo code there and the discount will be applied automatically to your order total.',
+  },
+];
+
+function ContactUsTab() {
+  const [openFaq, setOpenFaq]   = useState(null);
+  const [form, setForm]         = useState({ name: '', email: '', subject: '', message: '' });
+  const [sending, setSending]   = useState(false);
+  const [sent, setSent]         = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSending(true);
+    // Replace with your actual contact API endpoint
+    await new Promise(r => setTimeout(r, 1200)); // Simulated delay
+    setSending(false);
+    setSent(true);
+    setForm({ name: '', email: '', subject: '', message: '' });
+  };
+
+  return (
+    <div className="flex flex-col gap-6">
+      {/* Hero banner */}
+      <div className="bg-gradient-to-br from-[#ffe8ed] to-[#eadcf7] rounded-2xl p-6 flex items-center gap-4">
+        <span className="text-4xl">💬</span>
+        <div>
+          <h3 className="font-playfair font-bold text-roseDD text-lg">We're here to help!</h3>
+          <p className="text-sm text-textL mt-0.5">Reach out anytime — we usually respond within a few hours.</p>
+        </div>
+      </div>
+
+      {/* Quick contact info */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {[
+          { icon: '📞', label: 'Call Us',    value: '+91 98765 43210',         sub: 'Mon–Sat, 9 AM – 7 PM' },
+          { icon: '✉️', label: 'Email Us',   value: 'support@bouquetbuilder.in', sub: 'Reply within 24 hrs' },
+          { icon: '💬', label: 'WhatsApp',   value: '+91 98765 43210',         sub: 'Quick responses' },
+        ].map(item => (
+          <div key={item.label} className="bg-white rounded-2xl border border-pink-100 p-4 shadow-soft-s flex flex-col items-center text-center gap-1">
+            <span className="text-2xl mb-1">{item.icon}</span>
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">{item.label}</p>
+            <p className="text-sm font-semibold text-roseDD">{item.value}</p>
+            <p className="text-[.65rem] text-gray-400">{item.sub}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* FAQs */}
+      <div className="bg-white rounded-2xl border border-pink-100 p-6 shadow-soft-s">
+        <h3 className="font-playfair font-bold text-roseDD mb-1">❓ Frequently Asked Questions</h3>
+        <p className="text-xs text-gray-400 mb-5">Quick answers to common questions.</p>
+        <div className="flex flex-col gap-2">
+          {FAQS.map((faq, i) => (
+            <div key={i} className={`rounded-xl border transition-all overflow-hidden ${openFaq === i ? 'border-pink-300 bg-pink-50/40' : 'border-pink-100 bg-white'}`}>
+              <button
+                onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                className="w-full flex items-center justify-between px-4 py-3.5 text-left gap-3">
+                <span className="text-sm font-semibold text-gray-700">{faq.q}</span>
+                <span className={`text-pink-300 flex-shrink-0 text-xs transition-transform duration-200 ${openFaq === i ? 'rotate-180' : ''}`}>▼</span>
+              </button>
+              {openFaq === i && (
+                <div className="px-4 pb-4 text-sm text-gray-500 leading-relaxed border-t border-pink-100 pt-3">
+                  {faq.a}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Contact Form */}
+      <div className="bg-white rounded-2xl border border-pink-100 p-6 shadow-soft-s">
+        <h3 className="font-playfair font-bold text-roseDD mb-1">📝 Have a Question?</h3>
+        <p className="text-xs text-gray-400 mb-5">Fill out the form below and we'll get back to you shortly.</p>
+
+        {sent ? (
+          <div className="text-center py-8 flex flex-col items-center gap-3">
+            <span className="text-5xl">🌸</span>
+            <p className="font-playfair font-bold text-roseDD text-lg">Message Sent!</p>
+            <p className="text-sm text-textL">Thanks for reaching out. We'll reply to you soon.</p>
+            <button onClick={() => setSent(false)}
+              className="mt-2 text-sm text-roseD border border-pink-200 px-4 py-2 rounded-full hover:bg-pink-50 transition-all">
+              Send Another Message
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Field label="Your Name" icon="👤">
+                <input
+                  value={form.name}
+                  onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                  required
+                  placeholder="Sakshi Rani"
+                  className="flex-1 outline-none text-sm bg-transparent text-gray-700"
+                />
+              </Field>
+              <Field label="Email Address" icon="✉️">
+                <input
+                  type="email"
+                  value={form.email}
+                  onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                  required
+                  placeholder="you@email.com"
+                  className="flex-1 outline-none text-sm bg-transparent text-gray-700"
+                />
+              </Field>
+            </div>
+            <Field label="Subject" icon="📌">
+              <input
+                value={form.subject}
+                onChange={e => setForm(f => ({ ...f, subject: e.target.value }))}
+                required
+                placeholder="e.g. Issue with my order"
+                className="flex-1 outline-none text-sm bg-transparent text-gray-700"
+              />
+            </Field>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Message</label>
+              <div className="border-2 border-pink-100 rounded-xl px-4 py-3 focus-within:border-pink-400 transition-all bg-pink-50/30">
+                <textarea
+                  value={form.message}
+                  onChange={e => setForm(f => ({ ...f, message: e.target.value }))}
+                  required
+                  rows={4}
+                  placeholder="Tell us how we can help you..."
+                  className="w-full outline-none text-sm bg-transparent text-gray-700 resize-none"
+                />
+              </div>
+            </div>
+            <button type="submit" disabled={sending}
+              className="self-start bg-gradient-to-br from-rose to-[#e09099] text-white text-sm font-semibold px-6 py-2.5 rounded-full hover:-translate-y-0.5 transition-all disabled:opacity-60">
+              {sending ? 'Sending...' : 'Send Message 💌'}
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );
@@ -404,8 +764,10 @@ export default function AccountPage() {
             {activeTab === 'profile'   && <ProfileTab   token={token} user={user} onUserUpdate={handleUserUpdate} />}
             {activeTab === 'addresses' && <AddressesTab token={token} />}
             {activeTab === 'orders'    && <OrdersTab    token={token} />}
-            {activeTab === 'wishlist'  && <WishlistTab user={user} />}
+            {activeTab === 'wishlist'  && <WishlistTab  user={user} />}
+            {activeTab === 'wallet'    && <WalletTab    token={token} user={user} />}
             {activeTab === 'settings'  && <SettingsTab  token={token} onLogout={handleLogout} />}
+            {activeTab === 'contact'   && <ContactUsTab />}
           </main>
         </div>
       </div>
