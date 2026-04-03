@@ -190,7 +190,7 @@ const css = `
 .vnk-player-timer{font-size:.9rem;color:var(--gold);margin-bottom:16px;letter-spacing:.04em}
 
 /* cassette outer */
-  .vnk-cassette-outer{position:relative;display:flex;align-items:flex-start;gap:10px;margin:0 auto}
+  .vnk-cassette-outer{position:relative;display:flex;flex-direction:column;align-items:center;margin:0 auto}
 
 /* cassette */
   .vnk-cassette{position:relative;display:flex;align-items:stretch;width:360px;height:240px}
@@ -219,7 +219,7 @@ const css = `
   .vnk-spool-label{position:absolute;right:2px;top:50%;transform:translateY(-50%) rotate(90deg);font-size:.58rem;letter-spacing:.22em;color:#444;white-space:nowrap;pointer-events:none}
 
 /* HANDLE - small, to the right of spool */
-  .vnk-handle-assembly{display:flex;flex-direction:column;align-items:center;cursor:grab;user-select:none;transform-origin:50% 0%;will-change:transform;flex-shrink:0;margin-top:6px;}
+  .vnk-handle-assembly{display:flex;flex-direction:column;align-items:center;cursor:grab;user-select:none;transform-origin:50% 0%;will-change:transform;flex-shrink:0;margin-top:4px;}
   .vnk-handle-assembly:active{cursor:grabbing}
   .vnk-h-cap{width:11px;height:7px;background:linear-gradient(180deg,#d8d8d8,#aaa);border-radius:6px 6px 0 0;box-shadow:0 -1px 3px rgba(0,0,0,.3);}
   .vnk-h-bar{width:7px;height:40px;background:linear-gradient(90deg,#888,#e8e8e8 35%,#d0d0d0 60%,#888);border-radius:4px 4px 2px 2px;box-shadow:1px 1px 5px rgba(0,0,0,.4);position:relative;}
@@ -572,7 +572,7 @@ function PlayerScreen({ data, onNewMemory }) {
   useEffect(()=>{
     const el=handleAssRef.current; if(!el) return;
     let startAngle=0;
-    const getCenter=()=>{ const r=el.getBoundingClientRect(); return{x:r.left+r.width/2,y:r.top}; };
+    const getCenter=()=>{ const r=el.getBoundingClientRect(); return{x:r.left+r.width/2, y:r.top+window.scrollY}; };
     const angle=(cx,cy,ex,ey)=>Math.atan2(ey-cy,ex-cx)*180/Math.PI;
 
     const onDown=(e)=>{
@@ -581,7 +581,7 @@ function PlayerScreen({ data, onNewMemory }) {
       setShowHint(false);
       const pt=e.touches?e.touches[0]:e;
       const c=getCenter();
-      startAngle=angle(c.x,c.y,pt.clientX,pt.clientY)-accRotRef.current;
+      startAngle=angle(c.x,c.y,pt.clientX,pt.clientY+window.scrollY)-accRotRef.current;
       document.addEventListener('mousemove',onMove);
       document.addEventListener('touchmove',onMove,{passive:false});
       document.addEventListener('mouseup',onUp);
@@ -593,7 +593,7 @@ function PlayerScreen({ data, onNewMemory }) {
       e.preventDefault();
       const pt=e.touches?e.touches[0]:e;
       const c=getCenter();
-      const ang=angle(c.x,c.y,pt.clientX,pt.clientY);
+      const ang=angle(c.x,c.y,pt.clientX,pt.clientY+window.scrollY);
       let delta=ang-startAngle-accRotRef.current;
       while(delta>180) delta-=360;
       while(delta<-180) delta+=360;
