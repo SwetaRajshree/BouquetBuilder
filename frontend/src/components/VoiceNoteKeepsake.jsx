@@ -602,19 +602,24 @@ function PlayerScreen({ data, onNewMemory }) {
       let delta=ang-startAngle-accRotRef.current;
       while(delta>180) delta-=360;
       while(delta<-180) delta+=360;
-      const aud=audioRef.current;
       if(Math.abs(delta)>0.5){
         accRotRef.current+=delta;
         setHandleAngle(accRotRef.current);
-        if(aud?.duration){
-          const newTime=Math.max(0,Math.min(aud.duration,aud.currentTime+(delta/720)*aud.duration));
-          aud.currentTime=newTime;
-          if(delta>0 && aud.paused) aud.play().catch(()=>{});
-          if(delta<0 && !aud.paused) aud.pause();
-          const pct=newTime/aud.duration;
-          moveFilm(pct);
-          drawProgress(pct);
-          setPlayPos(newTime);
+        // move film directly
+        const track=filmTrackRef.current;
+        if(track){
+          const maxScroll=Math.max(0,track.scrollWidth-track.parentElement.clientWidth);
+          const pct=Math.min(1,Math.max(0,accRotRef.current/720));
+          track.style.transform=`translateX(-${pct*maxScroll}px)`;
+          // sync audio
+          const aud=audioRef.current;
+          if(aud?.duration){
+            aud.currentTime=pct*aud.duration;
+            if(delta>0 && aud.paused) aud.play().catch(()=>{});
+            if(delta<0 && !aud.paused) aud.pause();
+            drawProgress(pct);
+            setPlayPos(aud.currentTime);
+          }
         }
       }
       startAngle=ang-accRotRef.current;
