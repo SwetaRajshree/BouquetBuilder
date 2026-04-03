@@ -655,12 +655,6 @@ const woodProducts = [
   {id:3,emoji:"🐘",name:"Channapatna Elephant Set",price:"₹2,800",desc:"Lacquerware toy art"},
   {id:4,emoji:"👺",name:"Kerala Tribal Mask",price:"₹6,200",desc:"Traditional ritual art"},
 ];
-const stoneProducts = [
-  {id:1,emoji:"🪨",name:"Sandstone Ganesha",price:"₹8,500",desc:"Rajasthani stone carving"},
-  {id:2,emoji:"💎",name:"Marble Inlay Box",price:"₹4,200",desc:"Agra pietra dura work"},
-  {id:3,emoji:"🗿",name:"Black Granite Idol",price:"₹18,000",desc:"South Indian temple style"},
-  {id:4,emoji:"🌊",name:"Pebble River Art",price:"₹1,800",desc:"Hand-painted natural stones"},
-];
 const artists = [
   {name:"Rekha Devi",craft:"Handloom Weaving",location:"Varanasi, India",rating:4.9,emoji:"👩‍🎨",reviews:234},
   {name:"Jyoti Hait",craft:"Warli Painting",location:"Maharashtra, India",rating:4.8,emoji:"🎨",reviews:189},
@@ -949,6 +943,17 @@ function WoodSection() {
 function StoneSection() {
   const ref=useRef(null);const visible=useIntersection(ref);
   const [lightbox,setLightbox]=useState(null);
+  const [stoneItems,setStoneItems]=useState([]);
+  const [loading,setLoading]=useState(true);
+
+  useEffect(()=>{
+    fetch(`${API_URL}/api/stone-art`)
+      .then(r=>r.json())
+      .then(data=>setStoneItems(Array.isArray(data)?data:[]))
+      .catch(console.error)
+      .finally(()=>setLoading(false));
+  },[]);
+
   return (
     <section className="stone-section">
       <div className="section-inner" ref={ref}>
@@ -956,11 +961,14 @@ function StoneSection() {
           <div><div className="section-label">Ancient Craft</div><h2 className="section-title">Stone Art</h2></div>
           <button className="btn-explore">Explore All →</button>
         </div>
+        {loading && <p style={{color:"rgba(255,255,255,0.5)",fontSize:"0.9rem"}}>Loading stone art...</p>}
         <div className={`stone-gallery fade-up fade-up-delay-1${visible?" visible":""}`}>
-          {stoneProducts.map(p=>(
-            <div key={p.id} className="stone-card" onClick={()=>setLightbox(p)}>
-              <div className="stone-img">{p.emoji}</div>
-              <div className="stone-info"><h4>{p.name}</h4><p>{p.desc}</p><div className="stone-price">{p.price}</div></div>
+          {stoneItems.map(p=>(
+            <div key={p._id} className="stone-card" onClick={()=>setLightbox(p)}>
+              <div className="stone-img" style={p.image?{backgroundImage:`url(${p.image})`,backgroundSize:"cover",backgroundPosition:"center",fontSize:0}:{}}>
+                {!p.image && "🪨"}
+              </div>
+              <div className="stone-info"><h4>{p.name}</h4><p>{p.description}</p><div className="stone-price">₹{p.price?.toLocaleString()}</div></div>
             </div>
           ))}
         </div>
@@ -969,10 +977,13 @@ function StoneSection() {
         <div className="lightbox" onClick={()=>setLightbox(null)}>
           <div className="lightbox-content" onClick={e=>e.stopPropagation()}>
             <button className="lightbox-close" onClick={()=>setLightbox(null)}>✕</button>
-            <span className="lightbox-emoji">{lightbox.emoji}</span>
+            {lightbox.image
+              ? <img src={lightbox.image} alt={lightbox.name} style={{width:120,height:120,objectFit:"cover",borderRadius:12,marginBottom:18}}/>
+              : <span className="lightbox-emoji">🪨</span>
+            }
             <h2 style={{fontFamily:"var(--font-display)",color:"white",marginBottom:8}}>{lightbox.name}</h2>
-            <p style={{color:"rgba(255,255,255,0.5)",marginBottom:16}}>{lightbox.desc}</p>
-            <div style={{fontSize:"1.4rem",color:"var(--rose-mid)",fontWeight:700,marginBottom:22}}>{lightbox.price}</div>
+            <p style={{color:"rgba(255,255,255,0.5)",marginBottom:16}}>{lightbox.description}</p>
+            <div style={{fontSize:"1.4rem",color:"var(--rose-mid)",fontWeight:700,marginBottom:22}}>₹{lightbox.price?.toLocaleString()}</div>
             <button className="btn-primary" style={{margin:"0 auto"}}>Add to Cart</button>
           </div>
         </div>
