@@ -959,6 +959,7 @@ function StoneSection() {
   const [lightbox,setLightbox]=useState(null);
   const [stoneItems,setStoneItems]=useState([]);
   const [loading,setLoading]=useState(true);
+  const [showAll,setShowAll]=useState(false);
 
   useEffect(()=>{
     fetch(`${API_URL}/api/stone-art`)
@@ -968,21 +969,30 @@ function StoneSection() {
       .finally(()=>setLoading(false));
   },[]);
 
+  const displayed = showAll ? stoneItems : stoneItems.slice(0,8);
+
   return (
     <section className="stone-section">
       <div className="section-inner" ref={ref}>
         <div className={`section-header fade-up${visible?" visible":""}`}>
           <div><div className="section-label">Ancient Craft</div><h2 className="section-title">Stone Art</h2></div>
-          <button className="btn-explore">Explore All →</button>
+          <button className="btn-explore" onClick={()=>setShowAll(s=>!s)}>
+            {showAll ? "Show Less ↑" : "Explore All →"}
+          </button>
         </div>
         {loading && <p style={{color:"rgba(255,255,255,0.5)",fontSize:"0.9rem"}}>Loading stone art...</p>}
+        {!loading && stoneItems.length===0 && <p style={{color:"rgba(255,255,255,0.5)",fontSize:"0.9rem"}}>No items found.</p>}
         <div className={`stone-gallery fade-up fade-up-delay-1${visible?" visible":""}`}>
-          {stoneItems.map(p=>(
+          {displayed.map(p=>(
             <div key={p._id} className="stone-card" onClick={()=>setLightbox(p)}>
               <div className="stone-img" style={p.image?{backgroundImage:`url(${p.image})`,backgroundSize:"cover",backgroundPosition:"center",fontSize:0}:{}}>
                 {!p.image && "🪨"}
               </div>
-              <div className="stone-info"><h4>{p.name}</h4><p>{p.description}</p><div className="stone-price">₹{p.price?.toLocaleString()}</div></div>
+              <div className="stone-info">
+                <h4>{p.name}</h4>
+                <p>{p.description}</p>
+                <div className="stone-price">₹{p.price?.toLocaleString()}</div>
+              </div>
             </div>
           ))}
         </div>
