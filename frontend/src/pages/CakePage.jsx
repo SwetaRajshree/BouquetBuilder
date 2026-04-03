@@ -645,6 +645,69 @@ function ChatCustomizer({ onComplete }) {
   );
 }
 
+function BakerModal({ shop, accentColor, onClose }) {
+  const { addToCart, cartItems } = useCartContext();
+  const [cakes, setCakes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [toast, setToast] = useState('');
+
+  useEffect(() => {
+    fetch(`${API}/api/cakes?city=${encodeURIComponent(shop.city || '')}`)
+      .then(r => r.json())
+      .then(data => setCakes(Array.isArray(data) ? data : []))
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [shop]);
+
+  const handleAdd = (cake) => {
+    addToCart({ _id: cake._id, name: cake.name, pricePerStem: cake.price, image: cake.image, category: 'cake' });
+    setToast(cake.name);
+    setTimeout(() => setToast(''), 2500);
+  };
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+      onClick={e => e.target === e.currentTarget && onClose()}>
+      <div style={{ background: '#fff', borderRadius: 24, width: '100%', maxWidth: 680, maxHeight: '85vh', overflowY: 'auto', padding: 28, position: 'relative' }}>
+        <button onClick={onClose} style={{ position: 'absolute', top: 16, right: 16, background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#aaa' }}>✕</button>
+        <h3 style={{ fontFamily: "'Playfair Display',serif", fontWeight: 700, fontSize: 22, color: accentColor, marginBottom: 4 }}>🎂 {shop.name}</h3>
+        <p style={{ fontSize: 13, color: '#aaa', marginBottom: 20 }}>📍 {shop.area}, {shop.city}</p>
+
+        {loading && <p style={{ color: '#aaa', fontSize: 14 }}>Loading cakes...</p>}
+        {!loading && cakes.length === 0 && <p style={{ color: '#aaa', fontSize: 14 }}>No cakes listed for this baker yet.</p>}
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(180px,1fr))', gap: 16 }}>
+          {cakes.map(cake => (
+            <div key={cake._id} style={{ background: '#fff', borderRadius: 16, border: '1.5px solid #f0f0f0', overflow: 'hidden', boxShadow: '0 2px 10px rgba(0,0,0,0.06)', transition: 'all 0.2s' }}
+              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.borderColor = accentColor; e.currentTarget.style.boxShadow = `0 8px 24px ${accentColor}22`; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.borderColor = '#f0f0f0'; e.currentTarget.style.boxShadow = '0 2px 10px rgba(0,0,0,0.06)'; }}>
+              <div style={{ height: 130, background: '#fff5f5', overflow: 'hidden' }}>
+                {cake.image
+                  ? <img src={cake.image} alt={cake.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40 }}>🎂</div>}
+              </div>
+              <div style={{ padding: '12px 14px' }}>
+                <p style={{ fontSize: 11, color: accentColor, fontWeight: 600, marginBottom: 3 }}>{cake.category}</p>
+                <p style={{ fontSize: 14, fontWeight: 700, color: '#222', marginBottom: 6, fontFamily: "'Playfair Display',serif", lineHeight: 1.3 }}>{cake.name}</p>
+                <p style={{ fontSize: 14, fontWeight: 700, color: accentColor, marginBottom: 10 }}>₹{cake.price}</p>
+                <button onClick={() => handleAdd(cake)}
+                  style={{ width: '100%', background: cartItems.find(i => i._id === cake._id) ? '#2e7d32' : accentColor, color: '#fff', border: 'none', borderRadius: 10, padding: '9px 0', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: "'Poppins',sans-serif", transition: 'background 0.2s' }}>
+                  {cartItems.find(i => i._id === cake._id) ? '✓ In Cart 🛒' : 'Add to Cart 🛒'}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      {toast && (
+        <div style={{ position: 'fixed', bottom: 32, left: '50%', transform: 'translateX(-50%)', background: '#2e7d32', color: '#fff', borderRadius: 30, padding: '12px 24px', fontSize: 14, fontWeight: 600, zIndex: 9999, boxShadow: '0 8px 32px rgba(0,0,0,0.2)' }}>
+          🛒 {toast} added to cart!
+        </div>
+      )}
+    </div>
+  );
+}
+
 function NearbyBakers({ onSelect }) {
   const [bakerType, setBakerType] = useState('home_baker');
   const [shops, setShops] = useState([]);
@@ -652,6 +715,7 @@ function NearbyBakers({ onSelect }) {
   const [search, setSearch] = useState('');
   const [userPos, setUserPos] = useState(null);
   const [activeShop, setActiveShop] = useState(null);
+  const [modalShop, setModalShop] = useState(null);
 
   useEffect(() => {
     setLoading(true);
@@ -731,9 +795,9 @@ function NearbyBakers({ onSelect }) {
                         <div style={{ textAlign: 'center', minWidth: 120 }}>
                           <p style={{ fontWeight: 600, fontSize: 13, color: accentColor, marginBottom: 4 }}>{shop.name}</p>
                           <p style={{ fontSize: 11, color: '#888', marginBottom: 8 }}>{shop.area}</p>
-                          <button onClick={() => onSelect(shop)}
+                          <button onClick={() => setModalShop(shop)}
                             style={{ background: accentColor, color: '#fff', border: 'none', borderRadius: 20, padding: '5px 14px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
-                            Select Baker
+                            View Cakes
                           </button>
                         </div>
                       </Popup>
@@ -777,20 +841,19 @@ function NearbyBakers({ onSelect }) {
                   <p style={{ fontWeight: 700, fontSize: 15, color: '#222', marginBottom: 3, fontFamily: "'Playfair Display',serif" }}>{shop.name}</p>
                   {shop.area && <p style={{ fontSize: 12, color: '#aaa' }}>📍 {shop.area}, {shop.city}</p>}
                 </div>
-                <button onClick={e => { e.stopPropagation(); onSelect(shop); }}
+                <button onClick={e => { e.stopPropagation(); setModalShop(shop); }}
                   style={{ background: accentColor, color: '#fff', border: 'none', borderRadius: 20, padding: '7px 16px', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0, fontFamily: "'Poppins',sans-serif" }}>
-                  Select
+                  View Cakes
                 </button>
               </div>
             </div>
           ))}
         </div>
       </div>
+      {modalShop && <BakerModal shop={modalShop} accentColor={accentColor} onClose={() => setModalShop(null)} />}
     </div>
   );
 }
-
-function Toast({ msg }) {
   return (
     <div style={{ position: "fixed", bottom: 32, right: 32, zIndex: 9999, background: "#2e7d32", color: "#fff", borderRadius: 14, padding: "16px 28px", fontFamily: "'Poppins',sans-serif", fontSize: 14, fontWeight: 600, boxShadow: "0 8px 32px rgba(0,0,0,0.2)", display: "flex", alignItems: "center", gap: 10, animation: "fadeUp 0.4s ease" }}>
       <span style={{ fontSize: 22 }}>🎉</span> {msg}
