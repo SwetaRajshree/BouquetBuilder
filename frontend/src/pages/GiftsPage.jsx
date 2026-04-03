@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useCartContext } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 
+const API = import.meta.env.VITE_API_URL;
+
 /* ══════════════════════════════════════════════
    COLOR SYSTEM — BouquetBuilder Gift Palette
    Rose · Sage · Champagne · Blush · Forest
@@ -72,10 +74,6 @@ const PRODUCTS = [
   { id:"i2", cat:"instant",   name:"Midnight Surprise Setup",   sub:"Balloons · Rose Petals · Fairy Lights",         price:799,  was:1099, badge:"⚡ 60 Min",        badgeColor:"orange",  tag:"Express",    img:"https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=600&q=80", rating:4.7, reviews:156 },
   { id:"i3", cat:"instant",   name:"Digital Gift Card",         sub:"Any Amount · Any Occasion · Instant Send",      price:250,  was:null, badge:"⚡ Instant",       badgeColor:"orange",  tag:"Digital",    img:"https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&q=80", rating:4.5, reviews:621 },
   { id:"i4", cat:"instant",   name:"Roses + Cake Combo",        sub:"Red Roses · 500g Custom Cake · Note",           price:899,  was:1199, badge:"⚡ 2 Hr Delivery", badgeColor:"orange",  tag:"Bestseller", img:"https://images.unsplash.com/photo-1558636508-e0969431e731?w=600&q=80", rating:4.9, reviews:289 },
-  { id:"j1", cat:"jewellery", name:"Engraved Silver Bracelet",  sub:"Sterling Silver · Custom Engraving · Gift Box", price:1199, was:1599, badge:"Personalised",    badgeColor:"purple",  tag:"Trending",   img:"https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&q=80", rating:4.9, reviews:342 },
-  { id:"j2", cat:"jewellery", name:"Rose Gold Pendant",         sub:"Rose Gold · Delicate Chain · Velvet Pouch",     price:1499, was:1999, badge:"25% Off",         badgeColor:"champ",   tag:"New",        img:"https://images.unsplash.com/photo-1602173574767-37ac01994b2a?w=600&q=80", rating:4.8, reviews:178 },
-  { id:"j3", cat:"jewellery", name:"Birthstone Ring Set",       sub:"Adjustable · Birthstones · Set of Two",         price:1899, was:2499, badge:"Couple's Special", badgeColor:"rose",   tag:"Bestseller", img:"https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600&q=80", rating:5.0, reviews:93 },
-  { id:"j4", cat:"jewellery", name:"Gold-Plated Name Locket",   sub:"18K Gold Plated · Name Engraving · Gift Ready", price:999,  was:1299, badge:"Trending",        badgeColor:"sage",    tag:"Trending",   img:"https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&q=80", rating:4.7, reviews:265 },
 ];
 
 const BADGE_MAP = {
@@ -93,15 +91,6 @@ const TAG_MAP = {
   Express:    { bg:"#fff4e8", color:"#c05a10" },
   Digital:    { bg:"#f3eeff", color:"#6d28d9" },
 };
-
-const JEWEL_CATS = [
-  { name:"Earrings",  img:"https://images.unsplash.com/photo-1588444837495-c6cfeb53f32d?w=400&q=80" },
-  { name:"Necklaces", img:"https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&q=80" },
-  { name:"Bracelets", img:"https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=400&q=80" },
-  { name:"Rings",     img:"https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400&q=80" },
-  { name:"Pendants",  img:"https://images.unsplash.com/photo-1602173574767-37ac01994b2a?w=400&q=80" },
-  { name:"Gift Sets", img:"https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=400&q=80" },
-];
 
 const REVIEWS = [
   { name:"Priya S.", loc:"Mumbai",    stars:5, text:"The custom gift box was absolutely stunning — she cried happy tears. Everything was wrapped so beautifully. Will definitely order again!", avatar:"P", color:C.rose },
@@ -164,10 +153,17 @@ function HeroCard({ title, sub, cta, gradient, accentColor, btnGrad, emoji, onCl
 }
 
 /* ─── JEWELLERY STRIP ───────────────────────────────────────── */
-function JewelleryCatStrip() {
+function JewelleryCatStrip({ onSelectCat, activeCat }) {
+  const cats = [
+    { name:"Earrings",  key:"earrings",  img:"https://images.unsplash.com/photo-1588444837495-c6cfeb53f32d?w=400&q=80" },
+    { name:"Necklaces", key:"necklaces", img:"https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=400&q=80" },
+    { name:"Bracelets", key:"bracelets", img:"https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=400&q=80" },
+    { name:"Rings",     key:"rings",     img:"https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=400&q=80" },
+    { name:"Pendants",  key:"necklaces", img:"https://images.unsplash.com/photo-1602173574767-37ac01994b2a?w=400&q=80" },
+    { name:"All",       key:"all",       img:"https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=400&q=80" },
+  ];
   return (
     <div style={{ marginBottom:56 }}>
-      {/* Section header on a textured band */}
       <div style={{ background:"linear-gradient(90deg,#eaf4ee,#fdf4dc,#fce8ed,#eaf4ee)", borderRadius:16, padding:"22px 28px", marginBottom:18, textAlign:"center", border:`1px solid ${C.borderMid}` }}>
         <p style={{ margin:"0 0 5px", fontSize:10.5, fontWeight:900, color:C.champagne, letterSpacing:3.5, textTransform:"uppercase" }}>Everyday Demifine</p>
         <h2 style={{ margin:"0 0 4px", fontSize:25, fontWeight:900, color:C.ink, letterSpacing:-0.5 }}>Shop Jewellery by Category</h2>
@@ -178,13 +174,14 @@ function JewelleryCatStrip() {
         </div>
       </div>
       <div style={{ display:"grid", gridTemplateColumns:"repeat(6,1fr)", gap:4, borderRadius:18, overflow:"hidden", boxShadow:`0 8px 32px ${C.rose}18` }}>
-        {JEWEL_CATS.map((c,i)=>(
-          <div key={i} style={{ position:"relative", aspectRatio:"3/4", overflow:"hidden", cursor:"pointer" }}
+        {cats.map((c,i)=>(
+          <div key={i} onClick={()=>onSelectCat(c.key)}
+            style={{ position:"relative", aspectRatio:"3/4", overflow:"hidden", cursor:"pointer", outline: activeCat===c.key ? `3px solid ${C.rose}` : 'none' }}
             onMouseEnter={e=>{e.currentTarget.querySelector("img").style.transform="scale(1.1)";e.currentTarget.querySelector(".jov").style.opacity="1";}}
-            onMouseLeave={e=>{e.currentTarget.querySelector("img").style.transform="scale(1)";e.currentTarget.querySelector(".jov").style.opacity="0";}}>
+            onMouseLeave={e=>{e.currentTarget.querySelector("img").style.transform="scale(1)";e.currentTarget.querySelector(".jov").style.opacity=activeCat===c.key?"1":"0";}}>
             <img src={c.img} alt={c.name} style={{ width:"100%", height:"100%", objectFit:"cover", transition:"transform 0.45s ease", display:"block" }} />
             <div style={{ position:"absolute", inset:0, background:"linear-gradient(to top,rgba(44,26,46,0.78) 0%,rgba(44,26,46,0.1) 52%,transparent 100%)" }} />
-            <div className="jov" style={{ position:"absolute", inset:0, background:`${C.rose}22`, opacity:0, transition:"opacity 0.3s" }} />
+            <div className="jov" style={{ position:"absolute", inset:0, background:`${C.rose}22`, opacity:activeCat===c.key?1:0, transition:"opacity 0.3s" }} />
             <div style={{ position:"absolute", bottom:12, left:12, color:"#fff" }}>
               <div style={{ fontSize:11.5, fontWeight:900, letterSpacing:1.2, textTransform:"uppercase", textShadow:"0 1px 6px rgba(0,0,0,0.6)" }}>{c.name}</div>
               <div style={{ fontSize:12, color:C.champMid, marginTop:3, fontWeight:700 }}>Shop →</div>
@@ -375,16 +372,45 @@ function CartDrawer({ cart, onClose, onRemove }) {
 export default function GiftSection() {
   const { addToCart, cartItems } = useCartContext();
   const { wishlist: globalWishlist, toggle: toggleWishlistGlobal } = useWishlist();
-  const [cat,setCat]         = useState("all");
+  const [cat,setCat]           = useState("all");
+  const [jewelleryItems, setJewelleryItems] = useState([]);
+  const [jewellerySubCat, setJewellerySubCat] = useState("all");
   const [occasion,setOccasion] = useState(null);
-  const [search,setSearch]   = useState("");
-  const [sortBy,setSortBy]   = useState("default");
-  const [cart,setCart]       = useState([]);
+  const [search,setSearch]     = useState("");
+  const [sortBy,setSortBy]     = useState("default");
+  const [cart,setCart]         = useState([]);
   const [cartOpen,setCartOpen] = useState(false);
 
   const inWishlist = (id) => globalWishlist.some(w => w._id === id);
 
-  const products = PRODUCTS.filter(p=>{
+  // Fetch jewellery from API
+  useEffect(() => {
+    const url = jewellerySubCat === 'all'
+      ? `${API}/api/collection`
+      : `${API}/api/collection?category=${jewellerySubCat}`;
+    fetch(url)
+      .then(r => r.json())
+      .then(data => setJewelleryItems(Array.isArray(data) ? data : []))
+      .catch(() => {});
+  }, [jewellerySubCat]);
+
+  // Map API jewellery items to the same shape as PRODUCTS for the grid
+  const jewelleryAsProducts = jewelleryItems.map(j => ({
+    id: j._id, cat: 'jewellery',
+    name: j.name, sub: j.material + ' · ' + j.reviews + ' reviews',
+    price: Math.round(j.price * 83), // convert USD to INR approx
+    was: null,
+    badge: j.isFeatured ? 'Featured' : null,
+    badgeColor: j.isFeatured ? 'rose' : null,
+    tag: j.rating >= 4.8 ? 'Bestseller' : null,
+    img: j.images[0],
+    rating: j.rating,
+    reviews: j.reviews,
+  }));
+
+  const allProducts = cat === 'jewellery' ? jewelleryAsProducts : [...PRODUCTS, ...jewelleryAsProducts];
+
+  const products = allProducts.filter(p=>{
     if(cat!=="all" && p.cat!==cat) return false;
     if(search && !p.name.toLowerCase().includes(search.toLowerCase()) && !p.sub.toLowerCase().includes(search.toLowerCase())) return false;
     return true;
@@ -451,7 +477,10 @@ export default function GiftSection() {
         </div>
 
         {/* ── Jewellery Strip ── */}
-        <JewelleryCatStrip />
+        <JewelleryCatStrip
+          onSelectCat={key => { setJewellerySubCat(key); setCat('jewellery'); }}
+          activeCat={jewellerySubCat}
+        />
 
         {/* ── Occasion Pills ── */}
         <div style={{ marginBottom:32 }}>
