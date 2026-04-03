@@ -514,7 +514,7 @@ export default function GiftSection() {
             accentColor={C.champagne}
             btnGrad={C.goldGrad}
             emoji="🧺"
-            onClick={()=>setCat("customize")}
+            onClick={()=>navigate('/gift-hampers')}
             floatingEmojis={[
               {emoji:"🎁", top:"12%", left:"8%",  size:18, dur:3.2, delay:0},
               {emoji:"🍫", top:"55%", left:"6%",  size:14, dur:2.8, delay:0.5},
