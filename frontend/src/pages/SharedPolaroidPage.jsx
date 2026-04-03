@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import ReviewDialog from '../components/ReviewDialog';
 
 const FILTERS = [
   { id: "none",     css: "" },
@@ -112,11 +113,12 @@ export default function SharedPolaroidPage() {
   const [data, setData] = useState(null);
   const [notFound, setNotFound] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [showReview, setShowReview] = useState(false);
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/api/gardens/${id}`)
       .then(res => { if (!res.ok) throw new Error(); return res.json(); })
-      .then(d => setData(d))
+      .then(d => { setData(d); setTimeout(() => setShowReview(true), 6000); })
       .catch(() => setNotFound(true))
       .finally(() => setLoading(false));
   }, [id]);
@@ -141,6 +143,7 @@ export default function SharedPolaroidPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: 'linear-gradient(160deg,#120e06,#0d0d0d)', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '48px 20px 60px' }}>
+      {showReview && <ReviewDialog giftId={id} onClose={() => setShowReview(false)} />}
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&display=swap');`}</style>
       <h1 style={{ fontFamily: "'Playfair Display', serif", fontStyle: 'italic', color: '#C8A96E', fontSize: 'clamp(1.6rem,4vw,2.4rem)', marginBottom: 8 }}>
         {data.title}

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import ReviewDialog from '../components/ReviewDialog';
 
 const CARD_STYLES = [
   { id:'parchment', name:'Parchment', bg:'linear-gradient(135deg,#fce4f0,#f8d0e8,#f0c8e0)', border:'#d4a0c8' },
@@ -48,9 +49,6 @@ export default function ViewBouquetPage() {
   const [data, setData] = useState(null);
   const [error, setError] = useState(false);
   const [showReview, setShowReview] = useState(false);
-  const [reviewDone, setReviewDone] = useState(false);
-  const [review, setReview] = useState({ name: '', text: '', rating: 5 });
-  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (!id) { setError(true); return; }
@@ -67,71 +65,9 @@ export default function ViewBouquetPage() {
     return () => clearTimeout(t);
   }, [data]);
 
-  const submitReview = async () => {
-    if (!review.name.trim() || !review.text.trim()) return;
-    setSubmitting(true);
-    try {
-      await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/reviews`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...review, bouquetId: id }),
-      });
-      setReviewDone(true);
-      setTimeout(() => setShowReview(false), 2000);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
   const cardStyle = CARD_STYLES.find(c => c.id === data?.cs) || CARD_STYLES[0];
 
-  const ReviewDialog = (
-    <div style={{ position:'fixed', top:0, left:0, right:0, bottom:0, background:'rgba(0,0,0,0.6)', zIndex:99999, display:'flex', alignItems:'center', justifyContent:'center', padding:'24px' }}>
-      <div style={{ background:'white', borderRadius:'24px', padding:'32px', maxWidth:'420px', width:'100%', boxShadow:'0 20px 60px rgba(0,0,0,0.3)', fontFamily:'sans-serif', position:'relative' }}>
-        <button onClick={() => setShowReview(false)} style={{ position:'absolute', top:'16px', right:'16px', background:'none', border:'none', fontSize:'20px', cursor:'pointer', color:'#888' }}>✕</button>
-        {reviewDone ? (
-          <div style={{ textAlign:'center', padding:'20px 0' }}>
-            <div style={{ fontSize:'48px', marginBottom:'12px' }}>🌸</div>
-            <h3 style={{ fontFamily:'Georgia,serif', fontSize:'22px', color:'#3a6030', marginBottom:'8px' }}>Thank you!</h3>
-            <p style={{ color:'#666', fontSize:'14px' }}>Your review means the world to us 💚</p>
-          </div>
-        ) : (
-          <div>
-            <div style={{ textAlign:'center', marginBottom:'20px' }}>
-              <div style={{ fontSize:'36px', marginBottom:'8px' }}>💫</div>
-              <h3 style={{ fontFamily:'Georgia,serif', fontSize:'20px', color:'#3a6030', marginBottom:'4px' }}>How was your experience?</h3>
-              <p style={{ color:'#888', fontSize:'13px' }}>Share your thoughts — it helps others spread love too</p>
-            </div>
-            <div style={{ display:'flex', justifyContent:'center', gap:'8px', marginBottom:'20px' }}>
-              {[1,2,3,4,5].map(star => (
-                <button key={star} onClick={() => setReview(r => ({ ...r, rating: star }))}
-                  style={{ background:'none', border:'none', fontSize:'28px', cursor:'pointer', color: star <= review.rating ? '#f59e0b' : '#ddd' }}>★</button>
-              ))}
-            </div>
-            <input placeholder="Your name" value={review.name}
-              onChange={e => setReview(r => ({ ...r, name: e.target.value }))}
-              style={{ width:'100%', padding:'10px 14px', borderRadius:'12px', border:'1.5px solid #e0e0e0', fontSize:'14px', marginBottom:'10px', outline:'none', boxSizing:'border-box' }}
-            />
-            <textarea placeholder="Tell us about your experience..." value={review.text}
-              onChange={e => setReview(r => ({ ...r, text: e.target.value }))}
-              rows={3}
-              style={{ width:'100%', padding:'10px 14px', borderRadius:'12px', border:'1.5px solid #e0e0e0', fontSize:'14px', resize:'none', outline:'none', boxSizing:'border-box', marginBottom:'16px' }}
-            />
-            <button onClick={submitReview} disabled={submitting || !review.name.trim() || !review.text.trim()}
-              style={{ width:'100%', padding:'12px', background:'linear-gradient(135deg,#3a6030,#5a8050)', color:'white', border:'none', borderRadius:'50px', fontSize:'14px', fontWeight:600, cursor:'pointer', opacity:(!review.name.trim() || !review.text.trim()) ? 0.5 : 1 }}>
-              {submitting ? 'Submitting...' : 'Submit Review 🌸'}
-            </button>
-            <button onClick={() => setShowReview(false)}
-              style={{ width:'100%', marginTop:'8px', padding:'10px', background:'none', border:'none', color:'#aaa', fontSize:'13px', cursor:'pointer' }}>
-              Maybe later
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+
 
   if (error) return (
     <>
@@ -157,8 +93,7 @@ export default function ViewBouquetPage() {
 
   return (
     <>
-      {/* REVIEW DIALOG */}
-      {showReview && ReviewDialog}
+      {showReview && <ReviewDialog giftId={id} onClose={() => setShowReview(false)} />}
 
       <div style={{ minHeight:'100vh', background:'#c8e8c8', fontFamily:"Georgia,'Palatino Linotype',serif" }}>
       <style>{`

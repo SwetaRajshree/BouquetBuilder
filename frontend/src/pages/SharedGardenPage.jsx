@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import ReviewDialog from '../components/ReviewDialog';
 
 export default function SharedGardenPage() {
   const { id } = useParams();
@@ -7,6 +8,7 @@ export default function SharedGardenPage() {
   const [garden, setGarden] = useState(null);
   const [notFound, setNotFound] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [showReview, setShowReview] = useState(false);
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/api/gardens/${id}`)
@@ -14,7 +16,7 @@ export default function SharedGardenPage() {
         if (!res.ok) throw new Error('Not found');
         return res.json();
       })
-      .then(data => setGarden(data))
+      .then(data => { setGarden(data); setTimeout(() => setShowReview(true), 6000); })
       .catch(() => setNotFound(true))
       .finally(() => setLoading(false));
   }, [id]);
@@ -39,6 +41,7 @@ export default function SharedGardenPage() {
 
   return (
     <div style={{ minHeight:'100vh', background:'linear-gradient(135deg,#f2ede2,#e8f5e0)', display:'flex', flexDirection:'column', alignItems:'center', padding:'40px 20px 60px', fontFamily:"'Walter Turncoat',cursive" }}>
+      {showReview && <ReviewDialog giftId={id} onClose={() => setShowReview(false)} />}
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Walter+Turncoat&display=swap');`}</style>
 
       <div style={{ textAlign:'center', marginBottom:32 }}>
