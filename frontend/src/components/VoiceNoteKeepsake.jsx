@@ -528,11 +528,18 @@ function PlayerScreen({ data, onNewMemory }) {
   const [showHint,     setShowHint]     = useState(true);
   const [toastVisible, setToastVisible] = useState(false);
   const [handleAngle,  setHandleAngle]  = useState(0);
-  const [filmOffset,   setFilmOffset]   = useState(0);
 
-  const accRotRef  = useRef(0);
+  const accRotRef   = useRef(0);
   const draggingRef = useRef(false);
-  const totalFilmW = useRef(0);
+  const filmOffRef  = useRef(0);
+
+  const moveFilm = useCallback((pct)=>{
+    const track = filmTrackRef.current; if(!track) return;
+    const totalW = track.scrollWidth - track.parentElement.clientWidth;
+    const off = Math.max(0, pct * totalW);
+    filmOffRef.current = off;
+    track.style.transform = `translateX(-${off}px)`;
+  },[]);
 
   useEffect(()=>{
     const audio = new Audio(audioUrl);
@@ -542,17 +549,15 @@ function PlayerScreen({ data, onNewMemory }) {
       const pct = audio.currentTime / audio.duration;
       setPlayPos(audio.currentTime);
       drawProgress(pct);
-      setFilmOffset(pct * totalFilmW.current);
+      moveFilm(pct);
       accRotRef.current = pct * 720;
       setHandleAngle(pct * 720);
     });
     return ()=>{ audio.pause(); audio.src=''; };
-  },[audioUrl]);
+  },[audioUrl, moveFilm]);
 
-  useEffect(()=>{
-    if(photos?.length) totalFilmW.current = photos.length * 136;
-    drawProgress(0);
-  },[photos]);
+  useEffect(()=>{ drawProgress(0); },[]);
+  useEffect(()=>{ moveFilm(0); },[photos, moveFilm]);
 
   const drawProgress = useCallback((pct)=>{
     const canvas = canvasRef.current; if(!canvas) return;
@@ -607,7 +612,7 @@ function PlayerScreen({ data, onNewMemory }) {
           if(delta>0 && aud.paused) aud.play().catch(()=>{});
           if(delta<0 && !aud.paused) aud.pause();
           const pct=newTime/aud.duration;
-          setFilmOffset(pct*totalFilmW.current);
+          moveFilm(pct);
           drawProgress(pct);
           setPlayPos(newTime);
         }
@@ -666,7 +671,6 @@ function PlayerScreen({ data, onNewMemory }) {
               <div
                 ref={filmTrackRef}
                 className="vnk-film-track"
-                style={{transform:`translateX(-${filmOffset}px)`}}
               >
                 {photos?.map((url,i)=>(
                   <img key={i} className="vnk-strip-img" src={url} alt={`m${i}`}/>
