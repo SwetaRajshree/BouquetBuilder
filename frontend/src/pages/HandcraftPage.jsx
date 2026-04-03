@@ -252,7 +252,7 @@ function HeroSlider({setPage}){
       <div style={{position:"absolute",inset:0,backgroundImage:`linear-gradient(rgba(255,255,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.03) 1px,transparent 1px)`,backgroundSize:"60px 60px",pointerEvents:"none"}}/>
       <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",textAlign:"center",padding:"0 20px",opacity:transitioning?0:1,transform:transitioning?"translateY(20px)":"translateY(0)",transition:"all 0.4s ease"}}>
         <div style={{display:"inline-flex",alignItems:"center",gap:8,background:"rgba(255,255,255,0.08)",backdropFilter:"blur(10px)",border:`1px solid ${s.accent}44`,padding:"8px 20px",borderRadius:40,fontSize:13,color:s.accent,fontWeight:600,marginBottom:28,animation:"fadeUp 0.6s ease both"}}>
-          <span style={{animation:"bounce 1s infinite"}}>{s.emoji}</span>CraftBaazar — India's Artisan Marketplace
+          <span style={{animation:"bounce 1s infinite"}}>{s.emoji}</span>ArtisanWorld — India's Artisan Marketplace
         </div>
         <h1 style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:"clamp(2.5rem,7vw,5.5rem)",lineHeight:1.1,marginBottom:16,animation:"fadeUp 0.6s 0.1s ease both",opacity:0,animationFillMode:"both"}}>
           <span style={{color:"rgba(255,255,255,0.9)"}}>{s.title} </span>
@@ -792,7 +792,7 @@ function HomePage({setPage,setCart,wishlist,toggleWish,toast,onOpenDetail}){
             <div>
               <div style={{color:"#a855f7",fontSize:13,fontWeight:600,letterSpacing:2,marginBottom:12}}>FOR ARTISANS</div>
               <h2 style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:"clamp(1.8rem,4vw,2.8rem)",color:"#fff",marginBottom:16,lineHeight:1.2}}>Turn Your Passion<br/><span style={{color:"#a855f7"}}>Into Income</span></h2>
-              <p style={{color:"rgba(255,255,255,0.6)",maxWidth:440,lineHeight:1.7,marginBottom:28}}>Join 500+ artisans already selling on CraftBaazar. Setup takes under 5 minutes. Keep 85% of every sale.</p>
+              <p style={{color:"rgba(255,255,255,0.6)",maxWidth:440,lineHeight:1.7,marginBottom:28}}>Join 500+ artisans already selling on ArtisanWorld. Setup takes under 5 minutes. Keep 85% of every sale.</p>
               <button onClick={()=>setPage("seller")} style={{padding:"15px 36px",borderRadius:50,border:"none",background:"linear-gradient(135deg,#a855f7,#7c3aed)",color:"#fff",fontWeight:700,fontSize:15,cursor:"pointer",fontFamily:"'Outfit',sans-serif",boxShadow:"0 8px 30px rgba(168,85,247,0.4)",transition:"all .3s"}}
               onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-3px)";}}
               onMouseLeave={e=>{e.currentTarget.style.transform="translateY(0)";}}>Start Selling for Free →</button>
@@ -1128,7 +1128,7 @@ function LoginPage({setUser,setPage,toast}){
       <div style={{background:"#111117",borderRadius:28,padding:"48px",border:"1px solid #1e1e2e",width:"100%",maxWidth:440,boxShadow:"0 40px 80px rgba(0,0,0,0.6)"}}>
         <div style={{textAlign:"center",marginBottom:32}}>
           <div style={{fontSize:48,marginBottom:12}}>🎨</div>
-          <h2 style={{fontFamily:"'Syne',sans-serif",fontWeight:800,color:"#fff",fontSize:"1.8rem"}}>{tab==="login"?"Welcome Back":"Join CraftBaazar"}</h2>
+          <h2 style={{fontFamily:"'Syne',sans-serif",fontWeight:800,color:"#fff",fontSize:"1.8rem"}}>{tab==="login"?"Welcome Back":"Join ArtisanWorld"}</h2>
           <p style={{color:"rgba(255,255,255,0.4)",fontSize:14,marginTop:8}}>{tab==="login"?"Sign in to continue shopping":"Create your account today"}</p>
         </div>
         <div style={{display:"flex",background:"#0a0a0f",borderRadius:12,padding:4,marginBottom:28}}>
@@ -1308,7 +1308,7 @@ function Footer({setPage}){
           ))}
         </div>
         <div style={{borderTop:"1px solid #1e1e2e",paddingTop:24,display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:12}}>
-          <p style={{fontSize:12,color:"rgba(255,255,255,0.25)"}}>© 2024 CraftBaazar. Made with ❤️ in India. All rights reserved.</p>
+          <p style={{fontSize:12,color:"rgba(255,255,255,0.25)"}}>© 2024 ArtisanWorld. Made with ❤️ in India. All rights reserved.</p>
           <div style={{display:"flex",gap:16}}>
             {["Privacy Policy","Terms of Service","Cookie Policy"].map(l=>(
               <span key={l} style={{fontSize:12,color:"rgba(255,255,255,0.25)",cursor:"pointer"}}
