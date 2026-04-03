@@ -112,11 +112,8 @@ export default function HeartJarReviews() {
       .then(r => r.json())
       .then(data => {
         if (Array.isArray(data) && data.length > 0) {
-          setReviews(prev => {
-            if (prev.length === data.length && prev[0]?._id === data[0]?._id) return prev;
-            setHeartProps(buildHeartProps(data));
-            return data;
-          });
+          setReviews(data);
+          setHeartProps(buildHeartProps(data));
         }
       })
       .catch(() => {});
