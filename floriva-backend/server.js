@@ -37,6 +37,7 @@ const cakeRoutes         = require("./routes/cakeRoutes");
 const woodenSculptureRoutes = require("./routes/woodenSculptureRoutes");
 const stoneArtRoutes        = require("./routes/stoneArtRoutes");
 const paintingRoutes        = require("./routes/paintingRoutes");
+const potteryRoutes         = require("./routes/potteryRoutes");
 const giftRoutes         = require("./routes/giftRoutes");
 
 app.use("/api/auth",       authRoutes);
@@ -56,6 +57,7 @@ app.use("/api/cakes",      cakeRoutes);
 app.use("/api/wooden-sculptures", woodenSculptureRoutes);
 app.use("/api/stone-art",         stoneArtRoutes);
 app.use("/api/paintings",         paintingRoutes);
+app.use("/api/pottery",           potteryRoutes);
 app.use("/api/gifts",      giftRoutes);
 
 // Test Route

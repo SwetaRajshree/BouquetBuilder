@@ -625,14 +625,6 @@ const handloomProducts = [
   {id:5,emoji:"🧺",name:"Ikat Weave Table Cloth",artist:"Lakshmi Rao",region:"Odisha, India",price:"₹2,100",original:"₹2,800"},
   {id:6,emoji:"🪴",name:"Kashmiri Wool Carpet",artist:"Mohammad Ali",region:"Kashmir, India",price:"₹28,000",original:"₹35,000"},
 ];
-const potteryProducts = [
-  {id:1,emoji:"🏺",name:"Blue Pottery Vase",artist:"Ramesh Kumhar",region:"Jaipur, India",price:"₹2,200",original:"₹3,000"},
-  {id:2,emoji:"🫖",name:"Terracotta Tea Set",artist:"Meena Devi",region:"Rajasthan, India",price:"₹1,800",original:"₹2,500"},
-  {id:3,emoji:"🍶",name:"Khurja Ceramic Bowl",artist:"Suresh Prajapat",region:"Uttar Pradesh",price:"₹950",original:"₹1,400"},
-  {id:4,emoji:"🪔",name:"Handmade Diya Set",artist:"Anita Kumari",region:"Bihar, India",price:"₹450",original:"₹700"},
-  {id:5,emoji:"🌸",name:"Floral Ceramic Planter",artist:"Priya Sharma",region:"Pune, India",price:"₹1,200",original:"₹1,800"},
-  {id:6,emoji:"🎎",name:"Kondapalli Clay Doll",artist:"Lakshmi Rao",region:"Andhra Pradesh",price:"₹1,600",original:"₹2,200"},
-];
 const spotriProducts = [
   {id:1,emoji:"🛋️",name:"Kashmiri Embroidered Cushion",category:"Cushions",desc:"Hand-stitched floral patterns"},
   {id:2,emoji:"🎪",name:"Kantha Work Wall Hanging",category:"Wall Art",desc:"Traditional stitch art from Bengal"},
@@ -859,17 +851,30 @@ function PaintingsSection() {
 
 function PotterySection() {
   const ref=useRef(null);const visible=useIntersection(ref);
-  const pills=["Vases","Tea Sets","Bowls","Diyas","Planters","Dolls"];
+  const [potteryItems,setPotteryItems]=useState([]);
+  const [loading,setLoading]=useState(true);
   const [active,setActive]=useState(0);
+
+  useEffect(()=>{
+    fetch(`${API_URL}/api/pottery`)
+      .then(r=>r.json())
+      .then(data=>setPotteryItems(Array.isArray(data)?data:[]))
+      .catch(console.error)
+      .finally(()=>setLoading(false));
+  },[]);
+
+  const allTags=[...new Set(potteryItems.flatMap(p=>p.tags||[]))];
+
   return (
     <section className="section" style={{background:"var(--bg2)"}}><div className="section-inner" ref={ref}>
       <div className={`section-header fade-up${visible?" visible":""}`}>
         <div><div className="section-label">Earth &amp; Fire</div><h2 className="section-title">Pottery</h2></div>
         <button className="btn-explore">Explore All →</button>
       </div>
+      {loading && <p style={{color:"var(--text-muted)",fontSize:"0.9rem"}}>Loading pottery...</p>}
       <div className={`fade-up fade-up-delay-1${visible?" visible":""}`}>
-        <ProductCarousel products={potteryProducts}/>
-        <div className="pill-row">{pills.map((p,i)=><button key={p} className={`pill${i===active?" active":""}`} onClick={()=>setActive(i)}>{p}</button>)}</div>
+        <ProductCarousel products={potteryItems}/>
+        <div className="pill-row">{allTags.slice(0,8).map((t,i)=><button key={t} className={`pill${i===active?" active":""}`} onClick={()=>setActive(i)}>{t}</button>)}</div>
       </div>
     </div></section>
   );
