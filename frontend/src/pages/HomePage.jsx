@@ -324,25 +324,56 @@ export default function HomePage() {
           50%  { transform: translateX(calc(-100vw + 110px)); }
           100% { transform: translateX(0); }
         }
+        @keyframes trailPetal {
+          0%   { opacity: 0.9; transform: translateY(0) scale(1) rotate(0deg); }
+          100% { opacity: 0; transform: translateY(40px) scale(0.3) rotate(120deg); }
+        }
+        @keyframes btnGlow {
+          0%,100% { box-shadow: 0 8px 28px rgba(60,100,48,0.35), 0 0 0 0 rgba(100,180,100,0.4); }
+          50%      { box-shadow: 0 12px 36px rgba(60,100,48,0.5), 0 0 18px 6px rgba(100,180,100,0.2); }
+        }
+        .flower-btn-wrap {
+          position: fixed; top: 75vh; right: 24px; z-index: 9999;
+          animation: slideAcross 40s ease-in-out infinite;
+        }
+        .flower-btn-wrap:hover .flower-btn { transform: scale(1.1); }
+        .flower-btn {
+          width: 80px; height: 80px; border-radius: 50%;
+          background: linear-gradient(135deg,#c8e8c8,#a8d8a8);
+          border: 3px solid rgba(90,140,80,0.45);
+          cursor: pointer; display: flex; align-items: center; justify-content: center;
+          animation: btnGlow 2.5s ease-in-out infinite;
+          transition: transform 0.2s ease;
+          position: relative;
+        }
+        .trail-petal {
+          position: absolute;
+          font-size: 14px;
+          pointer-events: none;
+          animation: trailPetal 1.2s ease-out infinite;
+          opacity: 0;
+        }
+        .trail-petal:nth-child(1) { right: 72px; top: 20px; animation-delay: 0s;    font-size: 13px; }
+        .trail-petal:nth-child(2) { right: 88px; top: 40px; animation-delay: 0.3s;  font-size: 10px; }
+        .trail-petal:nth-child(3) { right: 78px; top: 55px; animation-delay: 0.6s;  font-size: 12px; }
+        .trail-petal:nth-child(4) { right: 96px; top: 28px; animation-delay: 0.9s;  font-size: 9px;  }
+        .trail-petal:nth-child(5) { right: 68px; top: 65px; animation-delay: 0.15s; font-size: 11px; }
       `}</style>
-      <div
-        onClick={() => navigate('/digital-gifting')}
-        title="Send a Digital Gift"
-        style={{
-          position: 'fixed', top: '75vh', right: 24, zIndex: 9999,
-          width: 80, height: 80, borderRadius: '50%',
-          background: 'linear-gradient(135deg,#c8e8c8,#a8d8a8)',
-          boxShadow: '0 8px 28px rgba(60,100,48,0.35)',
-          cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          border: '3px solid rgba(90,140,80,0.35)',
-          animation: 'slideAcross 40s ease-in-out infinite',
-        }}
-      >
-        <img
-          src="https://res.cloudinary.com/deixioyzo/image/upload/v1774807029/anemone_fjaadv.webp"
-          alt="Digital Gift"
-          style={{ width: 56, height: 56, objectFit: 'contain', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.18))' }}
-        />
+
+      <div className="flower-btn-wrap" onClick={() => navigate('/digital-gifting')} title="Send a Digital Gift">
+        {/* trailing petals */}
+        <span className="trail-petal">🌸</span>
+        <span className="trail-petal">🌼</span>
+        <span className="trail-petal">🌺</span>
+        <span className="trail-petal">✿</span>
+        <span className="trail-petal">🌷</span>
+        <div className="flower-btn">
+          <img
+            src="https://res.cloudinary.com/deixioyzo/image/upload/v1774807029/anemone_fjaadv.webp"
+            alt="Digital Gift"
+            style={{ width: 56, height: 56, objectFit: 'contain', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.18))' }}
+          />
+        </div>
       </div>
 
     </div>
