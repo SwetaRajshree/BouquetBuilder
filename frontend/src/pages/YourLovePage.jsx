@@ -101,6 +101,10 @@ const FloatUp = ({ x, delay, duration, color }) => (
 export default function HeartJarReviews() {
   const [reviews, setReviews] = useState([]);
   const [heartProps, setHeartProps] = useState([]);
+  const [showForm, setShowForm]   = useState(false);
+  const [form, setForm]           = useState({ name: '', text: '', rating: 5 });
+  const [submitting, setSubmitting] = useState(false);
+  const [done, setDone]           = useState(false);
 
   const fetchReviews = () => {
     fetch(`${API}/api/reviews`)
@@ -119,6 +123,29 @@ export default function HeartJarReviews() {
     const interval = setInterval(fetchReviews, 30000);
     return () => clearInterval(interval);
   }, []);
+
+  const submitReview = async () => {
+    if (!form.name.trim() || !form.text.trim()) return;
+    setSubmitting(true);
+    try {
+      const res = await fetch(`${API}/api/reviews`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      const newReview = await res.json();
+      const updated = [newReview, ...reviews];
+      setReviews(updated);
+      setHeartProps(buildHeartProps(updated));
+      setDone(true);
+      setForm({ name: '', text: '', rating: 5 });
+      setTimeout(() => { setDone(false); setShowForm(false); }, 2500);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const [isOpen, setIsOpen]       = useState(false);
   const [isOpening, setIsOpening] = useState(false);
@@ -624,6 +651,72 @@ export default function HeartJarReviews() {
           </div>
         );
       })()}
+
+      {/* ── LEAVE A REVIEW BUTTON + FORM ── */}
+      <div style={{marginTop:"28px",zIndex:10,width:"100%",maxWidth:"420px"}}>
+        {!showForm ? (
+          <button onClick={() => setShowForm(true)} style={{
+            width:"100%",padding:"13px",
+            background:"linear-gradient(135deg,#C62828,#7B0000)",
+            color:"white",border:"none",borderRadius:"999px",
+            fontSize:"clamp(13px,1.9vw,15px)",fontWeight:"700",cursor:"pointer",
+            fontFamily:"Palatino Linotype,serif",
+            boxShadow:"0 6px 22px rgba(123,0,0,0.35)",
+          }}>💌 Drop your love note in the jar</button>
+        ) : (
+          <div style={{
+            background:"linear-gradient(145deg,#fff9fa,#fff0f2)",
+            borderRadius:"20px",padding:"24px",
+            boxShadow:"0 10px 34px rgba(176,58,46,0.18)",
+            border:"1.5px solid rgba(160,50,50,0.18)",
+          }}>
+            {done ? (
+              <div style={{textAlign:"center",padding:"16px 0"}}>
+                <div style={{fontSize:"44px",marginBottom:"10px"}}>🌸</div>
+                <p style={{color:"#7B0000",fontWeight:"700",fontSize:"16px",margin:0}}>Your heart is in the jar! 💝</p>
+              </div>
+            ) : (
+              <>
+                <p style={{textAlign:"center",color:"#7B0000",fontWeight:"700",fontSize:"15px",marginBottom:"16px",marginTop:0}}>💫 How was your experience?</p>
+                <div style={{display:"flex",justifyContent:"center",gap:"6px",marginBottom:"14px"}}>
+                  {[1,2,3,4,5].map(star => (
+                    <button key={star} onClick={() => setForm(f => ({ ...f, rating: star }))}
+                      style={{background:"none",border:"none",fontSize:"26px",cursor:"pointer",
+                        color: star <= form.rating ? '#f59e0b' : '#ddd'}}>★</button>
+                  ))}
+                </div>
+                <input placeholder="Your name" value={form.name}
+                  onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                  style={{width:"100%",padding:"10px 14px",borderRadius:"12px",border:"1.5px solid #f0c0c0",
+                    fontSize:"14px",marginBottom:"10px",outline:"none",boxSizing:"border-box",
+                    fontFamily:"Palatino Linotype,serif",background:"#fff9fa"}}
+                />
+                <textarea placeholder="Tell us your story..." value={form.text}
+                  onChange={e => setForm(f => ({ ...f, text: e.target.value }))}
+                  rows={3}
+                  style={{width:"100%",padding:"10px 14px",borderRadius:"12px",border:"1.5px solid #f0c0c0",
+                    fontSize:"14px",resize:"none",outline:"none",boxSizing:"border-box",
+                    marginBottom:"14px",fontFamily:"Palatino Linotype,serif",background:"#fff9fa"}}
+                />
+                <button onClick={submitReview} disabled={submitting || !form.name.trim() || !form.text.trim()}
+                  style={{width:"100%",padding:"12px",
+                    background:"linear-gradient(135deg,#C62828,#7B0000)",
+                    color:"white",border:"none",borderRadius:"999px",fontSize:"14px",
+                    fontWeight:"700",cursor:"pointer",fontFamily:"Palatino Linotype,serif",
+                    opacity:(!form.name.trim()||!form.text.trim())?0.5:1,
+                    boxShadow:"0 4px 16px rgba(123,0,0,0.30)"}}>
+                  {submitting ? "Adding to jar..." : "Add to the jar 🫙"}
+                </button>
+                <button onClick={() => setShowForm(false)}
+                  style={{width:"100%",marginTop:"8px",padding:"8px",background:"none",
+                    border:"none",color:"#aaa",fontSize:"13px",cursor:"pointer"}}>
+                  Maybe later
+                </button>
+              </>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* Bottom deco */}
       <div style={{marginTop:"34px",display:"flex",gap:"13px",alignItems:"center",opacity:0.55,zIndex:10}}>
