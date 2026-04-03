@@ -109,7 +109,7 @@ export default function HomePage() {
           </p>
           <div className="flex justify-center mt-2">
             <button
-              onClick={() => navigate('/buy')}
+              onClick={() => navigate('/digital-gifting')}
               className="flex items-center gap-2 px-8 py-3.5 rounded-full text-white font-semibold text-[.95rem] transition-all hover:-translate-y-0.5 hover:shadow-soft-l active:scale-95"
               style={{ background: 'linear-gradient(135deg, #7c3aed, #a855f7)' }}
             >
