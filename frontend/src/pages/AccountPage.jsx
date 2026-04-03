@@ -114,28 +114,36 @@ function AddressesTab({ token }) {
   const [form, setForm] = useState(emptyForm);
 
   const load = async () => {
-    const res  = await fetch(`${API}/api/auth/me`, { headers: { Authorization: `Bearer ${token}` } });
-    const data = await res.json();
-    setAddresses(data.addresses || []);
+    try {
+      const res  = await fetch(`${API}/api/auth/me`, { headers: { Authorization: `Bearer ${token}` } });
+      const data = await res.json();
+      setAddresses(data.addresses || []);
+    } catch { /* silently keep existing addresses */ }
   };
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [token]);
 
   const reset = () => { setForm(emptyForm); setEditing(null); setShowForm(false); };
 
   const save = async (e) => {
     e.preventDefault();
     setSaving(true);
-    const url    = editing ? `${API}/api/auth/addresses/${editing}` : `${API}/api/auth/addresses`;
-    const method = editing ? 'PUT' : 'POST';
-    await fetch(url, { method, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(form) });
+    try {
+      const url    = editing ? `${API}/api/auth/addresses/${editing}` : `${API}/api/auth/addresses`;
+      const method = editing ? 'PUT' : 'POST';
+      const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(form) });
+      const data = await res.json();
+      if (res.ok) setAddresses(data.addresses || []);
+    } catch { /* keep existing list on failure */ }
     setSaving(false);
     reset();
-    load();
   };
 
   const del = async (id) => {
-    await fetch(`${API}/api/auth/addresses/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
-    load();
+    try {
+      const res = await fetch(`${API}/api/auth/addresses/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+      const data = await res.json();
+      if (res.ok) setAddresses(data.addresses || []);
+    } catch { /* keep existing list on failure */ }
   };
 
   const startEdit = (a) => {
@@ -224,7 +232,7 @@ function OrdersTab({ token }) {
   useEffect(() => {
     fetch(`${API}/api/orders/my-orders`, { headers: { Authorization: `Bearer ${token}` } })
       .then(r => r.json()).then(d => setOrders(Array.isArray(d) ? d : [])).finally(() => setLoading(false));
-  }, []);
+  }, [token]);
 
   if (loading) return <div className="text-center py-12 text-gray-400 text-sm">Loading...</div>;
 
@@ -240,7 +248,7 @@ function OrdersTab({ token }) {
   return (
     <div className="flex flex-col gap-3">
       {orders.map(o => (
-        <div key={o._id} onClick={() => navigate('/tracking')}
+        <div key={o._id} onClick={() => navigate(`/tracking?orderId=${o._id}`)}
           className="bg-white rounded-2xl border border-pink-100 p-4 shadow-soft-s flex items-center gap-4 hover:border-pink-300 transition-all cursor-pointer">
           <div className="w-12 h-12 rounded-xl bg-pink-50 flex items-center justify-center text-2xl flex-shrink-0 border border-pink-100">🌸</div>
           <div className="flex-1 min-w-0">
@@ -323,7 +331,7 @@ function WalletTab({ token, user }) {
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [token]);
 
   const handleAddMoney = async (e) => {
     e.preventDefault();
@@ -387,7 +395,7 @@ function WalletTab({ token, user }) {
               type="number"
               min="1"
               value={addAmount}
-              onChange={e => setAddAmount(e.target.value)}
+              onChange={e => { setAddAmount(e.target.value); setMsg(''); }}
               placeholder="Enter custom amount"
               className="flex-1 outline-none text-sm bg-transparent text-gray-700"
             />
@@ -716,7 +724,7 @@ function ContactUsTab() {
 export default function AccountPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { user, token, logout } = useAuth();
+  const { user, token, logout, updateUser } = useAuth();
   const [activeTab, setActiveTab] = useState(searchParams.get('tab') || 'profile');
 
   function switchTab(key) { setActiveTab(key); setSearchParams({ tab: key }); }
@@ -724,9 +732,7 @@ export default function AccountPage() {
   function handleLogout() { logout(); navigate('/'); }
 
   function handleUserUpdate(updated) {
-    const merged = { ...user, ...updated };
-    localStorage.setItem('floriva_user', JSON.stringify(merged));
-    window.dispatchEvent(new Event('storage'));
+    updateUser(updated);
   }
 
   if (!user) return (

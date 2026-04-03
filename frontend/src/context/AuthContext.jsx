@@ -7,8 +7,10 @@ const API = import.meta.env.VITE_API_URL;
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
-    const stored = localStorage.getItem("floriva_user");
-    return stored ? JSON.parse(stored) : null;
+    try {
+      const stored = localStorage.getItem("floriva_user");
+      return stored ? JSON.parse(stored) : null;
+    } catch { return null; }
   });
   const [token, setToken] = useState(() => localStorage.getItem("floriva_token") || null);
   const [loading, setLoading] = useState(false);
@@ -62,6 +64,12 @@ export function AuthProvider({ children }) {
     }
   }
 
+  function updateUser(updated) {
+    const merged = { ...user, ...updated };
+    setUser(merged);
+    localStorage.setItem("floriva_user", JSON.stringify(merged));
+  }
+
   function logout() {
     localStorage.removeItem("floriva_token");
     localStorage.removeItem("floriva_user");
@@ -70,7 +78,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, error, login, register, logout }}>
+    <AuthContext.Provider value={{ user, token, loading, error, login, register, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

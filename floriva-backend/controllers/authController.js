@@ -18,7 +18,7 @@ exports.registerUser = async (req, res) => {
       name,
       email,
       password: hashedPassword,
-      role: role || "customer",
+      role: "customer",
       location: { city, coordinates }
     });
 
@@ -157,7 +157,8 @@ exports.updateAddress = async (req, res) => {
     const addr = user.addresses.id(req.params.addrId);
     if (!addr) return res.status(404).json({ message: "Address not found" });
     if (req.body.isDefault) user.addresses.forEach(a => a.isDefault = false);
-    Object.assign(addr, req.body);
+    const { label, fullName, phone, line1, line2, city, state, pincode, isDefault } = req.body;
+    Object.assign(addr, { label, fullName, phone, line1, line2, city, state, pincode, isDefault });
     await user.save();
     res.json({ message: "Address updated", addresses: user.addresses });
   } catch (error) {
