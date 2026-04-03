@@ -28,6 +28,7 @@ import BouquetCustomizePage from './pages/BouquetCustomizePage';
 import PostcardPage           from './pages/PostcardPage';
 import DigitalPostcardPage    from './pages/DigitalPostcardPage';
 import HandcraftPage          from './pages/HandcraftPage';
+import CollectionPage         from './pages/CollectionPage';
 
 import DigitalGiftingPage from './pages/DigitalGiftingPage';
 import BuyPage            from './pages/BuyPage';
@@ -95,6 +96,7 @@ export default function App() {
           <Route path="/buy"               element={<BuyPage />}                              />
           <Route path="/digital-bouquet"   element={<Navigate to="/bouquet-builder" replace />} />
           <Route path="/handcraft"          element={<HandcraftPage />} />
+          <Route path="/collection"          element={<CollectionPage />} />
           {/* Fallback */}
           <Route path="*"             element={<HomePage />}         />
         </Routes>

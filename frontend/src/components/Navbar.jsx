@@ -15,6 +15,7 @@ const LINKS = [
   { to: '/tracking',  label: '📦 Orders'   },
   { to: '/story',     label: 'Our Story'   },
   { to: '/handcraft',  label: '🧵 Handcraft' },
+  { to: '/collection',  label: '💎 Collection' },
 ];
 
 export default function Navbar() {

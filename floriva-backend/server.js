@@ -32,6 +32,7 @@ const fillerRoutes       = require("./routes/fillerRoutes");
 const plantRoutes        = require("./routes/plantRoutes");
 const reviewRoutes       = require("./routes/reviewRoutes");
 const gardenRoutes       = require("./routes/gardenRoutes");
+const collectionRoutes   = require("./routes/collectionRoutes");
 
 app.use("/api/auth",       authRoutes);
 app.use("/api/flowers",    flowerRoutes);
@@ -44,7 +45,8 @@ app.use("/api/voice",      voiceNoteRoutes);
 app.use("/api/fillers",    fillerRoutes);
 app.use("/api/plants",    plantRoutes);
 app.use("/api/reviews",   reviewRoutes);
-app.use("/api/gardens",   gardenRoutes);
+app.use("/api/gardens",    gardenRoutes);
+app.use("/api/collection", collectionRoutes);
 
 // Test Route
 app.get("/", (req, res) => {
