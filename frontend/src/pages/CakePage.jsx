@@ -6,6 +6,7 @@ import 'leaflet/dist/leaflet.css';
 
 const API = import.meta.env.VITE_API_URL;
 
+// Fix leaflet default icon
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -646,7 +647,6 @@ function ChatCustomizer({ onComplete }) {
 
 function NearbyBakers({ onSelect }) {
   const [bakerType, setBakerType] = useState('home_baker');
-  const CAKE_SHOP_TYPE = 'cake';
   const [shops, setShops] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
