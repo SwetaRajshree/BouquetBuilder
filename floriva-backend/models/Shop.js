@@ -3,7 +3,8 @@ const mongoose = require("mongoose");
 const shopSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
-    type: { type: String, enum: ["flower", "plant"], default: "flower" },
+    type: { type: String, enum: ["flower", "plant", "baker", "cakeshop", "cake"], default: "flower" },
+    category: { type: String },
     area: { type: String },
     city: { type: String },
     keywords: { type: [String] },

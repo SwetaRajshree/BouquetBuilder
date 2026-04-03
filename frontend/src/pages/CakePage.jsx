@@ -1,16 +1,43 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useCartContext } from '../context/CartContext';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
 const API = import.meta.env.VITE_API_URL;
 
-const nearbyBakers = [
-  { id: 1, name: "Sweet Alchemy Bakery", rating: 4.9, reviews: 312, distance: "0.8 km", minOrder: 399, deliveryTime: "45–60 min", tags: ["Custom", "Fondant", "Wedding"], open: true, specialty: "Designer cakes", avatar: "SA", color: "#e53935" },
-  { id: 2, name: "The Cake Studio", rating: 4.8, reviews: 189, distance: "1.2 km", minOrder: 499, deliveryTime: "50–70 min", tags: ["Photo Cakes", "Theme", "Birthday"], open: true, specialty: "Photo & theme cakes", avatar: "TC", color: "#8b4513" },
-  { id: 3, name: "Cloud9 Kitchen", rating: 4.7, reviews: 256, distance: "1.9 km", minOrder: 349, deliveryTime: "30–45 min", tags: ["Classic", "Eggless", "Budget"], open: true, specialty: "Eggless classics", avatar: "C9", color: "#2e7d32" },
-  { id: 4, name: "Bake & Bloom", rating: 4.9, reviews: 421, distance: "2.3 km", minOrder: 599, deliveryTime: "60–80 min", tags: ["Floral", "Luxury", "Tier"], open: false, specialty: "Floral & tier cakes", avatar: "BB", color: "#6a1b9a" },
-  { id: 5, name: "Krispy Layers", rating: 4.6, reviews: 98, distance: "2.7 km", minOrder: 299, deliveryTime: "40–55 min", tags: ["Dessert Boxes", "Cupcakes", "Fast"], open: true, specialty: "Dessert boxes", avatar: "KL", color: "#f57f17" },
-  { id: 6, name: "Sugar & Spice Co.", rating: 4.8, reviews: 167, distance: "3.1 km", minOrder: 450, deliveryTime: "55–75 min", tags: ["Vegan", "Keto", "Healthy"], open: true, specialty: "Vegan & keto cakes", avatar: "SS", color: "#00796b" },
-];
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+});
+
+function makeBakerIcon(category, isActive) {
+  const bg = category === 'home_baker' ? (isActive ? '#a8304a' : '#e53935') : (isActive ? '#5d2d0a' : '#8b4513');
+  const emoji = category === 'home_baker' ? '🏠' : '🎂';
+  const size = isActive ? 40 : 32;
+  return new L.DivIcon({
+    html: `<div style="background:${bg};color:white;border-radius:50%;width:${size}px;height:${size}px;display:flex;align-items:center;justify-content:center;font-size:${isActive?18:14}px;box-shadow:0 4px 14px ${bg}88;border:${isActive?'3px':'2px'} solid white;">${emoji}</div>`,
+    className: '', iconSize: [size, size], iconAnchor: [size/2, size/2],
+  });
+}
+
+const userIcon = new L.DivIcon({
+  html: `<div style="background:#6c63ff;color:white;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 2px 12px rgba(108,99,255,0.5);border:3px solid white;">📍</div>`,
+  className: '', iconSize: [36, 36], iconAnchor: [18, 18],
+});
+
+function FlyTo({ shop }) {
+  const map = useMap();
+  useEffect(() => {
+    if (shop?.location?.coordinates) {
+      const [lng, lat] = shop.location.coordinates;
+      map.flyTo([lat, lng], 15, { duration: 1.2 });
+    }
+  }, [shop, map]);
+  return null;
+}
 
 const quickReplies = {
   start: ["Birthday cake 🎂", "Anniversary cake 💑", "Wedding cake 👰", "Custom design 🎨"],
@@ -32,10 +59,6 @@ const chatFlow = [
   { key: "budget", bot: "What's your budget?", replies: "budget" },
   { key: "confirm", bot: null, replies: "confirm" },
 ];
-
-function StarRating({ rating }) {
-  return <span style={{ color: "#f59e0b", fontSize: 13 }}>{"★".repeat(Math.floor(rating))}{"☆".repeat(5 - Math.floor(rating))}</span>;
-}
 
 const CATEGORIES = ['All', 'Wedding', 'Birthday', 'Anniversary', 'Dessert', 'Occasion'];
 
@@ -621,112 +644,140 @@ function ChatCustomizer({ onComplete }) {
   );
 }
 
-function NearbyBakers({ orderDetails, onSelect }) {
-  const [hovered, setHovered] = useState(null);
-  const [sortBy, setSortBy] = useState("distance");
-  const [filterOpen, setFilterOpen] = useState(false);
+function NearbyBakers({ onSelect }) {
+  const [bakerType, setBakerType] = useState('home_baker');
+  const CAKE_SHOP_TYPE = 'cake';
+  const [shops, setShops] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [userPos, setUserPos] = useState(null);
+  const [activeShop, setActiveShop] = useState(null);
 
-  const sorted = [...nearbyBakers]
-    .sort((a, b) => sortBy === "distance" ? parseFloat(a.distance) - parseFloat(b.distance) : sortBy === "rating" ? b.rating - a.rating : a.minOrder - b.minOrder)
-    .filter(b => filterOpen ? b.open : true);
+  useEffect(() => {
+    setLoading(true);
+    fetch(`${API}/api/shops?type=cake&category=${bakerType}`)
+      .then(r => r.json())
+      .then(data => setShops(Array.isArray(data) ? data : []))
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [bakerType]);
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        p => setUserPos([p.coords.latitude, p.coords.longitude]),
+        () => setUserPos([20.2961, 85.8245])
+      );
+    } else setUserPos([20.2961, 85.8245]);
+  }, []);
+
+  const filtered = shops.filter(s => {
+    const q = search.toLowerCase();
+    return !q || s.name?.toLowerCase().includes(q) || s.area?.toLowerCase().includes(q);
+  });
+
+  const mapCenter = userPos || [20.2961, 85.8245];
+  const accentColor = bakerType === 'baker' ? '#e53935' : '#8b4513';
 
   return (
-    <div style={{ padding: "60px 48px", background: "#fafafa", fontFamily: "'Poppins',sans-serif" }}>
-      <div style={{ textAlign: "center", marginBottom: 40 }}>
-        <div style={{ display: "inline-block", background: "#e8f5e9", color: "#2e7d32", borderRadius: 20, padding: "6px 20px", fontSize: 13, fontWeight: 600, marginBottom: 14 }}>📍 6 bakers near you in Bhubaneswar</div>
-        <h2 style={{ fontSize: 36, fontWeight: 700, color: "#222", fontFamily: "'Playfair Display',serif" }}>Choose Your Baker</h2>
-        <p style={{ color: "#888", marginTop: 8, fontSize: 15 }}>
-          {orderDetails ? `Showing bakers for your ${orderDetails.occasion || "custom"} cake` : "All accepting custom orders today"}
-        </p>
-        <div style={{ display: "flex", gap: 12, justifyContent: "center", marginTop: 24, flexWrap: "wrap" }}>
-          {[["distance", "📍 Nearest"], ["rating", "⭐ Top Rated"], ["price", "💰 Price"]].map(([val, label]) => (
-            <button key={val} onClick={() => setSortBy(val)} style={{ padding: "8px 20px", borderRadius: 20, border: "1.5px solid", borderColor: sortBy === val ? "#e53935" : "#e0e0e0", background: sortBy === val ? "#e53935" : "#fff", color: sortBy === val ? "#fff" : "#555", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'Poppins',sans-serif", transition: "all 0.2s" }}>
-              {label}
-            </button>
-          ))}
-          <button onClick={() => setFilterOpen(!filterOpen)} style={{ padding: "8px 20px", borderRadius: 20, border: "1.5px solid", borderColor: filterOpen ? "#2e7d32" : "#e0e0e0", background: filterOpen ? "#e8f5e9" : "#fff", color: filterOpen ? "#2e7d32" : "#555", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'Poppins',sans-serif", transition: "all 0.2s" }}>
-            🟢 Open Now
+    <div style={{ padding: '40px 48px', background: '#fafafa', fontFamily: "'Poppins',sans-serif" }}>
+      <h2 style={{ fontSize: 32, fontWeight: 700, color: '#222', fontFamily: "'Playfair Display',serif", marginBottom: 6 }}>🏪 Find Your Baker</h2>
+      <p style={{ color: '#888', fontSize: 14, marginBottom: 24 }}>Browse nearby home bakers and cake shops on the map</p>
+
+      {/* Sub-tabs */}
+      <div style={{ display: 'flex', gap: 10, marginBottom: 24 }}>
+        {[['home_baker', '🏠 Home Bakers'], ['shop', '🎂 Cake Shops']].map(([key, label]) => (
+          <button key={key} onClick={() => { setBakerType(key); setActiveShop(null); setSearch(''); }}
+            style={{ padding: '9px 22px', borderRadius: 20, border: '1.5px solid', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'Poppins',sans-serif", transition: 'all 0.2s',
+              borderColor: bakerType === key ? accentColor : '#e0e0e0',
+              background: bakerType === key ? accentColor : '#fff',
+              color: bakerType === key ? '#fff' : '#555' }}>
+            {label}
           </button>
-        </div>
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(300px,1fr))", gap: 24, maxWidth: 1100, margin: "0 auto" }}>
-        {sorted.map(baker => (
-          <div key={baker.id} onMouseEnter={() => setHovered(baker.id)} onMouseLeave={() => setHovered(null)}
-            style={{ background: "#fff", borderRadius: 20, border: hovered === baker.id ? "2px solid #e53935" : "1.5px solid #f0f0f0", boxShadow: hovered === baker.id ? "0 16px 48px rgba(229,57,53,0.15)" : "0 4px 16px rgba(0,0,0,0.06)", transform: hovered === baker.id ? "translateY(-6px)" : "translateY(0)", transition: "all 0.3s cubic-bezier(0.34,1.56,0.64,1)", overflow: "hidden", cursor: "pointer" }}>
-            <div style={{ background: `${baker.color}18`, padding: "20px 20px 16px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                <div style={{ width: 56, height: 56, borderRadius: "50%", background: baker.color, display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 16, flexShrink: 0, animation: hovered === baker.id ? "bounceY 0.8s ease infinite" : "none" }}>
-                  {baker.avatar}
-                </div>
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: 15, color: "#222" }}>{baker.name}</div>
-                  <div style={{ fontSize: 12, color: "#888", marginTop: 2 }}>{baker.specialty}</div>
-                </div>
-                <div style={{ marginLeft: "auto" }}>
-                  <div style={{ display: "inline-flex", alignItems: "center", gap: 4, background: baker.open ? "#e8f5e9" : "#f5f5f5", borderRadius: 10, padding: "3px 10px" }}>
-                    <div style={{ width: 7, height: 7, borderRadius: "50%", background: baker.open ? "#4caf50" : "#bbb" }} />
-                    <span style={{ fontSize: 11, fontWeight: 600, color: baker.open ? "#2e7d32" : "#999" }}>{baker.open ? "OPEN" : "CLOSED"}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div style={{ padding: "14px 20px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, borderBottom: "1px solid #f5f5f5" }}>
-              {[{ label: "Rating", val: `⭐ ${baker.rating}` }, { label: "Distance", val: `📍 ${baker.distance}` }, { label: "Delivery", val: `⏱ ${baker.deliveryTime}` }].map(s => (
-                <div key={s.label} style={{ textAlign: "center" }}>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "#222" }}>{s.val}</div>
-                  <div style={{ fontSize: 11, color: "#aaa", marginTop: 2 }}>{s.label}</div>
-                </div>
-              ))}
-            </div>
-
-            <div style={{ padding: "12px 20px 8px", display: "flex", flexWrap: "wrap", gap: 6 }}>
-              {baker.tags.map(tag => <span key={tag} style={{ background: "#f5f5f5", color: "#555", borderRadius: 10, padding: "3px 10px", fontSize: 11, fontWeight: 500 }}>{tag}</span>)}
-              <span style={{ background: "#fff3e0", color: "#e65100", borderRadius: 10, padding: "3px 10px", fontSize: 11, fontWeight: 600 }}>Min ₹{baker.minOrder}</span>
-            </div>
-
-            <div style={{ padding: "4px 20px 8px" }}>
-              <StarRating rating={baker.rating} />
-              <span style={{ fontSize: 12, color: "#aaa", marginLeft: 4 }}>{baker.reviews} reviews</span>
-            </div>
-
-            <div style={{ padding: "12px 20px 20px", display: "flex", gap: 10 }}>
-              <button onClick={() => onSelect(baker)} disabled={!baker.open}
-                style={{ flex: 1, background: baker.open ? "#e53935" : "#e0e0e0", color: baker.open ? "#fff" : "#aaa", border: "none", borderRadius: 10, padding: "12px 0", fontSize: 13, fontWeight: 700, cursor: baker.open ? "pointer" : "not-allowed", fontFamily: "'Poppins',sans-serif", transition: "background 0.2s", animation: baker.open && hovered === baker.id ? "pulse2 1.5s ease infinite" : "none" }}>
-                {baker.open ? "Send My Order 🎂" : "Opens Tomorrow"}
-              </button>
-              <button style={{ background: "#f5f5f5", border: "none", borderRadius: 10, padding: "12px 14px", fontSize: 16, cursor: "pointer" }}>💬</button>
-            </div>
-          </div>
         ))}
       </div>
 
-      {/* Baker join CTA */}
-      <div style={{ maxWidth: 700, margin: "56px auto 0", background: "linear-gradient(135deg,#e53935,#b71c1c)", borderRadius: 20, padding: "40px 48px", textAlign: "center", color: "#fff" }}>
-        <div style={{ fontSize: 36, marginBottom: 12, animation: "bounceY 2s ease infinite" }}>🏪</div>
-        <h3 style={{ fontSize: 24, fontFamily: "'Playfair Display',serif", fontStyle: "italic", marginBottom: 10 }}>Are you a local baker?</h3>
-        <p style={{ opacity: 0.85, fontSize: 15, lineHeight: 1.7, marginBottom: 28 }}>
-          Join hundreds of cloud kitchens & home bakers already earning on Bakingo. Get orders, grow your business, and reach thousands nearby.
-        </p>
-        <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
-          {["🚀 Register as Baker", "📊 View Baker Dashboard"].map(label => (
-            <button key={label} style={{ background: "rgba(255,255,255,0.15)", color: "#fff", border: "2px solid rgba(255,255,255,0.5)", borderRadius: 8, padding: "12px 28px", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "'Poppins',sans-serif", transition: "background 0.2s" }}
-              onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.25)"}
-              onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.15)"}>
-              {label}
-            </button>
-          ))}
+      {/* Search */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: '#fff', border: '1.5px solid #e0e0e0', borderRadius: 14, padding: '10px 16px', maxWidth: 400, marginBottom: 28 }}>
+        <span>🔍</span>
+        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name or area..."
+          style={{ flex: 1, border: 'none', outline: 'none', fontSize: 13, fontFamily: "'Poppins',sans-serif", background: 'transparent', color: '#555' }} />
+        {search && <button onClick={() => setSearch('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#aaa', fontSize: 16 }}>✕</button>}
+      </div>
+
+      {/* Map + List layout */}
+      <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+
+        {/* Map */}
+        <div style={{ flex: '1 1 500px', borderRadius: 18, overflow: 'hidden', border: '1.5px solid #e0e0e0', boxShadow: '0 4px 16px rgba(0,0,0,0.08)', height: 480, minWidth: 300 }}>
+          {userPos ? (
+            <MapContainer center={mapCenter} zoom={12} style={{ height: '100%', width: '100%' }}>
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+              {activeShop && <FlyTo shop={activeShop} />}
+              <Marker position={mapCenter} icon={userIcon}>
+                <Popup><div style={{ textAlign: 'center', fontSize: 13, fontWeight: 600, color: '#6c63ff' }}>📍 You are here</div></Popup>
+              </Marker>
+              {filtered.map(shop => {
+                if (!shop.location?.coordinates) return null;
+                const [lng, lat] = shop.location.coordinates;
+                return (
+                  <Marker key={shop._id} position={[lat, lng]} icon={makeBakerIcon(bakerType, activeShop?._id === shop._id)}
+                    eventHandlers={{ click: () => setActiveShop(shop) }}>
+                    <Popup>
+                      <div style={{ textAlign: 'center', minWidth: 120 }}>
+                        <p style={{ fontWeight: 600, fontSize: 13, color: accentColor, marginBottom: 4 }}>{shop.name}</p>
+                        <p style={{ fontSize: 11, color: '#888', marginBottom: 8 }}>{shop.area}</p>
+                        <button onClick={() => onSelect(shop)}
+                          style={{ background: accentColor, color: '#fff', border: 'none', borderRadius: 20, padding: '5px 14px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+                          Select Baker
+                        </button>
+                      </div>
+                    </Popup>
+                  </Marker>
+                );
+              })}
+            </MapContainer>
+          ) : (
+            <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff5f5' }}>
+              <p style={{ color: '#e53935', fontSize: 14 }}>Loading map...</p>
+            </div>
+          )}
         </div>
-        <div style={{ display: "flex", gap: 32, justifyContent: "center", marginTop: 32, flexWrap: "wrap" }}>
-          {[["500+", "Active Bakers"], ["2 Cr+", "Orders Delivered"], ["4.8★", "Avg Baker Rating"]].map(([num, label]) => (
-            <div key={label} style={{ textAlign: "center" }}>
-              <div style={{ fontSize: 22, fontWeight: 700 }}>{num}</div>
-              <div style={{ fontSize: 12, opacity: 0.75 }}>{label}</div>
+
+        {/* Shop list */}
+        <div style={{ flex: '0 0 300px', maxHeight: 480, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {loading && <p style={{ color: accentColor, fontSize: 13 }}>Loading...</p>}
+          {!loading && filtered.length === 0 && (
+            <p style={{ color: '#aaa', fontSize: 13 }}>No {bakerType === 'home_baker' ? 'home bakers' : 'cake shops'} found{search ? ` for "${search}"` : '. Add data to the database to see results here.'}.</p>
+          )}
+          {filtered.map((shop, i) => (
+            <div key={shop._id} onClick={() => setActiveShop(shop)}
+              style={{ background: '#fff', borderRadius: 14, border: `1.5px solid ${activeShop?._id === shop._id ? accentColor : '#f0f0f0'}`, padding: '12px 16px', cursor: 'pointer', transition: 'all 0.2s',
+                boxShadow: activeShop?._id === shop._id ? `0 4px 16px ${accentColor}22` : '0 2px 8px rgba(0,0,0,0.04)' }}
+              onMouseEnter={e => e.currentTarget.style.borderColor = accentColor}
+              onMouseLeave={e => e.currentTarget.style.borderColor = activeShop?._id === shop._id ? accentColor : '#f0f0f0'}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ width: 40, height: 40, borderRadius: '50%', background: accentColor, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>
+                  {bakerType === 'home_baker' ? '🏠' : '🎂'}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontWeight: 700, fontSize: 13, color: '#222', marginBottom: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{shop.name}</p>
+                  {shop.area && <p style={{ fontSize: 11, color: '#aaa' }}>📍 {shop.area}, {shop.city}</p>}
+                </div>
+                <button onClick={e => { e.stopPropagation(); onSelect(shop); }}
+                  style={{ background: accentColor, color: '#fff', border: 'none', borderRadius: 20, padding: '5px 12px', fontSize: 11, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
+                  Select
+                </button>
+              </div>
             </div>
           ))}
         </div>
       </div>
+
+      <p style={{ fontSize: 11, color: '#aaa', marginTop: 12 }}>🟣 You &nbsp;|&nbsp; {bakerType === 'home_baker' ? '🏠 Home Bakers' : '🎂 Cake Shops'} — click any pin or card to select</p>
     </div>
   );
 }
@@ -742,21 +793,15 @@ function Toast({ msg }) {
 export default function CakePage() {
   const { addToCart } = useCartContext();
   const [tab, setTab] = useState('cakes');
-  const [orderDetails, setOrderDetails] = useState(null);
   const [toast, setToast] = useState(null);
-  const bakerRef = useRef(null);
 
-  const handleCustomizeComplete = (order) => {
-    setOrderDetails(order);
+  const handleCustomizeComplete = () => {
     setTab('bakers');
-    setTimeout(() => bakerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
   };
 
-  const handleBakerSelect = (baker) => {
-    if (orderDetails) {
-      addToCart({ _id: baker.id, name: `${baker.name} — ${orderDetails.occasion || 'Custom'} Cake`, pricePerStem: baker.minOrder, image: null, category: 'cake', color: '', city: '' });
-    }
-    setToast(`Order sent to ${baker.name}! They'll confirm shortly.`);
+  const handleBakerSelect = (shop) => {
+    addToCart({ _id: shop._id, name: `${shop.name} — Custom Cake`, pricePerStem: 499, image: null, category: 'cake', color: '', city: shop.city || '' });
+    setToast(`Order sent to ${shop.name}! They'll confirm shortly.`);
     setTimeout(() => setToast(null), 4000);
   };
 
@@ -809,9 +854,7 @@ export default function CakePage() {
 
       {tab === 'bakers' && (
         <>
-          <div ref={bakerRef}>
-            <NearbyBakers orderDetails={orderDetails} onSelect={handleBakerSelect} />
-          </div>
+          <NearbyBakers onSelect={handleBakerSelect} />
           <div style={{ textAlign: 'center', padding: '0 0 40px' }}>
             <button onClick={() => setTab('customize')} style={{ background: 'none', border: '1.5px solid #e53935', color: '#e53935', borderRadius: 8, padding: '12px 32px', fontSize: 14, cursor: 'pointer', fontFamily: "'Poppins',sans-serif" }}>
               ← Customise My Cake

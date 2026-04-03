@@ -2,7 +2,10 @@ const Shop = require("../models/Shop");
 
 exports.getAllShops = async (req, res) => {
   try {
-    const shops = await Shop.find().sort({ name: 1 });
+    const filter = {};
+    if (req.query.type) filter.type = req.query.type;
+    if (req.query.category) filter.category = req.query.category;
+    const shops = await Shop.find(filter).sort({ name: 1 });
     res.json(shops);
   } catch (error) {
     res.status(500).json({ error: error.message });
