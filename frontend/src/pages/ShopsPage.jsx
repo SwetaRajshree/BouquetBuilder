@@ -387,6 +387,62 @@ export default function ShopsPage() {
         </div>
       )}
 
+      {/* ── Featured Shop Reels ── */}
+      <div className="max-w-[1400px] mx-auto px-6 pb-16">
+        <div className="rounded-2xl overflow-hidden" style={{ background: 'linear-gradient(135deg,#1a0a2e,#2d1b3d,#1a0a2e)', padding: '40px 32px' }}>
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-1.5 rounded-full border border-white/20 mb-4">
+              <span className="text-pink-300 text-sm font-semibold">✨ Featured on Instagram</span>
+            </div>
+            <h2 className="font-playfair font-bold text-white text-[clamp(1.4rem,3vw,2rem)] mb-2">🌸 heartartbysweta</h2>
+            <p className="text-purple-200 text-sm font-light">Beautiful handcrafted bouquets & floral art — follow for daily blooms</p>
+          </div>
+
+          <div className="flex gap-4 overflow-x-auto pb-3" style={{ scrollbarWidth: 'none' }}>
+            <style>{`
+              .reel-card { flex-shrink: 0; width: 160px; border-radius: 16px; overflow: hidden; border: 2px solid rgba(255,255,255,0.12); transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1); cursor: pointer; background: rgba(255,255,255,0.06); }
+              .reel-card:hover { transform: translateY(-8px) scale(1.04); border-color: rgba(255,182,193,0.6); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+              .reel-thumb { width: 100%; aspect-ratio: 9/16; object-fit: cover; display: block; }
+              .reel-overlay { padding: 10px; }
+              @keyframes shimmer { 0%,100%{opacity:0.5;} 50%{opacity:1;} }
+            `}</style>
+
+            {[
+              { url: 'https://www.instagram.com/reel/DPtTDvPE-gn/?igsh=OWdtMWh0d2xvNG4z', emoji: '🌹', label: 'Rose Bouquet' },
+              { url: 'https://www.instagram.com/reel/DRhiPyZk4pR/?igsh=djJkajk2eWJ4dWZz', emoji: '🌸', label: 'Floral Art' },
+              { url: 'https://www.instagram.com/reel/DOn76waDzlk/?igsh=MXV0c2s0Zzl6dm9hYg==', emoji: '💐', label: 'Mixed Blooms' },
+              { url: 'https://www.instagram.com/reel/DPtssgQkuHf/?igsh=MW42dDRoamZ6ZHd3cg==', emoji: '🌷', label: 'Tulip Special' },
+              { url: 'https://www.instagram.com/reel/DR3mcNuAVIW/?igsh=cmNqYzlqNTg0NWs2', emoji: '🌺', label: 'Hibiscus Art' },
+              { url: 'https://www.instagram.com/reel/DVqpn0fjAOb/?igsh=MWY5YWgydDJtcDYyMw==', emoji: '🪷', label: 'Lotus Craft' },
+            ].map((reel, i) => (
+              <a key={i} href={reel.url} target="_blank" rel="noreferrer" className="reel-card"
+                style={{ animationDelay: `${i * 0.1}s` }}>
+                <div style={{
+                  width: '100%', aspectRatio: '9/16',
+                  background: `linear-gradient(135deg, hsl(${300 + i * 20},60%,20%), hsl(${320 + i * 15},70%,30%))`,
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8,
+                }}>
+                  <span style={{ fontSize: 40, animation: `shimmer ${2 + i * 0.3}s ease-in-out infinite` }}>{reel.emoji}</span>
+                  <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', fontFamily: 'sans-serif', letterSpacing: 1 }}>▶ REEL</span>
+                </div>
+                <div className="reel-overlay">
+                  <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.85)', fontWeight: 600, fontFamily: 'sans-serif' }}>{reel.label}</p>
+                  <p style={{ margin: '3px 0 0', fontSize: 10, color: 'rgba(255,255,255,0.4)', fontFamily: 'sans-serif' }}>@heartartbysweta</p>
+                </div>
+              </a>
+            ))}
+          </div>
+
+          <div className="text-center mt-6">
+            <a href="https://www.instagram.com/heartartbysweta?igsh=eXQ0eHJ0c3RsOGdk" target="_blank" rel="noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-semibold transition-all hover:-translate-y-0.5"
+              style={{ background: 'linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)', color: 'white', boxShadow: '0 6px 20px rgba(220,39,67,0.4)' }}>
+              <span>📸</span> Follow @heartartbysweta
+            </a>
+          </div>
+        </div>
+      </div>
+
       {/* Toast */}
       {toast && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] bg-roseDD text-white text-sm font-semibold px-5 py-3 rounded-full shadow-lg flex items-center gap-2" style={{animation:'pageIn 0.3s ease both'}}>
