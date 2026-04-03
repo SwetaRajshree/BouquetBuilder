@@ -559,7 +559,7 @@ export default function GiftSection() {
             accentColor={C.rose}
             btnGrad={C.btnGrad}
             emoji="🌹"
-            onClick={()=>setCat("customize")}
+            onClick={()=>setCat("flowers")}
             floatingEmojis={[
               {emoji:"🌸", top:"10%", left:"8%",  size:18, dur:3.4, delay:0},
               {emoji:"🌺", top:"55%", left:"6%",  size:15, dur:2.9, delay:0.5},
