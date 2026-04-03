@@ -76,10 +76,15 @@ export default function HomePage() {
       .then((data) => setShops(data))
       .catch(console.error);
 
-    fetch(`${import.meta.env.VITE_API_URL}/api/reviews`)
-      .then((r) => r.json())
-      .then((data) => Array.isArray(data) && setReviewCount(data.length))
-      .catch(() => {});
+    const fetchCount = () =>
+      fetch(`${import.meta.env.VITE_API_URL}/api/reviews`)
+        .then((r) => r.json())
+        .then((data) => Array.isArray(data) && setReviewCount(data.length))
+        .catch(() => {});
+
+    fetchCount();
+    const interval = setInterval(fetchCount, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   return (
