@@ -303,33 +303,63 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Bouquet Builder Promo ── */}
+      {/* ── Your Love Promo ── */}
       <section className="py-2 bg-white">
         <div className="max-w-[1200px] mx-auto px-4 py-10">
-          <div className="relative overflow-hidden rounded-lg bg-gradient-to-br from-[#fff0f5] via-[#fdf4ff] to-[#f0fdf4] border border-blush/20 p-10 md:p-14 shadow-soft-m">
-            <span className="absolute top-4 left-6 text-4xl opacity-20 select-none animate-[petalFloat_6s_ease-in-out_infinite]">🌸</span>
-            <span className="absolute top-6 right-8 text-3xl opacity-20 select-none animate-[petalFloat_8s_ease-in-out_1s_infinite]">🌺</span>
-            <span className="absolute bottom-4 left-10 text-3xl opacity-20 select-none animate-[petalFloat_7s_ease-in-out_2s_infinite]">🌷</span>
-            <span className="absolute bottom-6 right-6 text-4xl opacity-20 select-none animate-[petalFloat_9s_ease-in-out_.5s_infinite]">💐</span>
+          <div className="relative overflow-hidden rounded-lg p-10 md:p-14 shadow-soft-m cursor-pointer group"
+            onClick={() => navigate('/your-love')}
+            style={{ background: 'linear-gradient(135deg,#fff0f5,#fce4f0,#f5e0ff,#ffe8f0)', backgroundSize: '300% 300%', animation: 'loveShift 6s ease infinite', border: '1.5px solid #f0c0d8' }}>
+
+            {/* Animated floating hearts & flowers */}
+            <span className="absolute top-4 left-6   text-3xl pointer-events-none select-none animate-[petalFloat_4s_ease-in-out_infinite]">💝</span>
+            <span className="absolute top-6 right-10  text-2xl pointer-events-none select-none animate-[petalFloat_5s_ease-in-out_0.8s_infinite]">🌸</span>
+            <span className="absolute bottom-5 left-12 text-2xl pointer-events-none select-none animate-[petalFloat_6s_ease-in-out_1.5s_infinite]">💖</span>
+            <span className="absolute bottom-4 right-8 text-3xl pointer-events-none select-none animate-[petalFloat_4.5s_ease-in-out_0.4s_infinite]">🌷</span>
+            <span className="absolute top-1/2 left-[5%]  text-xl pointer-events-none select-none animate-[petalFloat_7s_ease-in-out_2s_infinite]">✿</span>
+            <span className="absolute top-1/2 right-[5%] text-xl pointer-events-none select-none animate-[petalFloat_5.5s_ease-in-out_1s_infinite]">💕</span>
+            <span className="absolute top-[20%] left-[30%] text-lg pointer-events-none select-none animate-[petalFloat_6s_ease-in-out_0.6s_infinite] opacity-40">🫧</span>
+            <span className="absolute bottom-[20%] right-[30%] text-lg pointer-events-none select-none animate-[petalFloat_5s_ease-in-out_1.8s_infinite] opacity-40">✨</span>
+
             <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
-              <div className="flex-shrink-0 flex gap-3">
-                {['🌹','🌻','🌷','🌸'].map((f,i) => (
-                  <div key={i} className="text-[2.8rem] animate-[petalFloat_5s_ease-in-out_infinite]" style={{ animationDelay: `${i*0.4}s` }}>{f}</div>
+              {/* Jar animation */}
+              <div className="flex-shrink-0 relative">
+                <div className="text-[5rem] animate-[petalFloat_3s_ease-in-out_infinite] drop-shadow-lg">🫙</div>
+                {/* floating hearts out of jar */}
+                {['💝','💖','💗','💓'].map((h, i) => (
+                  <span key={i} className="absolute text-lg pointer-events-none select-none"
+                    style={{
+                      top: `${-10 - i * 18}px`,
+                      left: `${30 + (i % 2 === 0 ? -14 : 14)}px`,
+                      animation: `petalFloat ${2.5 + i * 0.4}s ease-in-out ${i * 0.3}s infinite`,
+                      opacity: 0.85,
+                    }}>{h}</span>
                 ))}
               </div>
+
               <div className="flex-1 text-center md:text-left">
+                <div className="inline-block bg-white/60 backdrop-blur-sm text-roseD text-[.75rem] font-semibold px-3 py-1 rounded-full border border-blush/40 mb-3 tracking-wide">
+                  💌 Real stories from real customers
+                </div>
                 <h2 className="font-playfair font-bold text-[clamp(1.5rem,3vw,2.1rem)] text-roseDD mb-3">
-                  🎨 Build & Send a Digital Bouquet
+                  Your Love 💝
                 </h2>
                 <p className="text-[.92rem] text-textM mb-6 font-light leading-relaxed">
-                  Drag & drop hand-drawn flowers, arrange layers, pick a wrapping — then create a beautiful digital card with stickers & messages to send to your loved ones!
+                  A jar full of hearts — read the love notes, happy tears and sweet moments our customers have shared. Every bouquet tells a story. 🌸
                 </p>
-                <button onClick={() => navigate('/digital-bouquet')}
-                  className="bg-gradient-to-br from-rose to-[#e09099] text-white font-semibold px-8 py-3.5 rounded-full text-[.9rem] hover:-translate-y-0.5 hover:shadow-soft-l transition-all">
-                  Start Building 🌸
+                <button
+                  onClick={e => { e.stopPropagation(); navigate('/your-love'); }}
+                  className="bg-gradient-to-br from-rose to-[#e09099] text-white font-semibold px-8 py-3.5 rounded-full text-[.9rem] hover:-translate-y-0.5 hover:shadow-soft-l transition-all group-hover:shadow-[0_8px_28px_rgba(201,132,138,0.5)]">
+                  Open the Jar 🫙
                 </button>
               </div>
             </div>
+
+            <style>{`
+              @keyframes loveShift {
+                0%,100% { background-position: 0% 50%; }
+                50%      { background-position: 100% 50%; }
+              }
+            `}</style>
           </div>
         </div>
       </section>

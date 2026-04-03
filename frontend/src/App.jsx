@@ -31,6 +31,7 @@ import BuyPage            from './pages/BuyPage';
 import CakePage           from './pages/CakePage';
 import GiftsPage          from './pages/GiftsPage';
 import DigiLovePage       from './pages/DigiLovePage';
+import YourLovePage       from './pages/YourLovePage';
 import SharedGardenPage  from './pages/SharedGardenPage';
 import SharedPolaroidPage from './pages/SharedPolaroidPage';
 
@@ -80,6 +81,7 @@ export default function App() {
           <Route path="/bouquet-customize" element={<BouquetCustomizePage />} />
           <Route path="/postcard"           element={<PostcardPage />} />
 
+          <Route path="/your-love"     element={<YourLovePage />}       />
           <Route path="/cake"          element={<CakePage />}           />
           <Route path="/gifts"         element={<GiftsPage />}          />
           <Route path="/digilove"      element={<Navigate to="/digital-gifting" replace />} />
