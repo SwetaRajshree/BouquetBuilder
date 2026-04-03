@@ -1041,6 +1041,24 @@ export default function HandcraftPage() {
     <>
       <style>{styles}</style>
       <Navbar/>
+      <button
+        onClick={() => window.history.back()}
+        style={{
+          position: 'fixed', top: 80, left: 20, zIndex: 1000,
+          display: 'flex', alignItems: 'center', gap: 6,
+          background: 'rgba(253,248,245,0.92)', backdropFilter: 'blur(10px)',
+          border: '1.5px solid var(--rose-mid)', borderRadius: 12,
+          padding: '8px 16px', cursor: 'pointer',
+          fontFamily: 'var(--font-body)', fontSize: '0.85rem',
+          fontWeight: 600, color: 'var(--rose-deep)',
+          boxShadow: '0 4px 16px rgba(150,90,110,0.12)',
+          transition: 'all 0.25s ease',
+        }}
+        onMouseEnter={e => { e.currentTarget.style.background = 'var(--rose)'; e.currentTarget.style.color = 'white'; e.currentTarget.style.borderColor = 'var(--rose)'; }}
+        onMouseLeave={e => { e.currentTarget.style.background = 'rgba(253,248,245,0.92)'; e.currentTarget.style.color = 'var(--rose-deep)'; e.currentTarget.style.borderColor = 'var(--rose-mid)'; }}
+      >
+        ← Back
+      </button>
       <HeroSection/>
       <OurStorySection/>
       <HandloomSection/>
