@@ -7,11 +7,6 @@ const PAPER_COLORS = [
   "#E8B4B8","#D4A5A5","#C9806E","#B85450",
 ];
 
-const FALLBACK_REVIEWS = [
-  { _id:"1", name:"Ananya", text:"My mom cried when she received the flowers. Best gift I ever gave.", rating:5 },
-  { _id:"2", name:"Rahul",  text:"It made long distance feel a little closer. Thank you BouquetBuilder.", rating:5 },
-  { _id:"3", name:"Sneha",  text:"Knowing farmers are supported made every petal feel more special.", rating:5 },
-];
 
 const seededRand = (seed) => {
   let s = (seed + 1) * 7919;
@@ -104,8 +99,8 @@ const FloatUp = ({ x, delay, duration, color }) => (
 
 // ─── MAIN ─────────────────────────────────────────────────────────────────────
 export default function HeartJarReviews() {
-  const [reviews, setReviews] = useState(FALLBACK_REVIEWS);
-  const [heartProps, setHeartProps] = useState(() => buildHeartProps(FALLBACK_REVIEWS));
+  const [reviews, setReviews] = useState([]);
+  const [heartProps, setHeartProps] = useState([]);
 
   const fetchReviews = () => {
     fetch(`${API}/api/reviews`)
