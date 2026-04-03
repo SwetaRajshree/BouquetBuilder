@@ -59,6 +59,7 @@ const C = {
 /* ─── DATA ───────────────────────────────────────────────── */
 const CATEGORIES = [
   { key:"all",       label:"All Gifts",         icon:"✦" },
+  { key:"flowers",   label:"Forever Flowers",   icon:"🌸" },
   { key:"customize", label:"Customize Gift",    icon:"🎨" },
   { key:"instant",   label:"Instant Delivery",  icon:"⚡" },
   { key:"jewellery", label:"Jewellery",          icon:"💎" },
