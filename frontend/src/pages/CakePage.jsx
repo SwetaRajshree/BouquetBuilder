@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useCartContext } from '../context/CartContext';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
@@ -677,7 +677,7 @@ function NearbyBakers({ onSelect }) {
   });
 
   const mapCenter = userPos || [20.2961, 85.8245];
-  const accentColor = bakerType === 'baker' ? '#e53935' : '#8b4513';
+  const accentColor = bakerType === 'home_baker' ? '#e53935' : '#8b4513';
 
   return (
     <div style={{ padding: '40px 48px', background: '#fafafa', fontFamily: "'Poppins',sans-serif" }}>
