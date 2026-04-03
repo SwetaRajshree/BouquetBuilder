@@ -9,7 +9,7 @@ const LINKS = [
   { to: '/buy',       label: '🛍️ Buy'      },
   { to: '/cake',      label: '🎂 Cake'     },
   { to: '/gifts',     label: '🎁 Gifts'    },
-  { to: '/digilove',  label: '💌 DigiLove' },
+  { to: '/digital-gifting', label: '💌 DigiLove' },
   { to: '/shops',     label: 'Shops'       },
   { to: '/calendar',  label: 'My Calendar' },
   { to: '/tracking',  label: '📦 Orders'   },
