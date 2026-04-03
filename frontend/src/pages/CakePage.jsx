@@ -48,8 +48,8 @@ function Navbar({ cartCount, onNav, active }) {
     <nav style={{ position: "sticky", top: 0, zIndex: 1000, boxShadow: scrolled ? "0 4px 20px rgba(0,0,0,0.15)" : "0 1px 4px rgba(0,0,0,0.06)", transition: "box-shadow 0.3s", fontFamily: "'Poppins',sans-serif" }}>
       <div style={{ background: "#e53935", padding: "10px 32px", display: "flex", alignItems: "center", gap: 20, justifyContent: "space-between" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-          <span onClick={() => onNav("home")} style={{ fontFamily: "'Pacifico',cursive", color: "#fff", fontSize: 28, cursor: "pointer" }}>bakingo</span>
-          <span style={{ color: "rgba(255,255,255,0.85)", fontSize: 13, cursor: "pointer" }}>📍 Kolkata ▾</span>
+          <span onClick={() => onNav("home")} style={{ fontFamily: "'Pacifico',cursive", color: "#fff", fontSize: 28, cursor: "pointer" }}>bakeyum</span>
+          <span style={{ color: "rgba(255,255,255,0.85)", fontSize: 13, cursor: "pointer" }}>📍 Bhubaneswar ▾</span>
         </div>
         <div style={{ flex: 1, maxWidth: 460, margin: "0 20px" }}>
           <div style={{ background: "#fff", borderRadius: 24, display: "flex", alignItems: "center", padding: "8px 16px", gap: 8 }}>
@@ -570,7 +570,7 @@ function NearbyBakers({ orderDetails, onSelect }) {
   return (
     <div style={{ padding: "60px 48px", background: "#fafafa", fontFamily: "'Poppins',sans-serif" }}>
       <div style={{ textAlign: "center", marginBottom: 40 }}>
-        <div style={{ display: "inline-block", background: "#e8f5e9", color: "#2e7d32", borderRadius: 20, padding: "6px 20px", fontSize: 13, fontWeight: 600, marginBottom: 14 }}>📍 6 bakers near you in Kolkata</div>
+        <div style={{ display: "inline-block", background: "#e8f5e9", color: "#2e7d32", borderRadius: 20, padding: "6px 20px", fontSize: 13, fontWeight: 600, marginBottom: 14 }}>📍 6 bakers near you in Bhubaneswar</div>
         <h2 style={{ fontSize: 36, fontWeight: 700, color: "#222", fontFamily: "'Playfair Display',serif" }}>Choose Your Baker</h2>
         <p style={{ color: "#888", marginTop: 8, fontSize: 15 }}>
           {orderDetails ? `Showing bakers for your ${orderDetails.occasion || "custom"} cake` : "All accepting custom orders today"}
@@ -766,7 +766,7 @@ export default function App() {
       <div style={{ background: "#111", color: "#ccc", padding: "48px", fontFamily: "'Poppins',sans-serif", fontSize: 13 }}>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 40, justifyContent: "space-between", maxWidth: 1100, margin: "0 auto 28px" }}>
           <div>
-            <div style={{ fontFamily: "'Pacifico',cursive", color: "#e53935", fontSize: 26, marginBottom: 10 }}>bakingo</div>
+            <div style={{ fontFamily: "'Pacifico',cursive", color: "#e53935", fontSize: 26, marginBottom: 10 }}>bakeyum</div>
             <p style={{ maxWidth: 230, lineHeight: 1.8, color: "#777", fontSize: 13 }}>Connecting cake lovers with the best local bakers. Fresh. Fast. Delicious.</p>
           </div>
           {[
@@ -781,7 +781,7 @@ export default function App() {
           ))}
         </div>
         <div style={{ borderTop: "1px solid #222", paddingTop: 18, textAlign: "center", color: "#444", fontSize: 12, maxWidth: 1100, margin: "0 auto" }}>
-          © 2025 Bakingo · Baked with ❤️ for every occasion · Made in India 🇮🇳
+          © 2025 Bakeyum · Baked with ❤️ for every occasion · Made in India 🇮🇳
         </div>
       </div>
 
