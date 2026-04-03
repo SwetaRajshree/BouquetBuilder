@@ -32,6 +32,7 @@ import CollectionPage         from './pages/CollectionPage';
 import ForeverFlowersPage     from './pages/ForeverFlowersPage';
 import InstantGiftsPage       from './pages/InstantGiftsPage';
 import GiftHampersPage        from './pages/GiftHampersPage';
+import GiftShopsPage          from './pages/GiftShopsPage';
 
 import DigitalGiftingPage from './pages/DigitalGiftingPage';
 import BuyPage            from './pages/BuyPage';
@@ -105,6 +106,7 @@ export default function App() {
           <Route path="/forever-flowers"     element={<ForeverFlowersPage />} />
           <Route path="/instant-gifts"        element={<InstantGiftsPage />} />
           <Route path="/gift-hampers"          element={<GiftHampersPage />} />
+          <Route path="/gift-shops"             element={<GiftShopsPage />} />
           {/* Fallback */}
           <Route path="*"             element={<HomePage />}         />
         </Routes>

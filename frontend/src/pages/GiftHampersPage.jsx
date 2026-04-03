@@ -139,7 +139,7 @@ export default function GiftHampersPage() {
           Luxury hampers with chocolates, candles, spa sets & more — perfect for every occasion
         </p>
         <button
-          onClick={() => navigate('/shops')}
+          onClick={() => navigate('/gift-shops')}
           style={{ marginTop: 28, padding: '13px 32px', background: 'linear-gradient(135deg,#c9a84c,#a8863a)', color: '#fff', border: 'none', borderRadius: 40, fontSize: 14, fontWeight: 800, cursor: 'pointer', boxShadow: '0 6px 22px rgba(201,168,76,0.45)', letterSpacing: 0.5 }}>
           🏪 Browse Gift Shops
         </button>
