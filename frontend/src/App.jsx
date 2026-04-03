@@ -26,6 +26,7 @@ import ViewBouquetPage   from './pages/ViewBouquetPage';
 import BouquetCustomizePage from './pages/BouquetCustomizePage';
 import PostcardPage           from './pages/PostcardPage';
 import DigitalPostcardPage    from './pages/DigitalPostcardPage';
+import HandcraftPage          from './pages/HandcraftPage';
 
 import DigitalGiftingPage from './pages/DigitalGiftingPage';
 import BuyPage            from './pages/BuyPage';
@@ -92,6 +93,7 @@ export default function App() {
           <Route path="/shared-polaroid/:id"  element={<SharedPolaroidPage />} />
           <Route path="/buy"               element={<BuyPage />}                              />
           <Route path="/digital-bouquet"   element={<Navigate to="/bouquet-builder" replace />} />
+          <Route path="/handcraft"          element={<HandcraftPage />} />
           {/* Fallback */}
           <Route path="*"             element={<HomePage />}         />
         </Routes>
