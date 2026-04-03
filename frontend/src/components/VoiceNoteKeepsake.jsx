@@ -507,7 +507,7 @@ function RecordScreen({ onContinue }) {
       <button
         className="vnk-btn primary vnk-btn-full"
         disabled={recState!=="done"}
-        onClick={()=>onContinue({photos,audioUrl:audioUrlRef.current,waveData:waveDataRef.current,duration:recSecsRef.current})}
+      onClick={()=>onContinue({photos, audioBlob: audioBlobRef.current, audioUrl:audioUrlRef.current, waveData:waveDataRef.current, duration:recSecsRef.current})}
       >Continue</button>
     </div>
   );
@@ -517,21 +517,26 @@ function RecordScreen({ onContinue }) {
    PLAYER
 ═══════════════════════════════════════ */
 function PlayerScreen({ data, onNewMemory }) {
-  const { photos, audioUrl, waveData, duration } = data;
+  const { photos, audioBlob, audioUrl, waveData, duration } = data;
 
   const canvasRef    = useRef(null);
   const audioRef     = useRef(null);
   const filmTrackRef = useRef(null);
-  const handleAssRef = useRef(null);
 
   const [playPos,      setPlayPos]      = useState(0);
   const [showHint,     setShowHint]     = useState(true);
-  const [toastVisible, setToastVisible] = useState(false);
   const [handleAngle,  setHandleAngle]  = useState(0);
+  const [saving,       setSaving]       = useState(false);
+  const [shareUrl,     setShareUrl]     = useState(null);
+  const [copied,       setCopied]       = useState(false);
+  const [toastMsg,     setToastMsg]     = useState('');
 
   const accRotRef   = useRef(0);
-  const draggingRef = useRef(false);
   const filmOffRef  = useRef(0);
+  const playingRef  = useRef(false);
+  const rafRef      = useRef(null);
+
+  const showToast = (msg) => { setToastMsg(msg); setTimeout(() => setToastMsg(''), 2500); };
 
   const moveFilm = useCallback((pct)=>{
     const track = filmTrackRef.current; if(!track) return;
@@ -540,24 +545,6 @@ function PlayerScreen({ data, onNewMemory }) {
     filmOffRef.current = off;
     track.style.transform = `translateX(-${off}px)`;
   },[]);
-
-  useEffect(()=>{
-    const audio = new Audio(audioUrl);
-    audioRef.current = audio;
-    audio.addEventListener('timeupdate',()=>{
-      if(!audio.duration) return;
-      const pct = audio.currentTime / audio.duration;
-      setPlayPos(audio.currentTime);
-      drawProgress(pct);
-      moveFilm(pct);
-      accRotRef.current = pct * 720;
-      setHandleAngle(pct * 720);
-    });
-    return ()=>{ audio.pause(); audio.src=''; };
-  },[audioUrl, moveFilm]);
-
-  useEffect(()=>{ drawProgress(0); },[]);
-  useEffect(()=>{ moveFilm(0); },[photos, moveFilm]);
 
   const drawProgress = useCallback((pct)=>{
     const canvas = canvasRef.current; if(!canvas) return;
@@ -574,8 +561,23 @@ function PlayerScreen({ data, onNewMemory }) {
     });
   },[waveData]);
 
-  const playingRef = useRef(false);
-  const rafRef = useRef(null);
+  useEffect(()=>{
+    const audio = new Audio(audioUrl);
+    audioRef.current = audio;
+    audio.addEventListener('timeupdate',()=>{
+      if(!audio.duration) return;
+      const pct = audio.currentTime / audio.duration;
+      setPlayPos(audio.currentTime);
+      drawProgress(pct);
+      moveFilm(pct);
+      accRotRef.current = pct * 720;
+      setHandleAngle(pct * 720);
+    });
+    return ()=>{ audio.pause(); audio.src=''; };
+  },[audioUrl, moveFilm, drawProgress]);
+
+  useEffect(()=>{ drawProgress(0); },[drawProgress]);
+  useEffect(()=>{ moveFilm(0); },[photos, moveFilm]);
 
   const handleClick = useCallback(()=>{
     const aud = audioRef.current; if(!aud) return;
@@ -607,21 +609,56 @@ function PlayerScreen({ data, onNewMemory }) {
     }
   },[drawProgress]);
 
-  const share=()=>{
-    const msg='Check out this voice note keepsake!';
-    if(navigator.share){navigator.share({title:'Voice Note Keepsake',text:msg}).catch(()=>{})}
-    else{
-      navigator.clipboard.writeText(window.location.href+' - '+msg).then(()=>{
-        setToastVisible(true);setTimeout(()=>setToastVisible(false),2500);
-      }).catch(()=>{});
+  // Convert blob URL photos to base64 for upload
+  const toBase64 = (url) => fetch(url).then(r => r.blob()).then(b => new Promise((res, rej) => {
+    const reader = new FileReader();
+    reader.onload = () => res(reader.result);
+    reader.onerror = rej;
+    reader.readAsDataURL(b);
+  }));
+
+  const handleSave = async () => {
+    if (!audioBlob) return;
+    setSaving(true);
+    try {
+      // Convert audio blob to base64
+      const audioBase64 = await new Promise((res, rej) => {
+        const reader = new FileReader();
+        reader.onload = () => res(reader.result.split(',')[1]);
+        reader.onerror = rej;
+        reader.readAsDataURL(audioBlob);
+      });
+
+      // Convert photo blob URLs to base64
+      const photoBase64s = await Promise.all((photos || []).map(toBase64));
+
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/voice/keepsake`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ photos: photoBase64s, audioBase64, mimeType: 'audio/webm', duration }),
+      });
+      if (!res.ok) throw new Error('Save failed');
+      const { id } = await res.json();
+      setShareUrl(`${window.location.origin}/keepsake/${id}`);
+    } catch (e) {
+      showToast('Failed to save. Try again.');
     }
+    setSaving(false);
+  };
+
+  const copyLink = () => {
+    navigator.clipboard.writeText(shareUrl).catch(() => {});
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
     <div className="vnk-screen vnk-player-screen">
       <div className="vnk-topbar">
         <button className="vnk-topbar-btn" onClick={onNewMemory}><RewindIcon/> New memory</button>
-        <button className="vnk-topbar-btn" onClick={share}><ShareIcon/> Share</button>
+        <button className="vnk-topbar-btn" onClick={handleSave} disabled={saving} style={{ opacity: saving ? 0.6 : 1 }}>
+          <ShareIcon/> {saving ? 'Saving...' : 'Save & Share'}
+        </button>
       </div>
       <div className="vnk-player-timer">{fmt(Math.floor(playPos))} / {fmt(duration)}</div>
 
@@ -667,7 +704,20 @@ function PlayerScreen({ data, onNewMemory }) {
       </div>
 
       {showHint&&<p className="vnk-handle-hint">Click the handle to play &#9654;</p>}
-      <div className={`vnk-toast${toastVisible?' show':''}`}>Copied to clipboard!</div>
+
+      {shareUrl && (
+        <div style={{ marginTop: 20, width: '100%', maxWidth: 360, background: 'rgba(201,168,76,0.12)', border: '1px solid rgba(201,168,76,0.35)', borderRadius: 12, padding: '14px 16px' }}>
+          <p style={{ fontSize: '.78rem', color: 'var(--gold)', marginBottom: 8, textAlign: 'center' }}>🎉 Saved! Share your keepsake:</p>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <input readOnly value={shareUrl} style={{ flex: 1, background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(201,168,76,0.3)', borderRadius: 8, padding: '8px 10px', color: 'var(--gold-light)', fontSize: '.75rem', outline: 'none', fontFamily: 'Lato, sans-serif' }} />
+            <button onClick={copyLink} style={{ background: copied ? '#6abf7c' : 'var(--gold)', color: 'var(--text-dark)', border: 'none', borderRadius: 8, padding: '8px 14px', cursor: 'pointer', fontSize: '.78rem', fontWeight: 700, whiteSpace: 'nowrap', transition: 'background .2s' }}>
+              {copied ? '✓ Copied' : 'Copy'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className={`vnk-toast${toastMsg ? ' show' : ''}`}>{toastMsg}</div>
     </div>
   );
 }

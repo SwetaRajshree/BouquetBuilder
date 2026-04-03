@@ -17,4 +17,13 @@ async function uploadBase64(base64, folder = 'floriva-shared') {
   return result.secure_url;
 }
 
-module.exports = { uploadBase64 };
+async function uploadAudio(buffer, mimeType = 'audio/webm', folder = 'floriva-voice') {
+  const b64 = `data:${mimeType};base64,${buffer.toString('base64')}`;
+  const result = await cloudinary.uploader.upload(b64, {
+    folder,
+    resource_type: 'video', // Cloudinary uses 'video' for audio files
+  });
+  return result.secure_url;
+}
+
+module.exports = { uploadBase64, uploadAudio };
