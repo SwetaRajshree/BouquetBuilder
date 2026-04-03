@@ -17,7 +17,7 @@ router.post('/', async (req, res) => {
 // GET /api/reviews — fetch approved reviews for Our Story page
 router.get('/', async (req, res) => {
   try {
-    const reviews = await Review.find({ approved: true }).sort({ createdAt: -1 }).limit(20);
+    const reviews = await Review.find({ approved: true }).sort({ createdAt: -1 });
     res.json(reviews);
   } catch (err) {
     res.status(500).json({ error: err.message });
