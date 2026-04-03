@@ -132,7 +132,7 @@ function PromoBanner() {
 }
 
 /* ─── HERO CARD ─────────────────────────────────────────────── */
-function HeroCard({ title, sub, cta, gradient, accentColor, btnGrad, emoji, onClick, floatingEmojis }) {
+function HeroCard({ title, sub, cta, gradient, accentColor, btnGrad, emoji, onClick, floatingEmojis, shopBtn, onShopClick }) {
   const [hov,setHov] = useState(false);
   return (
     <div onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)} onClick={onClick}
@@ -152,11 +152,19 @@ function HeroCard({ title, sub, cta, gradient, accentColor, btnGrad, emoji, onCl
       <div style={{ width:36, height:2.5, background:btnGrad, borderRadius:2, marginBottom:12 }} />
       <h2 style={{ margin:"0 0 10px", fontSize:22, fontWeight:900, color:C.ink, lineHeight:1.2, whiteSpace:"pre-line" }}>{title}</h2>
       <p style={{ margin:"0 0 22px", fontSize:12.5, color:C.inkMid, lineHeight:1.65, opacity:0.85 }}>{sub}</p>
-      <button onClick={e=>{e.stopPropagation();onClick();}}
-        style={{ background:btnGrad, color:"#fff", border:"none", borderRadius:10, padding:"10px 22px", fontSize:12.5, fontWeight:800, cursor:"pointer", letterSpacing:0.3,
-          boxShadow:`0 4px 14px ${accentColor}40`, transition:"transform 0.2s", transform:hov?"scale(1.05)":"scale(1)" }}>
-        {cta} →
-      </button>
+      <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
+        <button onClick={e=>{e.stopPropagation();onClick();}}
+          style={{ background:btnGrad, color:"#fff", border:"none", borderRadius:10, padding:"10px 22px", fontSize:12.5, fontWeight:800, cursor:"pointer", letterSpacing:0.3,
+            boxShadow:`0 4px 14px ${accentColor}40`, transition:"transform 0.2s", transform:hov?"scale(1.05)":"scale(1)" }}>
+          {cta} →
+        </button>
+        {shopBtn && (
+          <button onClick={e=>{e.stopPropagation();onShopClick();}}
+            style={{ background:"rgba(255,255,255,0.7)", color:C.inkMid, border:`1.5px solid ${accentColor}40`, borderRadius:10, padding:"10px 18px", fontSize:12.5, fontWeight:800, cursor:"pointer", letterSpacing:0.3, backdropFilter:"blur(6px)", transition:"transform 0.2s", transform:hov?"scale(1.05)":"scale(1)" }}>
+            🏪 {shopBtn}
+          </button>
+        )}
+      </div>
     </div>
   );
 }
@@ -528,6 +536,8 @@ export default function GiftSection() {
             btnGrad={C.btnSageGrad}
             emoji="💍"
             onClick={()=>navigate('/collection')}
+            shopBtn="Find Shops"
+            onShopClick={()=>navigate('/shops')}
             floatingEmojis={[
               {emoji:"💎", top:"10%", left:"10%", size:16, dur:3,   delay:0},
               {emoji:"✨", top:"60%", left:"8%",  size:13, dur:2.6, delay:0.6},
