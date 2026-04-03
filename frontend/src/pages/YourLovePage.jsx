@@ -97,54 +97,48 @@ const FloatUp = ({ x, delay, duration, color }) => (
   </div>
 );
 
+const buildEntries = (data) => data.map((review, i) => ({
+  ...review,
+  hp: buildHeartProps([review], i)[0] || buildHeartProps(data)[i],
+}));
+
 // ─── MAIN ─────────────────────────────────────────────────────────────────────
 export default function HeartJarReviews() {
-  const [reviews, setReviews] = useState([]);
-  const [heartProps, setHeartProps] = useState([]);
-  const [showForm, setShowForm]   = useState(false);
-  const [form, setForm]           = useState({ name: '', text: '', rating: 5 });
+  const [entries, setEntries] = useState([]);
+  const [showForm, setShowForm]     = useState(false);
+  const [form, setForm]             = useState({ name: '', text: '', rating: 5 });
   const [submitting, setSubmitting] = useState(false);
-  const [done, setDone]           = useState(false);
+  const [done, setDone]             = useState(false);
 
-  const fetchReviews = () => {
-    fetch(`${API}/api/reviews`)
-      .then(r => r.json())
-      .then(data => {
-        if (Array.isArray(data) && data.length > 0) {
-          setReviews(data);
-          setHeartProps(buildHeartProps(data));
-        }
-      })
-      .catch(() => {});
-  };
+  const loadEntries = (data) => setEntries(buildHeartProps(data).map((hp, i) => ({ ...data[i], hp })));
 
   useEffect(() => {
-    fetchReviews();
-    const interval = setInterval(fetchReviews, 30000);
-    return () => clearInterval(interval);
+    const fetch_ = () =>
+      fetch(`${API}/api/reviews`)
+        .then(r => r.json())
+        .then(data => { if (Array.isArray(data) && data.length > 0) loadEntries(data); })
+        .catch(() => {});
+    fetch_();
+    const t = setInterval(fetch_, 30000);
+    return () => clearInterval(t);
   }, []);
 
   const submitReview = async () => {
     if (!form.name.trim() || !form.text.trim()) return;
     setSubmitting(true);
     try {
-      const res = await fetch(`${API}/api/reviews`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res  = await fetch(`${API}/api/reviews`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       });
-      const newReview = await res.json();
-      const updated = [newReview, ...reviews];
-      setReviews(updated);
-      setHeartProps(buildHeartProps(updated));
+      const saved = await res.json();
+      const updated = [saved, ...entries.map(e => { const {hp,...r}=e; return r; })];
+      loadEntries(updated);
       setDone(true);
       setForm({ name: '', text: '', rating: 5 });
       setTimeout(() => { setDone(false); setShowForm(false); }, 2500);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setSubmitting(false);
-    }
+    } catch(e) { console.error(e); }
+    finally { setSubmitting(false); }
   };
 
   const [isOpen, setIsOpen]       = useState(false);
@@ -306,7 +300,7 @@ export default function HeartJarReviews() {
           animation:"sPulse 3.2s ease-in-out infinite",
         }}>
           <span style={{fontSize:"14px"}}>❤️</span>
-          <span style={{color:"#8B1A1A",fontWeight:"700",fontSize:"13px"}}>{reviews.length} Happy Customers</span>
+          <span style={{color:"#8B1A1A",fontWeight:"700",fontSize:"13px"}}>{entries.length} Happy Customers</span>
           <span style={{fontSize:"14px"}}>❤️</span>
         </div>
       </div>
@@ -461,15 +455,15 @@ export default function HeartJarReviews() {
             clipPath:"polygon(17.5% 2.5%, 82.5% 2.5%, 99.5% 100%, 0.5% 100%)",
             overflow:"hidden",
           }}>
-            {reviews.map((review, i) => {
-              const hp = heartProps[i];
-              const isHov = hoveredId === (review._id || review.id);
+            {entries.map((entry) => {
+              const hp = entry.hp;
+              const isHov = hoveredId === entry._id;
               return (
                 <div
-                  key={(review._id || review.id)}
-                  onMouseEnter={() => isOpen && setHoveredId((review._id || review.id))}
+                  key={entry._id}
+                  onMouseEnter={() => isOpen && setHoveredId(entry._id)}
                   onMouseLeave={() => setHoveredId(null)}
-                  onClick={e => handleHeartClick(e, review)}
+                  onClick={e => handleHeartClick(e, entry)}
                   style={{
                     position:"absolute",
                     left:`${hp.x}%`,
@@ -633,7 +627,7 @@ export default function HeartJarReviews() {
 
       {/* Hover bar */}
       {hoveredId && isOpen && (() => {
-        const r = reviews.find(rv=>(rv._id||rv.id)===hoveredId);
+        const r = entries.find(e => e._id === hoveredId);
         if (!r) return null;
         return (
           <div style={{
