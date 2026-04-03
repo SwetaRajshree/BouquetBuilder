@@ -30,9 +30,10 @@ export default function DigitalGiftingPage() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleSelect = (id) => {
-    setActiveMenu(id);
     setMenuOpen(false);
     if (id === 'postcard') navigate('/postcard');
+    else if (id === 'digitalbouquet') navigate('/bouquet-builder');
+    else setActiveMenu(id);
   };
 
   const activeOption = OPTIONS.find(o => o.id === activeMenu);
@@ -150,32 +151,6 @@ export default function DigitalGiftingPage() {
                   borderRadius: 40, padding: '8px 20px', fontSize: 12, fontWeight: 600, cursor: 'pointer',
                 }}>
                   Open →
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* ── Active content ── */}
-      {activeMenu === 'digitalbouquet' && (
-        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '40px 24px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 20 }}>
-            {[
-              { icon: '💐', title: 'Build a Bouquet',    desc: 'Pick flowers, foliage & layout — then send with a card.',        route: '/bouquet-builder', accent: '#a86870', bg: 'linear-gradient(135deg,#ffe8ed,#ffd0d8)' },
-              { icon: '🎵', title: 'Bouquet + Song',     desc: 'Pair your bouquet with a Spotify song for the ultimate gesture.', route: '/bouquet-builder', accent: '#3a7a3a', bg: 'linear-gradient(135deg,#d4f0d4,#c0e8c0)' },
-              { icon: '🎙️', title: 'Bouquet + Voice',    desc: 'Record a voice note and attach it to your digital bouquet.',      route: '/bouquet-builder', accent: '#8a6020', bg: 'linear-gradient(135deg,#fff0d0,#ffe4b0)' },
-              { icon: '💌', title: 'Bouquet + Card',     desc: 'Add a beautiful digital card with stickers & your message.',      route: '/digital-card',   accent: '#7a5a9a', bg: 'linear-gradient(135deg,#e8d5ff,#d8c0ff)' },
-            ].map(g => (
-              <div key={g.title} onClick={() => navigate(g.route)}
-                style={{ background: g.bg, borderRadius: 20, padding: '28px 24px', cursor: 'pointer', transition: 'all 0.25s' }}
-                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.boxShadow = `0 14px 36px ${g.accent}30`; }}
-                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}>
-                <div style={{ fontSize: 44, marginBottom: 12 }}>{g.icon}</div>
-                <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 17, fontWeight: 700, color: g.accent, marginBottom: 8 }}>{g.title}</h3>
-                <p style={{ fontSize: 13, color: '#6b5060', lineHeight: 1.6, marginBottom: 16 }}>{g.desc}</p>
-                <button style={{ background: g.accent, color: 'white', border: 'none', borderRadius: 40, padding: '8px 18px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
-                  Start →
                 </button>
               </div>
             ))}
