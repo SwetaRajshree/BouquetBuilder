@@ -706,69 +706,79 @@ function NearbyBakers({ onSelect }) {
       </div>
 
       {/* Map + List layout */}
-      <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start', flexWrap: 'wrap', minHeight: 'calc(100vh - 320px)' }}>
 
-        {/* Map */}
-        <div style={{ flex: '1 1 500px', borderRadius: 18, overflow: 'hidden', border: '1.5px solid #e0e0e0', boxShadow: '0 4px 16px rgba(0,0,0,0.08)', height: 480, minWidth: 300 }}>
-          {userPos ? (
-            <MapContainer center={mapCenter} zoom={12} style={{ height: '100%', width: '100%' }}>
-              <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
-              {activeShop && <FlyTo shop={activeShop} />}
-              <Marker position={mapCenter} icon={userIcon}>
-                <Popup><div style={{ textAlign: 'center', fontSize: 13, fontWeight: 600, color: '#6c63ff' }}>📍 You are here</div></Popup>
-              </Marker>
-              {filtered.map(shop => {
-                if (!shop.location?.coordinates) return null;
-                const [lng, lat] = shop.location.coordinates;
-                return (
-                  <Marker key={shop._id} position={[lat, lng]} icon={makeBakerIcon(bakerType, activeShop?._id === shop._id)}
-                    eventHandlers={{ click: () => setActiveShop(shop) }}>
-                    <Popup>
-                      <div style={{ textAlign: 'center', minWidth: 120 }}>
-                        <p style={{ fontWeight: 600, fontSize: 13, color: accentColor, marginBottom: 4 }}>{shop.name}</p>
-                        <p style={{ fontSize: 11, color: '#888', marginBottom: 8 }}>{shop.area}</p>
-                        <button onClick={() => onSelect(shop)}
-                          style={{ background: accentColor, color: '#fff', border: 'none', borderRadius: 20, padding: '5px 14px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
-                          Select Baker
-                        </button>
-                      </div>
-                    </Popup>
-                  </Marker>
-                );
-              })}
-            </MapContainer>
-          ) : (
-            <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff5f5' }}>
-              <p style={{ color: '#e53935', fontSize: 14 }}>Loading map...</p>
-            </div>
-          )}
+        {/* Map — sticky, full height */}
+        <div style={{ flex: '1 1 55%', position: 'sticky', top: 70 }}>
+          <div style={{ borderRadius: 18, overflow: 'hidden', border: '1.5px solid #e0e0e0', boxShadow: '0 4px 16px rgba(0,0,0,0.08)', height: 'calc(100vh - 220px)', minHeight: 500 }}>
+            {userPos ? (
+              <MapContainer center={mapCenter} zoom={12} style={{ height: '100%', width: '100%' }}>
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                {activeShop && <FlyTo shop={activeShop} />}
+                <Marker position={mapCenter} icon={userIcon}>
+                  <Popup><div style={{ textAlign: 'center', fontSize: 13, fontWeight: 600, color: '#6c63ff' }}>📍 You are here</div></Popup>
+                </Marker>
+                {filtered.map(shop => {
+                  if (!shop.location?.coordinates) return null;
+                  const [lng, lat] = shop.location.coordinates;
+                  return (
+                    <Marker key={shop._id} position={[lat, lng]} icon={makeBakerIcon(bakerType, activeShop?._id === shop._id)}
+                      eventHandlers={{ click: () => setActiveShop(shop) }}>
+                      <Popup>
+                        <div style={{ textAlign: 'center', minWidth: 120 }}>
+                          <p style={{ fontWeight: 600, fontSize: 13, color: accentColor, marginBottom: 4 }}>{shop.name}</p>
+                          <p style={{ fontSize: 11, color: '#888', marginBottom: 8 }}>{shop.area}</p>
+                          <button onClick={() => onSelect(shop)}
+                            style={{ background: accentColor, color: '#fff', border: 'none', borderRadius: 20, padding: '5px 14px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+                            Select Baker
+                          </button>
+                        </div>
+                      </Popup>
+                    </Marker>
+                  );
+                })}
+              </MapContainer>
+            ) : (
+              <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff5f5' }}>
+                <p style={{ color: '#e53935', fontSize: 14 }}>Loading map...</p>
+              </div>
+            )}
+          </div>
+          <p style={{ fontSize: 11, color: '#aaa', marginTop: 8, textAlign: 'center' }}>🟣 You &nbsp;|&nbsp; {bakerType === 'home_baker' ? '🏠 Home Bakers' : '🎂 Cake Shops'} — click any pin or card to select</p>
         </div>
 
-        {/* Shop list */}
-        <div style={{ flex: '0 0 300px', maxHeight: 480, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {/* Shop list — scrollable */}
+        <div style={{ flex: '1 1 40%', display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+            <h3 style={{ fontFamily: "'Playfair Display',serif", fontWeight: 600, fontSize: 17, color: accentColor }}>
+              {bakerType === 'home_baker' ? 'Home Bakers' : 'Cake Shops'}
+              <span style={{ marginLeft: 8, fontSize: 13, fontWeight: 400, color: '#aaa' }}>({filtered.length})</span>
+            </h3>
+          </div>
           {loading && <p style={{ color: accentColor, fontSize: 13 }}>Loading...</p>}
           {!loading && filtered.length === 0 && (
             <p style={{ color: '#aaa', fontSize: 13 }}>No {bakerType === 'home_baker' ? 'home bakers' : 'cake shops'} found{search ? ` for "${search}"` : '. Add data to the database to see results here.'}.</p>
           )}
           {filtered.map((shop, i) => (
             <div key={shop._id} onClick={() => setActiveShop(shop)}
-              style={{ background: '#fff', borderRadius: 14, border: `1.5px solid ${activeShop?._id === shop._id ? accentColor : '#f0f0f0'}`, padding: '12px 16px', cursor: 'pointer', transition: 'all 0.2s',
-                boxShadow: activeShop?._id === shop._id ? `0 4px 16px ${accentColor}22` : '0 2px 8px rgba(0,0,0,0.04)' }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = accentColor}
-              onMouseLeave={e => e.currentTarget.style.borderColor = activeShop?._id === shop._id ? accentColor : '#f0f0f0'}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{ width: 40, height: 40, borderRadius: '50%', background: accentColor, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>
+              style={{ background: '#fff', borderRadius: 16, border: `2px solid ${activeShop?._id === shop._id ? accentColor : '#f0f0f0'}`, padding: '16px 20px', cursor: 'pointer', transition: 'all 0.2s',
+                boxShadow: activeShop?._id === shop._id ? `0 4px 16px ${accentColor}22` : '0 2px 8px rgba(0,0,0,0.04)',
+                background: activeShop?._id === shop._id ? `${accentColor}08` : '#fff' }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = accentColor; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.1)'; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = activeShop?._id === shop._id ? accentColor : '#f0f0f0'; e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = activeShop?._id === shop._id ? `0 4px 16px ${accentColor}22` : '0 2px 8px rgba(0,0,0,0.04)'; }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                <div style={{ fontSize: 32, flexShrink: 0 }}>
                   {bakerType === 'home_baker' ? '🏠' : '🎂'}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontWeight: 700, fontSize: 13, color: '#222', marginBottom: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{shop.name}</p>
-                  {shop.area && <p style={{ fontSize: 11, color: '#aaa' }}>📍 {shop.area}, {shop.city}</p>}
+                  <p style={{ fontWeight: 700, fontSize: 15, color: '#222', marginBottom: 3, fontFamily: "'Playfair Display',serif" }}>{shop.name}</p>
+                  {shop.area && <p style={{ fontSize: 12, color: '#aaa' }}>📍 {shop.area}, {shop.city}</p>}
                 </div>
                 <button onClick={e => { e.stopPropagation(); onSelect(shop); }}
-                  style={{ background: accentColor, color: '#fff', border: 'none', borderRadius: 20, padding: '5px 12px', fontSize: 11, fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}>
+                  style={{ background: accentColor, color: '#fff', border: 'none', borderRadius: 20, padding: '7px 16px', fontSize: 12, fontWeight: 700, cursor: 'pointer', flexShrink: 0, fontFamily: "'Poppins',sans-serif" }}>
                   Select
                 </button>
               </div>
@@ -776,8 +786,6 @@ function NearbyBakers({ onSelect }) {
           ))}
         </div>
       </div>
-
-      <p style={{ fontSize: 11, color: '#aaa', marginTop: 12 }}>🟣 You &nbsp;|&nbsp; {bakerType === 'home_baker' ? '🏠 Home Bakers' : '🎂 Cake Shops'} — click any pin or card to select</p>
     </div>
   );
 }
