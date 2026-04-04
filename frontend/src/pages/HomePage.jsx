@@ -110,13 +110,13 @@ export default function HomePage() {
 
         <div className="relative z-10 max-w-[700px]">
           <div className="inline-block bg-white/60 backdrop-blur-sm text-roseD text-[.78rem] font-semibold px-4 py-1.5 rounded-full border border-blush/40 mb-5 tracking-wide">
-            🌸 Fresh Flowers · Same Day Delivery · 100% Natural
+            🎁 Flowers · Gifts · Handcrafted · Same Day Delivery
           </div>
           <h1 className="font-playfair font-extrabold text-roseDD leading-[1.15] text-[clamp(2.3rem,5.5vw,4rem)] mb-4 [text-shadow:0_2px_20px_rgba(168,104,112,.15)]">
-            Send Love,<br />One Petal at a Time 🌸
+            Every Occasion Deserves<br />Something Beautiful 🌸
           </h1>
           <p className="text-[1.05rem] text-textM mb-8 font-light leading-relaxed">
-            Discover local florists, build custom bouquets &<br />deliver happiness to someone special.
+            Fresh bouquets, sweet cakes, artisan gifts & more —<br />all in one place, delivered with love.
           </p>
           <div className="flex justify-center mt-2">
             <button
@@ -130,7 +130,11 @@ export default function HomePage() {
 
           {/* Quick stats */}
           <div className="flex justify-center gap-6 mt-8 flex-wrap">
-            {[['🌹','500+ Bouquets'],['🏪','50+ Shops'],['⭐','4.9 Rating']].map(([icon, label]) => (
+            {[
+              ['🎁', '1,200+ Gifts Sent'],
+              ['🏪', `${shops.length > 0 ? `${shops.length}+` : '50+'} Local Shops`],
+              ['⭐', `4.9 · ${reviewCount > 0 ? `${reviewCount}` : '800+'} Reviews`],
+            ].map(([icon, label]) => (
               <div key={label} className="bg-white/70 backdrop-blur-sm px-4 py-2 rounded-full text-[.8rem] font-medium text-roseD border border-blush/30">
                 {icon} {label}
               </div>
