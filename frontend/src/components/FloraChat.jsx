@@ -4,7 +4,7 @@ const CHATBOT_URL = import.meta.env.VITE_CHATBOT_URL || 'http://127.0.0.1:8000';
 
 export default function FloraChat() {
   const [msgs, setMsgs] = useState([
-    { from: 'flora', text: "Hi! I'm Flora 🌸 Ask me anything about flowers!" }
+    { from: 'flora', text: "Hi! I'm Flora 🌸 Ask me anything about gifting!" }
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -61,7 +61,7 @@ export default function FloraChat() {
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && send(input)}
-          placeholder="Ask Flora anything..."
+          placeholder="Ask Flora anything about gifting..."
         />
         <button onClick={() => send(input)} className="bg-gradient-to-br from-rose to-[#e09099] text-white text-[.85rem] font-semibold px-5 py-2.5 rounded-full">
           Send 🌸
@@ -74,7 +74,7 @@ export default function FloraChat() {
 export function FloraWidget() {
   const [open, setOpen] = useState(false);
   const [msgs, setMsgs] = useState([
-    { from: 'flora', text: "Hi! I'm Flora 🌸 Ask me anything about flowers!" }
+    { from: 'flora', text: "Hi! I'm Flora 🌸 Ask me anything about gifting!" }
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
