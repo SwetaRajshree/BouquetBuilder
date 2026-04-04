@@ -8,14 +8,16 @@ const app = express();
 // ======================
 // Middleware
 // ======================
-app.use(express.json({ limit: '20mb' }));
-app.use(cors({
+const corsOptions = {
   origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : ['http://localhost:5173', 'http://localhost:5174'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-}));
-app.options('*', cors());
+};
+
+app.use(express.json({ limit: '20mb' }));
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 // ======================
 // Routes
