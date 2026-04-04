@@ -25,8 +25,9 @@ export function AuthProvider({ children }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Login failed");
+      const text = await res.text();
+      const data = text ? JSON.parse(text) : {};
+      if (!res.ok) throw new Error(data.message || "Login failed. Please try again.");
       localStorage.setItem("floriva_token", data.token);
       localStorage.setItem("floriva_user", JSON.stringify(data.user));
       setToken(data.token);
@@ -49,8 +50,9 @@ export function AuthProvider({ children }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password, role: "customer" }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Registration failed");
+      const text = await res.text();
+      const data = text ? JSON.parse(text) : {};
+      if (!res.ok) throw new Error(data.message || "Registration failed. Please try again.");
       localStorage.setItem("floriva_token", data.token);
       localStorage.setItem("floriva_user", JSON.stringify(data.user));
       setToken(data.token);
