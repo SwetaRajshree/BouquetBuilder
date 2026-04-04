@@ -106,6 +106,15 @@ export default function App() {
           <Route path="/gift-hampers"          element={<PrivateRoute><GiftHampersPage /></PrivateRoute>} />
           <Route path="/gift-shops"             element={<PrivateRoute><GiftShopsPage /></PrivateRoute>} />
           <Route path="/digital-card"   element={<PrivateRoute><DigitalCardPage /></PrivateRoute>}  />
+          <Route path="/view-bouquet/:id" element={<ViewBouquetPage />}  />
+          <Route path="/shared-garden/:id"   element={<SharedGardenPage />} />
+          <Route path="/shared-polaroid/:id"  element={<SharedPolaroidPage />} />
+          <Route path="/story"        element={<OurStoryPage />}     />
+          <Route path="/admin-login"   element={<AdminLoginPage />}   />
+          <Route path="/admin"         element={<AdminPage />}        />
+          <Route path="/digilove"      element={<Navigate to="/digital-gifting" replace />} />
+          <Route path="/digital-bouquet" element={<Navigate to="/bouquet-builder" replace />} />
+          <Route path="/handcraft"     element={<HandcraftPage />} />
           {/* Fallback */}
           <Route path="*"             element={<HomePage />}         />
         </Routes>

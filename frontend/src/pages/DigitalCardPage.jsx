@@ -119,6 +119,7 @@ export default function DigitalCardPage() {
   const [shared, setShared]         = useState(false);
   const [confetti, setConfetti]     = useState([]);
   const [linkCopied, setLinkCopied] = useState(false);
+  const [shareURL, setShareURL]     = useState('');
   const [emailInput, setEmailInput] = useState('');
   const [showEmail, setShowEmail]   = useState(false);
   const [saving, setSaving]         = useState(false);
@@ -136,6 +137,7 @@ export default function DigitalCardPage() {
   const spotifyEmbedId = spotifyLink.match(/track\/([a-zA-Z0-9]+)/)?.[1] || null;
 
   const buildShareURL = async () => {
+    if (shareURL) return shareURL;
     setSaving(true);
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/bouquet/share`, {
@@ -146,7 +148,10 @@ export default function DigitalCardPage() {
       if (!res.ok) throw new Error(`Server responded ${res.status}`);
       const data = await res.json();
       if (!data.id) throw new Error('No ID returned');
-      return `${window.location.origin}/view-bouquet/${data.id}`;
+      const url = `${window.location.origin}/view-bouquet/${data.id}`;
+      setShareURL(url);
+      fireConfetti();
+      return url;
     } catch (err) {
       alert('Could not generate link: ' + err.message);
       return null;
@@ -474,18 +479,40 @@ export default function DigitalCardPage() {
           </div>
 
           <div style={{ display:'flex', gap:14, justifyContent:'center', flexWrap:'wrap', marginBottom:20 }}>
-            {/* Share via Link */}
             <button onClick={copyLink} disabled={saving}
               style={{ padding:'15px 26px', background: linkCopied ? 'linear-gradient(135deg,#2a7a40,#3a9050)' : 'linear-gradient(135deg,#3a6030,#5a8050)', color:'white', border:'none', borderRadius:50, fontSize:13, letterSpacing:2, cursor: saving ? 'wait' : 'pointer', fontFamily:'sans-serif', boxShadow:'0 8px 22px rgba(60,100,48,0.32)', transition:'all 0.3s ease' }}>
               {saving ? 'SAVING...' : linkCopied ? '✓ LINK COPIED!' : '📱 COPY SHARE LINK'}
             </button>
-
-            {/* Send via Email */}
             <button onClick={() => setShowEmail(e => !e)}
               style={{ padding:'15px 26px', background: showEmail ? 'rgba(255,255,255,0.9)' : 'linear-gradient(135deg,#3a6030,#5a8050)', color: showEmail ? '#3a6030' : 'white', border: showEmail ? '2px solid #3a6030' : 'none', borderRadius:50, fontSize:13, letterSpacing:2, cursor:'pointer', fontFamily:'sans-serif', boxShadow:'0 8px 22px rgba(60,100,48,0.32)', transition:'all 0.3s ease' }}>
               💌 SEND VIA EMAIL
             </button>
           </div>
+
+          {/* Visible shareable link box */}
+          {shareURL && (
+            <div style={{ animation:'fadeUp 0.4s ease-out', background:'rgba(255,255,255,0.9)', borderRadius:20, padding:'22px 28px', marginBottom:20, backdropFilter:'blur(10px)', border:'2px solid #5a8050' }}>
+              <div style={{ fontSize:11, letterSpacing:3, color:'#3a6030', marginBottom:12, fontFamily:'sans-serif', fontWeight:700 }}>🌸 YOUR SHAREABLE LINK</div>
+              <div style={{ display:'flex', gap:10, alignItems:'center', marginBottom:14 }}>
+                <input readOnly value={shareURL}
+                  style={{ flex:1, padding:'12px 16px', borderRadius:12, border:'1.5px solid #c8d8c0', background:'#f8f4ed', fontSize:13, color:'#3a6030', outline:'none', fontFamily:'sans-serif', cursor:'text' }}/>
+                <button onClick={copyLink}
+                  style={{ padding:'12px 18px', background: linkCopied ? '#2a7a40' : 'linear-gradient(135deg,#3a6030,#5a8050)', color:'white', border:'none', borderRadius:12, fontSize:12, cursor:'pointer', fontFamily:'sans-serif', letterSpacing:1, whiteSpace:'nowrap', transition:'all 0.2s' }}>
+                  {linkCopied ? '✓ COPIED' : 'COPY'}
+                </button>
+              </div>
+              <div style={{ display:'flex', gap:10, justifyContent:'center', flexWrap:'wrap' }}>
+                <a href={`https://wa.me/?text=${encodeURIComponent('I made you a bouquet 🌸 ' + shareURL)}`} target="_blank" rel="noreferrer"
+                  style={{ padding:'10px 20px', background:'#25D366', color:'white', borderRadius:50, fontSize:12, letterSpacing:1, textDecoration:'none', fontFamily:'sans-serif' }}>
+                  📱 SHARE ON WHATSAPP
+                </a>
+                <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent('I made you a bouquet 🌸')}&url=${encodeURIComponent(shareURL)}`} target="_blank" rel="noreferrer"
+                  style={{ padding:'10px 20px', background:'#1DA1F2', color:'white', borderRadius:50, fontSize:12, letterSpacing:1, textDecoration:'none', fontFamily:'sans-serif' }}>
+                  🐦 SHARE ON X
+                </a>
+              </div>
+            </div>
+          )}
 
           {/* Email input */}
           {showEmail && (
