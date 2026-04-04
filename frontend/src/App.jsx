@@ -61,8 +61,8 @@ function PrivateRoute({ children }) {
 }
 
 // Pages that have their own full-height panel layout (no standard Footer gap)
-const NO_FOOTER_PAGES = ['/handcraft'];
-const NO_NAVBAR_PAGES = ['/handcraft'];
+const NO_FOOTER_PAGES = ['/handcraft', '/artist-apply'];
+const NO_NAVBAR_PAGES = ['/handcraft', '/artist-apply'];
 
 export default function App() {
   const { pathname } = useLocation();

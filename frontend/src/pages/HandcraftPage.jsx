@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useCartContext } from "../context/CartContext";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -50,6 +51,7 @@ const styles = `
     backdrop-filter: blur(18px);
     border-bottom: 1px solid var(--border);
     transition: var(--transition);
+    position: relative;
   }
   .navbar.scrolled {
     height: 58px;
@@ -614,9 +616,9 @@ function useIntersection(ref, threshold = 0.15) {
 }
 
 const heroSlides = [
-  { tag:"🌍 Global Artisan Platform", title:"Art from Every Corner of the World", sub:"Discover handcrafted masterpieces made by skilled artisans across continents. Every piece tells a unique story.", bg:"hero-bg-1", btn1:"Explore Now", btn2:"View Collections" },
-  { tag:"❤️ Support Local Artisans", title:"Shop Handmade. Change Lives.", sub:"Every purchase directly supports independent artisans and their communities.", bg:"hero-bg-2", btn1:"Shop Now", btn2:"Meet the Artists" },
-  { tag:"🎨 Become a Seller", title:"Join as an Artist & Sell Globally", sub:"Turn your craft into a livelihood. Reach millions of buyers who appreciate authentic handmade art.", bg:"hero-bg-3", btn1:"Start Selling →", btn2:"Learn More" },
+  { tag:"🌍 Global Artisan Platform", title:"Art from Every Corner of the World", sub:"Discover handcrafted masterpieces made by skilled artisans across continents. Every piece tells a unique story.", bg:"hero-bg-1" },
+  { tag:"❤️ Support Local Artisans", title:"Shop Handmade. Change Lives.", sub:"Every purchase directly supports independent artisans and their communities.", bg:"hero-bg-2" },
+  { tag:"🎨 Become a Seller", title:"Join as an Artist & Sell Globally", sub:"Turn your craft into a livelihood. Reach millions of buyers who appreciate authentic handmade art.", bg:"hero-bg-3" },
 ];
 const spotriProducts = [
   {id:1,emoji:"🛋️",name:"Kashmiri Embroidered Cushion",category:"Cushions",desc:"Hand-stitched floral patterns"},
@@ -646,38 +648,76 @@ const testimonials = [
   {quote:"The stone carving I bought for my living room gets compliments every single day. Truly one-of-a-kind.",author:"Arjun Mehta",role:"Verified Buyer, Delhi"},
 ];
 
+const NAV_LINKS = [
+  { label: "Home",             id: "section-hero" },
+  { label: "Handloom",         id: "section-handloom" },
+  { label: "Paintings",        id: "section-paintings" },
+  { label: "Pottery",          id: "section-pottery" },
+  { label: "Wooden Sculpting", id: "section-wood" },
+  { label: "Stone Art",        id: "section-stone" },
+];
+
+function scrollTo(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", fn);
     return () => window.removeEventListener("scroll", fn);
   }, []);
+  function handleNav(id) { setMenuOpen(false); scrollTo(id); }
   return (
     <nav className={`navbar${scrolled?" scrolled":""}`}>
       <a href="#" className="nav-logo">
         <FlowerIcon size={28}/>
         ArtisanWorld
       </a>
+      {/* Desktop links */}
       <ul className="nav-links">
-        {["Home","Handloom","Paintings","Pottery","Wooden Sculpting","Stone Art","More ▾"].map(l=>(
-          <li key={l}><a href="#">{l}</a></li>
+        {NAV_LINKS.map(l=>(
+          <li key={l.label}>
+            <a href="#" onClick={e=>{ e.preventDefault(); scrollTo(l.id); }}>{l.label}</a>
+          </li>
         ))}
       </ul>
+      {/* Right side */}
       <div className="nav-right">
-        <div className="nav-search">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <input placeholder="Search artworks…"/>
-        </div>
-        <button className="btn-icon">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <button className="btn-artist" onClick={() => navigate('/artist-apply')}>Join as Artist</button>
+        {/* Hamburger */}
+        <button
+          onClick={() => setMenuOpen(v => !v)}
+          style={{ background:'none', border:'1.5px solid var(--rose-mid)', borderRadius:10, width:40, height:40, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:5, cursor:'pointer', flexShrink:0 }}
+          aria-label="Menu"
+        >
+          <span style={{ display:'block', width:18, height:2, background:'var(--rose)', borderRadius:2, transition:'all 0.3s', transform: menuOpen ? 'rotate(45deg) translate(5px,5px)' : 'none' }}/>
+          <span style={{ display:'block', width:18, height:2, background:'var(--rose)', borderRadius:2, transition:'all 0.3s', opacity: menuOpen ? 0 : 1 }}/>
+          <span style={{ display:'block', width:18, height:2, background:'var(--rose)', borderRadius:2, transition:'all 0.3s', transform: menuOpen ? 'rotate(-45deg) translate(5px,-5px)' : 'none' }}/>
         </button>
-        <button className="btn-icon" style={{position:"relative"}}>
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-          <span className="cart-badge">3</span>
-        </button>
-        <button className="btn-artist">Join as Artist</button>
       </div>
+      {/* Dropdown menu */}
+      {menuOpen && (
+        <div style={{ position:'absolute', top:'100%', right:20, background:'rgba(253,248,245,0.97)', backdropFilter:'blur(18px)', border:'1px solid var(--border)', borderRadius:16, boxShadow:'0 12px 40px rgba(150,90,110,0.15)', padding:'8px 0', minWidth:200, zIndex:1000 }}>
+          {NAV_LINKS.map(l=>(
+            <button key={l.label} onClick={()=>handleNav(l.id)}
+              style={{ display:'block', width:'100%', textAlign:'left', padding:'10px 20px', background:'none', border:'none', fontFamily:'var(--font-body)', fontSize:'0.9rem', fontWeight:500, color:'var(--text)', cursor:'pointer', transition:'background 0.2s' }}
+              onMouseEnter={e=>e.currentTarget.style.background='var(--rose-light)'}
+              onMouseLeave={e=>e.currentTarget.style.background='none'}
+            >{l.label}</button>
+          ))}
+          <div style={{ height:1, background:'var(--border)', margin:'6px 0' }}/>
+          <button onClick={()=>{ setMenuOpen(false); navigate('/artist-apply'); }}
+            style={{ display:'block', width:'100%', textAlign:'left', padding:'10px 20px', background:'none', border:'none', fontFamily:'var(--font-body)', fontSize:'0.9rem', fontWeight:600, color:'var(--rose)', cursor:'pointer' }}
+            onMouseEnter={e=>e.currentTarget.style.background='var(--rose-light)'}
+            onMouseLeave={e=>e.currentTarget.style.background='none'}
+          >🎨 Join as Artist</button>
+        </div>
+      )}
     </nav>
   );
 }
@@ -690,7 +730,7 @@ function HeroSection() {
   }, []);
   const petals = Array.from({length:10},(_,i)=>({id:i,left:`${8+Math.random()*84}%`,duration:`${9+Math.random()*11}s`,delay:`${-Math.random()*16}s`}));
   return (
-    <section className="hero">
+    <section className="hero" id="section-hero">
       {heroSlides.map((s,i)=>(
         <div key={i} className={`hero-slide${i===current?" active":""}`}>
           <div className={`hero-bg ${s.bg}`}/>
@@ -702,10 +742,7 @@ function HeroSection() {
             <div className="hero-tag">{s.tag}</div>
             <h1 className="hero-title">{s.title}</h1>
             <p className="hero-sub">{s.sub}</p>
-            <div className="hero-btns">
-              <button className="btn-primary">{s.btn1}</button>
-              <button className="btn-outline-white">{s.btn2}</button>
-            </div>
+
           </div>
         </div>
       ))}
@@ -747,7 +784,7 @@ function OurStorySection() {
           ))}
         </div>
         <div className="join-cta">
-          <button className="btn-rose-large" onClick={() => navigate('/artist-apply')}>Start Selling Today →</button>
+          <button className="btn-rose-large" onClick={() => { console.log('clicked'); navigate('/artist-apply'); }}>Start Selling Today →</button>
         </div>
       </div>
     </section>
@@ -756,6 +793,7 @@ function OurStorySection() {
 
 function ProductCarousel({products}) {
   const trackRef = useRef(null);
+  const { addToCart } = useCartContext();
   const scroll = dir => trackRef.current?.scrollBy({left:dir*280,behavior:"smooth"});
   const drag = useRef({active:false,startX:0,scrollLeft:0});
   return (
@@ -775,7 +813,7 @@ function ProductCarousel({products}) {
                 ? <img src={p.image} alt={p.name} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
                 : <div className="product-emoji">{p.emoji||"🎨"}</div>
               }
-              <button className="add-to-cart">Add to Cart</button>
+              <button className="add-to-cart" onClick={e=>{ e.stopPropagation(); addToCart({ _id: p._id||p.id||String(i), name: p.name, price: p.price, pricePerStem: p.price, image: p.image||null }); }}>Add to Cart</button>
             </div>
             <div className="product-info">
               <div className="product-region">{p.category||p.region}</div>
@@ -811,7 +849,7 @@ function HandloomSection() {
   const filtered = active===0 ? handloomItems : handloomItems.filter(p=>p.category===allCategories[active-1]);
 
   return (
-    <section className="section"><div className="section-inner" ref={ref}>
+    <section className="section" id="section-handloom"><div className="section-inner" ref={ref}>
       <div className={`section-header fade-up${visible?" visible":""}`}>
         <div><div className="section-label">Textile Heritage</div><h2 className="section-title">Handloom</h2></div>
         <button className="btn-explore">Explore All →</button>
@@ -847,7 +885,7 @@ function PaintingsSection() {
   const filtered = activeTag==='All' ? paintingItems : paintingItems.filter(p=>(p.tags||[]).includes(activeTag));
 
   return (
-    <section className="section paintings-section"><div className="section-inner" ref={ref}>
+    <section className="section paintings-section" id="section-paintings"><div className="section-inner" ref={ref}>
       <div className={`section-header fade-up${visible?" visible":""}`}>
         <div><div className="section-label">Fine Arts</div><h2 className="section-title">Paintings</h2></div>
         <button className="btn-explore" onClick={()=>setActiveTag('All')}>Explore All →</button>
@@ -884,7 +922,7 @@ function PotterySection() {
   const filtered = activeTag==='All' ? potteryItems : potteryItems.filter(p=>(p.tags||[]).includes(activeTag));
 
   return (
-    <section className="section" style={{background:"var(--bg2)"}}><div className="section-inner" ref={ref}>
+    <section className="section" id="section-pottery" style={{background:"var(--bg2)"}}><div className="section-inner" ref={ref}>
       <div className={`section-header fade-up${visible?" visible":""}`}>
         <div><div className="section-label">Earth &amp; Fire</div><h2 className="section-title">Pottery</h2></div>
         <button className="btn-explore" onClick={()=>setActiveTag('All')}>Explore All →</button>
@@ -942,7 +980,7 @@ function WoodSection() {
   const rest = woodItems.slice(1);
 
   return (
-    <section className="section wood-section"><div className="section-inner" ref={ref}>
+    <section className="section wood-section" id="section-wood"><div className="section-inner" ref={ref}>
       <div className={`section-header fade-up${visible?" visible":""}`}>
         <div><div className="section-label">Master Craft</div><h2 className="section-title" style={{color:"#6b4020"}}>Wooden Sculpting</h2></div>
         <button className="btn-explore" style={{borderColor:"#c49a6c",color:"#8b5e3c"}}>Explore All →</button>
@@ -995,7 +1033,7 @@ function StoneSection() {
   const displayed = showAll ? stoneItems : stoneItems.slice(0,8);
 
   return (
-    <section className="stone-section">
+    <section className="stone-section" id="section-stone">
       <div className="section-inner" ref={ref}>
         <div className={`section-header fade-up${visible?" visible":""}`}>
           <div><div className="section-label">Ancient Craft</div><h2 className="section-title">Stone Art</h2></div>
