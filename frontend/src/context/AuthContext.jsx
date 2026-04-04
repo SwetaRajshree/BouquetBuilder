@@ -26,7 +26,8 @@ export function AuthProvider({ children }) {
         body: JSON.stringify({ email, password }),
       });
       const text = await res.text();
-      const data = text ? JSON.parse(text) : {};
+      if (!text) throw new Error("Server is waking up, please try again in a few seconds.");
+      const data = JSON.parse(text);
       if (!res.ok) throw new Error(data.message || "Login failed. Please try again.");
       localStorage.setItem("floriva_token", data.token);
       localStorage.setItem("floriva_user", JSON.stringify(data.user));
@@ -51,7 +52,8 @@ export function AuthProvider({ children }) {
         body: JSON.stringify({ name, email, password, role: "customer" }),
       });
       const text = await res.text();
-      const data = text ? JSON.parse(text) : {};
+      if (!text) throw new Error("Server is waking up, please try again in a few seconds.");
+      const data = JSON.parse(text);
       if (!res.ok) throw new Error(data.message || "Registration failed. Please try again.");
       localStorage.setItem("floriva_token", data.token);
       localStorage.setItem("floriva_user", JSON.stringify(data.user));
