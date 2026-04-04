@@ -39,6 +39,7 @@ const stoneArtRoutes        = require("./routes/stoneArtRoutes");
 const paintingRoutes        = require("./routes/paintingRoutes");
 const potteryRoutes         = require("./routes/potteryRoutes");
 const handloomRoutes        = require("./routes/handloomRoutes");
+const artistApplicationRoutes = require("./routes/artistApplicationRoutes");
 const giftRoutes         = require("./routes/giftRoutes");
 
 app.use("/api/auth",       authRoutes);
@@ -60,6 +61,7 @@ app.use("/api/stone-art",         stoneArtRoutes);
 app.use("/api/paintings",         paintingRoutes);
 app.use("/api/pottery",           potteryRoutes);
 app.use("/api/handloom",          handloomRoutes);
+app.use("/api/artist-applications", artistApplicationRoutes);
 app.use("/api/gifts",      giftRoutes);
 
 // Test Route

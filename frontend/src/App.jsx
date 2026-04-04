@@ -29,6 +29,7 @@ import BouquetCustomizePage from './pages/BouquetCustomizePage';
 import PostcardPage           from './pages/PostcardPage';
 import DigitalPostcardPage    from './pages/DigitalPostcardPage';
 import HandcraftPage          from './pages/HandcraftPage';
+import ArtistApplyPage        from './pages/ArtistApplyPage';
 import CollectionPage         from './pages/CollectionPage';
 import ForeverFlowersPage     from './pages/ForeverFlowersPage';
 import InstantGiftsPage       from './pages/InstantGiftsPage';
@@ -115,6 +116,7 @@ export default function App() {
           <Route path="/digilove"      element={<Navigate to="/digital-gifting" replace />} />
           <Route path="/digital-bouquet" element={<Navigate to="/bouquet-builder" replace />} />
           <Route path="/handcraft"     element={<HandcraftPage />} />
+          <Route path="/artist-apply"   element={<ArtistApplyPage />} />
           {/* Fallback */}
           <Route path="*"             element={<HomePage />}         />
         </Routes>

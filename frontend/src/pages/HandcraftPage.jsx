@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -745,7 +746,7 @@ function OurStorySection() {
           ))}
         </div>
         <div className="join-cta">
-          <button className="btn-rose-large">Start Selling Today →</button>
+          <button className="btn-rose-large" onClick={() => navigate('/artist-apply')}>Start Selling Today →</button>
         </div>
       </div>
     </section>
@@ -1131,6 +1132,7 @@ function Footer() {
 }
 
 export default function HandcraftPage() {
+  const navigate = useNavigate();
   return (
     <>
       <style>{styles}</style>
