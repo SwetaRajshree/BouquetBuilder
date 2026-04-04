@@ -1,6 +1,6 @@
 
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
-import { useEffect }                  from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import { useAuth }                    from './context/AuthContext';
 
 import Navbar           from './components/Navbar';
@@ -8,43 +8,43 @@ import Footer           from './components/Footer';
 import { FloraWidget }  from './components/FloraChat';
 
 import HomePage         from './pages/HomePage';
+import AuthPage         from './pages/AuthPage';
 import ShopsPage        from './pages/ShopsPage';
 import ShopPage         from './pages/ShopPage';
-import SubscriptionPage from './pages/SubscriptionPage';
-import SchedulePage     from './pages/SchedulePage';
-import CalendarPage     from './pages/CalanderPage';
-import PaymentPage      from './pages/PaymentPage';
-import CartPage         from './pages/CartPage';
-import TrackingPage     from './pages/TrackingPage';
-import AuthPage        from './pages/AuthPage';
-import OccasionPage    from './pages/OccasionPage';
-import OurStoryPage     from './pages/OurStoryPage';
-import AdminPage       from './pages/AdminPage';
-import AdminLoginPage  from './pages/AdminLoginPage';
-import AccountPage     from './pages/AccountPage';
-import BouquetBuilderPage from './pages/BouquetBuilderPage';
-import DigitalCardPage    from './pages/DigitalCardPage';
-import ViewBouquetPage   from './pages/ViewBouquetPage';
-import BouquetCustomizePage from './pages/BouquetCustomizePage';
-import PostcardPage           from './pages/PostcardPage';
-import DigitalPostcardPage    from './pages/DigitalPostcardPage';
-import HandcraftPage          from './pages/HandcraftPage';
-import KeepsakePage           from './pages/KeepsakePage';
-import ArtistApplyPage        from './pages/ArtistApplyPage';
-import CollectionPage         from './pages/CollectionPage';
-import ForeverFlowersPage     from './pages/ForeverFlowersPage';
-import InstantGiftsPage       from './pages/InstantGiftsPage';
-import GiftHampersPage        from './pages/GiftHampersPage';
-import GiftShopsPage          from './pages/GiftShopsPage';
 
-import DigitalGiftingPage from './pages/DigitalGiftingPage';
-import BuyPage            from './pages/BuyPage';
-import CakePage           from './pages/CakePage';
-import GiftsPage          from './pages/GiftsPage';
-import DigiLovePage       from './pages/DigiLovePage';
-import YourLovePage       from './pages/YourLovePage';
-import SharedGardenPage  from './pages/SharedGardenPage';
-import SharedPolaroidPage from './pages/SharedPolaroidPage';
+const SubscriptionPage      = lazy(() => import('./pages/SubscriptionPage'));
+const SchedulePage          = lazy(() => import('./pages/SchedulePage'));
+const CalendarPage          = lazy(() => import('./pages/CalanderPage'));
+const PaymentPage           = lazy(() => import('./pages/PaymentPage'));
+const CartPage              = lazy(() => import('./pages/CartPage'));
+const TrackingPage          = lazy(() => import('./pages/TrackingPage'));
+const OccasionPage          = lazy(() => import('./pages/OccasionPage'));
+const OurStoryPage          = lazy(() => import('./pages/OurStoryPage'));
+const AdminPage             = lazy(() => import('./pages/AdminPage'));
+const AdminLoginPage        = lazy(() => import('./pages/AdminLoginPage'));
+const AccountPage           = lazy(() => import('./pages/AccountPage'));
+const BouquetBuilderPage    = lazy(() => import('./pages/BouquetBuilderPage'));
+const BouquetCustomizePage  = lazy(() => import('./pages/BouquetCustomizePage'));
+const DigitalCardPage       = lazy(() => import('./pages/DigitalCardPage'));
+const ViewBouquetPage       = lazy(() => import('./pages/ViewBouquetPage'));
+const PostcardPage          = lazy(() => import('./pages/PostcardPage'));
+const DigitalPostcardPage   = lazy(() => import('./pages/DigitalPostcardPage'));
+const HandcraftPage         = lazy(() => import('./pages/HandcraftPage'));
+const KeepsakePage          = lazy(() => import('./pages/KeepsakePage'));
+const ArtistApplyPage       = lazy(() => import('./pages/ArtistApplyPage'));
+const CollectionPage        = lazy(() => import('./pages/CollectionPage'));
+const ForeverFlowersPage    = lazy(() => import('./pages/ForeverFlowersPage'));
+const InstantGiftsPage      = lazy(() => import('./pages/InstantGiftsPage'));
+const GiftHampersPage       = lazy(() => import('./pages/GiftHampersPage'));
+const GiftShopsPage         = lazy(() => import('./pages/GiftShopsPage'));
+const DigitalGiftingPage    = lazy(() => import('./pages/DigitalGiftingPage'));
+const BuyPage               = lazy(() => import('./pages/BuyPage'));
+const CakePage              = lazy(() => import('./pages/CakePage'));
+const GiftsPage             = lazy(() => import('./pages/GiftsPage'));
+const DigiLovePage          = lazy(() => import('./pages/DigiLovePage'));
+const YourLovePage          = lazy(() => import('./pages/YourLovePage'));
+const SharedGardenPage      = lazy(() => import('./pages/SharedGardenPage'));
+const SharedPolaroidPage    = lazy(() => import('./pages/SharedPolaroidPage'));
 
 // Scroll to top on route change
 function ScrollToTop() {
@@ -79,6 +79,7 @@ export default function App() {
       {showNavbar && <Navbar />}
 
       <main className="flex-1">
+        <Suspense fallback={<div style={{minHeight:'60vh',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'2rem'}}>🌸</div>}>
         <Routes>
           <Route path="/"             element={<HomePage />}         />
           <Route path="/sale"         element={<Navigate to="/buy" replace />} />
@@ -125,6 +126,7 @@ export default function App() {
           {/* Fallback */}
           <Route path="*"             element={<HomePage />}         />
         </Routes>
+        </Suspense>
       </main>
 
       {showFooter && <Footer />}
