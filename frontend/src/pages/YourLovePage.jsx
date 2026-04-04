@@ -642,6 +642,26 @@ export default function HeartJarReviews() {
         );
       })()}
 
+      {/* ── SHARE BUTTON ── */}
+      <div style={{marginTop:"16px",zIndex:10,width:"100%",maxWidth:"420px",textAlign:"center"}}>
+        <button onClick={() => {
+          const url = window.location.origin + '/your-love';
+          if (navigator.share) {
+            navigator.share({ title: '💌 Our Love Letters', text: 'Open the jar and read our love letters!', url });
+          } else {
+            navigator.clipboard.writeText(url).then(() => alert('Link copied! 💌'));
+          }
+        }} style={{
+          padding:"10px 28px",
+          background:"rgba(255,255,255,0.80)",backdropFilter:"blur(12px)",
+          color:"#7B0000",border:"1.5px solid rgba(160,50,50,0.25)",borderRadius:"999px",
+          fontSize:"13px",fontWeight:"700",cursor:"pointer",
+          fontFamily:"Palatino Linotype,serif",
+          boxShadow:"0 4px 14px rgba(123,0,0,0.12)",
+          display:"inline-flex",alignItems:"center",gap:"7px",
+        }}>🔗 Share this Love Jar</button>
+      </div>
+
       {/* ── LEAVE A REVIEW BUTTON + FORM ── */}
       <div style={{marginTop:"28px",zIndex:10,width:"100%",maxWidth:"420px"}}>
         {!showForm ? (

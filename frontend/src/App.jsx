@@ -95,7 +95,7 @@ export default function App() {
           <Route path="/bouquet-customize" element={<PrivateRoute><BouquetCustomizePage /></PrivateRoute>} />
           <Route path="/postcard"           element={<PrivateRoute><PostcardPage /></PrivateRoute>} />
           <Route path="/digital-postcard"    element={<PrivateRoute><DigitalPostcardPage /></PrivateRoute>} />
-          <Route path="/your-love"     element={<PrivateRoute><YourLovePage /></PrivateRoute>}       />
+          <Route path="/your-love"     element={<YourLovePage />}       />
           <Route path="/cake"          element={<PrivateRoute><CakePage /></PrivateRoute>}           />
           <Route path="/gifts"         element={<PrivateRoute><GiftsPage /></PrivateRoute>}          />
           <Route path="/digital-gifting"     element={<PrivateRoute><DigitalGiftingPage /></PrivateRoute>} />
