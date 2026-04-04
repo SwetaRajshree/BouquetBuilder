@@ -617,14 +617,6 @@ const heroSlides = [
   { tag:"❤️ Support Local Artisans", title:"Shop Handmade. Change Lives.", sub:"Every purchase directly supports independent artisans and their communities.", bg:"hero-bg-2", btn1:"Shop Now", btn2:"Meet the Artists" },
   { tag:"🎨 Become a Seller", title:"Join as an Artist & Sell Globally", sub:"Turn your craft into a livelihood. Reach millions of buyers who appreciate authentic handmade art.", bg:"hero-bg-3", btn1:"Start Selling →", btn2:"Learn More" },
 ];
-const handloomProducts = [
-  {id:1,emoji:"🥻",name:"Banarasi Silk Saree",artist:"Rekha Devi",region:"Varanasi, India",price:"₹12,500",original:"₹16,000"},
-  {id:2,emoji:"🧣",name:"Assam Muga Dupatta",artist:"Priya Bora",region:"Assam, India",price:"₹3,200",original:"₹4,500"},
-  {id:3,emoji:"🏮",name:"Chanderi Cotton Stole",artist:"Sunita Patel",region:"Madhya Pradesh",price:"₹1,800",original:"₹2,400"},
-  {id:4,emoji:"🛏️",name:"Handwoven Bed Linen",artist:"Fatima Begum",region:"Jaipur, India",price:"₹5,600",original:"₹7,000"},
-  {id:5,emoji:"🧺",name:"Ikat Weave Table Cloth",artist:"Lakshmi Rao",region:"Odisha, India",price:"₹2,100",original:"₹2,800"},
-  {id:6,emoji:"🪴",name:"Kashmiri Wool Carpet",artist:"Mohammad Ali",region:"Kashmir, India",price:"₹28,000",original:"₹35,000"},
-];
 const spotriProducts = [
   {id:1,emoji:"🛋️",name:"Kashmiri Embroidered Cushion",category:"Cushions",desc:"Hand-stitched floral patterns"},
   {id:2,emoji:"🎪",name:"Kantha Work Wall Hanging",category:"Wall Art",desc:"Traditional stitch art from Bengal"},
@@ -801,17 +793,30 @@ function ProductCarousel({products}) {
 
 function HandloomSection() {
   const ref=useRef(null);const visible=useIntersection(ref);
-  const pills=["Sarees","Dupattas","Stoles","Bed Linen","Table Cloth","Carpets"];
+  const [handloomItems,setHandloomItems]=useState([]);
+  const [loading,setLoading]=useState(true);
   const [active,setActive]=useState(0);
+
+  useEffect(()=>{
+    fetch(`${API_URL}/api/handloom`)
+      .then(r=>r.json())
+      .then(data=>setHandloomItems(Array.isArray(data)?data:[]))
+      .catch(console.error)
+      .finally(()=>setLoading(false));
+  },[]);
+
+  const allCategories=[...new Set(handloomItems.map(p=>p.category).filter(Boolean))];
+
   return (
     <section className="section"><div className="section-inner" ref={ref}>
       <div className={`section-header fade-up${visible?" visible":""}`}>
         <div><div className="section-label">Textile Heritage</div><h2 className="section-title">Handloom</h2></div>
         <button className="btn-explore">Explore All →</button>
       </div>
+      {loading && <p style={{color:"var(--text-muted)",fontSize:"0.9rem"}}>Loading handloom...</p>}
       <div className={`fade-up fade-up-delay-1${visible?" visible":""}`}>
-        <ProductCarousel products={handloomProducts}/>
-        <div className="pill-row">{pills.map((p,i)=><button key={p} className={`pill${i===active?" active":""}`} onClick={()=>setActive(i)}>{p}</button>)}</div>
+        <ProductCarousel products={handloomItems.map(p=>({...p, image:p.images?.[0], artist:p.artisan, region:p.location}))}/>
+        <div className="pill-row">{allCategories.map((c,i)=><button key={c} className={`pill${i===active?" active":""}`} onClick={()=>setActive(i)}>{c}</button>)}</div>
       </div>
     </div></section>
   );
