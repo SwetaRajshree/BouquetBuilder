@@ -5,7 +5,7 @@
   "scripts": {
     "build": "cd frontend && npm install && npm run build",
     "dev": "cd frontend && npm run dev",
-    "deploy": "wrangler deploy",
+    "deploy": "npm run build && wrangler deploy",
     "preview": "wrangler dev"
   },
   "devDependencies": {
