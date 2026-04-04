@@ -717,6 +717,7 @@ function HeroSection() {
 }
 
 function OurStorySection() {
+  const navigate = useNavigate();
   const ref = useRef(null); const visible = useIntersection(ref);
   const steps = [
     {emoji:"📸",title:"Upload Your Artwork",desc:"Create a stunning portfolio with photos and descriptions of your handcrafted pieces."},
