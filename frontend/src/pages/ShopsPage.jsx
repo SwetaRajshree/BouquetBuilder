@@ -316,6 +316,49 @@ export default function ShopsPage() {
               </div>
             ))}
           </div>
+
+          {/* ── Instagram Reels ── */}
+          <div className="mt-6 rounded-2xl overflow-hidden" style={{ background: 'linear-gradient(135deg,#1a0a2e,#2d1b3d,#1a0a2e)', padding: '28px 20px' }}>
+            <div className="text-center mb-5">
+              <div className="inline-flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full border border-white/20 mb-3">
+                <span className="text-pink-300 text-xs font-semibold">✨ Featured on Instagram</span>
+              </div>
+              <h3 className="font-playfair font-bold text-white text-base mb-1">🌸 heartartbysweta</h3>
+              <p className="text-purple-200 text-xs">Handcrafted bouquets & floral art</p>
+            </div>
+            <style>{`
+              .reel-card{flex-shrink:0;width:100px;border-radius:12px;overflow:hidden;border:2px solid rgba(255,255,255,0.12);transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);cursor:pointer;background:rgba(255,255,255,0.06);text-decoration:none;}
+              .reel-card:hover{transform:translateY(-6px) scale(1.05);border-color:rgba(255,182,193,0.6);box-shadow:0 16px 32px rgba(0,0,0,0.4);}
+              @keyframes shimmer{0%,100%{opacity:0.5;}50%{opacity:1;}}
+            `}</style>
+            <div className="flex gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth:'none' }}>
+              {[
+                { url:'https://www.instagram.com/reel/DPtTDvPE-gn/?igsh=OWdtMWh0d2xvNG4z', emoji:'🌹', label:'Rose Bouquet' },
+                { url:'https://www.instagram.com/reel/DRhiPyZk4pR/?igsh=djJkajk2eWJ4dWZz', emoji:'🌸', label:'Floral Art' },
+                { url:'https://www.instagram.com/reel/DOn76waDzlk/?igsh=MXV0c2s0Zzl6dm9hYg==', emoji:'💐', label:'Mixed Blooms' },
+                { url:'https://www.instagram.com/reel/DPtssgQkuHf/?igsh=MW42dDRoamZ6ZHd3cg==', emoji:'🌷', label:'Tulip Special' },
+                { url:'https://www.instagram.com/reel/DR3mcNuAVIW/?igsh=cmNqYzlqNTg0NWs2', emoji:'🌺', label:'Hibiscus Art' },
+                { url:'https://www.instagram.com/reel/DVqpn0fjAOb/?igsh=MWY5YWgydDJtcDYyMw==', emoji:'🪷', label:'Lotus Craft' },
+              ].map((reel, i) => (
+                <a key={i} href={reel.url} target="_blank" rel="noreferrer" className="reel-card">
+                  <div style={{ width:'100%', aspectRatio:'9/16', background:`linear-gradient(135deg,hsl(${300+i*20},60%,20%),hsl(${320+i*15},70%,30%))`, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:6 }}>
+                    <span style={{ fontSize:28, animation:`shimmer ${2+i*0.3}s ease-in-out infinite` }}>{reel.emoji}</span>
+                    <span style={{ fontSize:9, color:'rgba(255,255,255,0.5)', fontFamily:'sans-serif', letterSpacing:1 }}>▶ REEL</span>
+                  </div>
+                  <div style={{ padding:'8px' }}>
+                    <p style={{ margin:0, fontSize:10, color:'rgba(255,255,255,0.85)', fontWeight:600, fontFamily:'sans-serif' }}>{reel.label}</p>
+                  </div>
+                </a>
+              ))}
+            </div>
+            <div className="text-center mt-4">
+              <a href="https://www.instagram.com/heartartbysweta?igsh=eXQ0eHJ0c3RsOGdk" target="_blank" rel="noreferrer"
+                className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-xs font-semibold hover:-translate-y-0.5 transition-all"
+                style={{ background:'linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)', color:'white', boxShadow:'0 4px 14px rgba(220,39,67,0.4)' }}>
+                📸 Follow @heartartbysweta
+              </a>
+            </div>
+          </div>
         </div>
       </div>
 

@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function AuthPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirect = searchParams.get('redirect') || '/';
   const { login, register, loading } = useAuth();
 
   const [tab, setTab] = useState("login");
@@ -35,7 +37,7 @@ export default function AuthPage() {
       const res = await login(form.email, form.password);
       if (!res.success) return setError(res.message);
       setSuccess("Welcome back! 🌸 Redirecting...");
-      setTimeout(() => navigate("/"), 1200);
+      setTimeout(() => navigate(redirect), 1200);
 
     } else {
       if (!form.name || !form.email || !form.password) return setError("Please fill in all fields.");
@@ -43,7 +45,7 @@ export default function AuthPage() {
       const res = await register(form.name, form.email, form.password);
       if (!res.success) return setError(res.message);
       setSuccess("Account created! 🌺 Welcome to Floriva!");
-      setTimeout(() => navigate("/"), 1200);
+      setTimeout(() => navigate(redirect), 1200);
     }
   }
 
