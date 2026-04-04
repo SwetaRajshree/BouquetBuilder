@@ -12,6 +12,6 @@
     "nodejs_compat"
   ],
   "build": {
-    "command": "cd frontend && npm install && npm run build"
+    "command": "cd frontend && npm install --legacy-peer-deps && VITE_API_URL=https://bouquetbuilder.onrender.com VITE_CHATBOT_URL=https://bouquetbuilder-chatbot.onrender.com npm run build"
   }
 }
