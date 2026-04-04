@@ -629,11 +629,7 @@ export default function PostcardStudio() {
   ];
 
   const tabs = [
-    { id:"greeting",      label:"Greeting Cards"    },
-    { id:"occasions",     label:"Cards by Occasion" },
-    { id:"everyday",      label:"Everyday Cards"    },
-    { id:"makeown",       label:"Make Your Own"     },
-    { id:"announcements", label:"Announcements"     },
+    { id:"greeting", label:"Greeting Cards" },
   ];
   const scrollTo = (id) => {
     document.getElementById(id)?.scrollIntoView({ behavior:"smooth", block:"start" });
@@ -715,18 +711,7 @@ export default function PostcardStudio() {
           <p style={{ fontSize:16.5, lineHeight:1.78, color:"#6b6560", maxWidth:420, marginBottom:42, animation:"heroIn 0.9s ease 0.5s both" }}>
             From heartfelt birthday wishes to elegant announcements — customizable digital postcards delivered via email or text, right now.
           </p>
-          <div style={{ display:"flex", gap:14, flexWrap:"wrap", animation:"heroIn 0.9s ease 0.7s both" }}>
-            <button onClick={()=>scrollTo("greeting")} style={{ padding:"15px 36px", background:"#1a1714", color:"#faf8f3", border:"none", fontFamily:"inherit", fontSize:11.5, fontWeight:700, letterSpacing:"0.09em", textTransform:"uppercase", cursor:"pointer", transition:"all 0.3s" }} onMouseEnter={e=>e.currentTarget.style.background="#c98b8b"} onMouseLeave={e=>e.currentTarget.style.background="#1a1714"}>Browse Cards</button>
-            <button onClick={()=>scrollTo("makeown")} style={{ padding:"15px 36px", background:"transparent", color:"#1a1714", border:"1.5px solid rgba(26,23,20,0.28)", fontFamily:"inherit", fontSize:11.5, fontWeight:600, letterSpacing:"0.09em", textTransform:"uppercase", cursor:"pointer", transition:"all 0.3s" }} onMouseEnter={e=>{e.currentTarget.style.borderColor="#1a1714";e.currentTarget.style.background="#f5f1e8";}} onMouseLeave={e=>{e.currentTarget.style.borderColor="rgba(26,23,20,0.28)";e.currentTarget.style.background="transparent";}}>Make Your Own</button>
-          </div>
-          <div style={{ display:"flex", gap:44, marginTop:58, animation:"heroIn 0.9s ease 0.9s both" }}>
-            {[["500+","Card Designs"],["10M+","Cards Sent"],["200+","Designers"]].map(([n,l])=>(
-              <div key={l}>
-                <div style={{ fontFamily:"'Playfair Display',serif", fontSize:28, fontWeight:700, color:"#1a1714", letterSpacing:"-1px" }}>{n}</div>
-                <div style={{ fontSize:9.5, color:"#b8a99a", letterSpacing:"0.1em", textTransform:"uppercase", marginTop:3 }}>{l}</div>
-              </div>
-            ))}
-          </div>
+
         </div>
 
         {/* RIGHT — envelope animation */}
@@ -785,139 +770,6 @@ export default function PostcardStudio() {
         </div>
       </section>
 
-      {/* ════ OCCASIONS ════ */}
-      <section id="occasions" ref={el=>refs.current["occasions"]=el} style={{ padding:"80px", background:"#f5f1e8" }}>
-        <div id="occ-inner" ref={el=>refs.current["occ-inner"]=el} style={rev("occ-inner")}>
-          <div style={{ marginBottom:48 }}>
-            <div style={{ fontSize:10, fontWeight:700, letterSpacing:"0.14em", textTransform:"uppercase", color:"#b8a99a", marginBottom:10 }}>Browse by Occasion</div>
-            <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(28px,4vw,48px)", fontWeight:700, letterSpacing:"-1.5px" }}>Cards for <em style={{ color:"#c98b8b" }}>every</em> moment</h2>
-          </div>
-          <div style={{ display:"flex", gap:24, overflowX:"auto", paddingBottom:16, scrollbarWidth:"none" }}>
-            {[
-              { bg:"linear-gradient(135deg,#f7e1dc,#e8b4a8)", text:"Happy<br/>Birthday! 🎂", label:"Birthday",    color:"#7a3a30" },
-              { bg:"linear-gradient(135deg,#dce3f2,#9aaad4)", text:"Me &<br/>You 💑",        label:"Anniversary", color:"#1a2a5e" },
-              { bg:"linear-gradient(135deg,#dff2e4,#a8d4b2)", text:"Congrats! 🎉",           label:"Congrats",    color:"#1a4a28" },
-              { bg:"linear-gradient(135deg,#fff3d6,#f0cc70)", text:"Hello<br/>Baby! 🍼",      label:"New Baby",    color:"#5a4010" },
-              { bg:"linear-gradient(135deg,#e8e4f0,#b8aed4)", text:"With<br/>Sympathy 🕊️",   label:"Sympathy",    color:"#2a2040" },
-              { bg:"linear-gradient(135deg,#fdf6ee,#e8cfa8)", text:"Save<br/>the Date 💍",    label:"Wedding",     color:"#4a3820" },
-              { bg:"linear-gradient(135deg,#f2dce0,#d49aa0)", text:"Season's<br/>Joy 🎄",     label:"Holiday",     color:"#4a1a20" },
-              { bg:"linear-gradient(135deg,#ffe8e8,#f0a0a0)", text:"Love<br/>You ♥",          label:"Love",        color:"#6a1a1a" },
-            ].map(occ=>(
-              <OccasionCircle key={occ.label} {...occ} onClick={()=>showToast(`Browsing ${occ.label} cards...`)}/>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ════ EVERYDAY ════ */}
-      <section id="everyday" ref={el=>refs.current["everyday"]=el} style={{ padding:"80px" }}>
-        <div id="everyday-inner" ref={el=>refs.current["everyday-inner"]=el} style={rev("everyday-inner")}>
-          <div style={{ textAlign:"center", marginBottom:56 }}>
-            <div style={{ fontSize:10, fontWeight:700, letterSpacing:"0.14em", textTransform:"uppercase", color:"#b8a99a", marginBottom:12 }}>Everyday Expressions</div>
-            <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(28px,4vw,52px)", fontWeight:700, letterSpacing:"-1.5px" }}>Send the perfect <em style={{ color:"#c98b8b" }}>sentiment</em></h2>
-          </div>
-          <div style={{ background:"linear-gradient(135deg,#edf5f7 0%,#e0ecf0 100%)", padding:"56px 64px", borderRadius:4, marginBottom:56 }}>
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:20 }}>
-              {[
-                { bg:"linear-gradient(135deg,#1a1714,#3a2a24)", text:"<span style='font-size:28px;display:block;margin-bottom:8px'>♥</span>Love You.<br/>Always.", label:"LOVE" },
-                { bg:"linear-gradient(135deg,#f5e6a3,#e8d070)", text:"☀️ Sending<br/>good vibes<br/>your way", label:"THINKING OF YOU" },
-                { bg:"linear-gradient(135deg,#c8ddd0,#6a9e8a)", text:"Feel<br/>Better<br/>Soon 🌸", label:"GET WELL SOON" },
-                { bg:"linear-gradient(135deg,#e8e0f0,#b0a0d4)", text:"With<br/>Deepest<br/>Sympathy", label:"SYMPATHY" },
-              ].map(s=>(
-                <SentimentCard key={s.label} {...s} onClick={()=>showToast(`Browsing ${s.label} cards...`)}/>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ════ MAKE YOUR OWN ════ */}
-      <section id="makeown" ref={el=>refs.current["makeown"]=el} style={{ padding:"80px", background:"#f5f1e8" }}>
-        <div id="makeown-inner" ref={el=>refs.current["makeown-inner"]=el} style={rev("makeown-inner")}>
-          <div style={{ fontSize:12, color:"#b8a99a", marginBottom:32, display:"flex", gap:8, alignItems:"center" }}>
-            <span style={{ cursor:"pointer" }}>Home</span><span>/</span><span style={{ cursor:"pointer" }}>Online invitations</span><span>/</span><span style={{ color:"#1a1714", fontWeight:500 }}>Make your own</span>
-          </div>
-          <div style={{ marginBottom:48 }}>
-            <div style={{ fontSize:10, fontWeight:700, letterSpacing:"0.14em", textTransform:"uppercase", color:"#b8a99a", marginBottom:10 }}>Your Creativity</div>
-            <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(28px,4vw,48px)", fontWeight:700, letterSpacing:"-1.5px" }}>Make <em style={{ color:"#c98b8b" }}>your own</em> card</h2>
-          </div>
-          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:24, marginBottom:72 }}>
-            <MakeYourOwnCard title="Upload your own Card design" desc="Choose an invitation template for your design, send instantly, and manage everything with our helpful features." ctaLabel="Get Started" accent="#c98b8b" onClick={()=>showToast("Opening card design uploader...")}
-              preview={
-                <div style={{ position:"relative", width:200, height:200, flexShrink:0 }}>
-                  <div style={{ position:"absolute", top:20, right:10, width:120, height:160, background:"linear-gradient(135deg,#9b59b6,#8e44ad)", borderRadius:3, transform:"rotate(6deg)", boxShadow:"0 8px 24px rgba(0,0,0,0.2)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                    <svg viewBox="0 0 60 40" width={50}><rect x="1" y="8" width="58" height="29" rx="2" fill="#d4b870"/><path d="M1 8 L30 22 L59 8Z" fill="#e8cfa0"/></svg>
-                  </div>
-                  <div style={{ position:"absolute", top:40, left:10, width:120, height:160, background:"white", borderRadius:3, border:"2px dashed #c98b8b", transform:"rotate(-4deg)", boxShadow:"0 8px 24px rgba(0,0,0,0.12)", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:8, padding:12 }}>
-                    <div style={{ fontSize:28, color:"#c98b8b" }}>↑</div>
-                    <div style={{ fontSize:10, fontWeight:700, color:"#c98b8b", textAlign:"center", letterSpacing:"0.05em" }}>Upload<br/>Design</div>
-                  </div>
-                </div>
-              }
-            />
-            <MakeYourOwnCard title="Create your own Flyer in minutes" desc="Make a one-of-a-kind textable event page with customizable designs, images, stickers, filters, and more." ctaLabel="Create Now" accent="#c4714a" onClick={()=>showToast("Opening flyer creator...")}
-              preview={
-                <div style={{ position:"relative", width:200, height:200, flexShrink:0 }}>
-                  <div style={{ position:"absolute", right:0, top:10, width:130, height:170, background:"linear-gradient(135deg,#ff6b35,#f7c59f)", borderRadius:4, boxShadow:"0 8px 24px rgba(0,0,0,0.2)", display:"flex", flexDirection:"column", padding:10, gap:4 }}>
-                    <div style={{ background:"rgba(255,255,255,0.3)", height:30, borderRadius:2, display:"flex", alignItems:"center", padding:"0 8px", gap:6 }}>
-                      {["FORGE","Ace","Cable","Airbrush"].map(f=><div key={f} style={{ fontSize:8, fontWeight:700, color:f==="Cable"?"#1a1714":"rgba(255,255,255,0.8)", background:f==="Cable"?"white":"none", padding:"1px 4px", borderRadius:1 }}>{f}</div>)}
-                    </div>
-                    <div style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center" }}>
-                      <div style={{ fontSize:14, fontWeight:900, color:"white", letterSpacing:"0.05em", textAlign:"center", textTransform:"uppercase" }}>BIRTHDAY<br/>MOOD</div>
-                    </div>
-                    <div style={{ background:"#1a1714", color:"white", fontSize:8, fontWeight:700, textAlign:"center", padding:"4px 0", letterSpacing:"0.1em" }}>RSVP</div>
-                  </div>
-                </div>
-              }
-            />
-          </div>
-          <div style={{ marginBottom:40 }}>
-            <h3 style={{ fontFamily:"'Playfair Display',serif", fontSize:28, fontWeight:700, textAlign:"center", letterSpacing:"-0.8px", marginBottom:10 }}>Upload your own invitation templates</h3>
-            <p style={{ textAlign:"center", color:"#6b6560", fontSize:14, marginBottom:48 }}>Have an existing design? Find the right invitation template and send via email, text, or link.</p>
-            <div style={{ display:"flex", gap:10, marginBottom:32, flexWrap:"wrap", alignItems:"center" }}>
-              {["Most Popular ▾","Color ▾","Photo count ▾","Designer ▾","Price ▾"].map(f=>(
-                <button key={f} onClick={()=>showToast(`Filter: ${f}`)} style={{ padding:"8px 14px", fontSize:12, fontWeight:500, fontFamily:"inherit", border:"1.5px solid rgba(184,169,154,0.4)", background:"white", color:"#1a1714", cursor:"pointer", transition:"all 0.2s" }} onMouseEnter={e=>e.currentTarget.style.borderColor="#1a1714"} onMouseLeave={e=>e.currentTarget.style.borderColor="rgba(184,169,154,0.4)"}>{f}</button>
-              ))}
-              <span style={{ fontSize:12, fontWeight:600, color:"#2c7be5", display:"flex", alignItems:"center", gap:6 }}>⚡ All filters</span>
-              <span style={{ fontSize:12, color:"#6b6560" }}>19 Results</span>
-              <button onClick={()=>showToast("Opening photo preview...")} style={{ marginLeft:"auto", padding:"10px 24px", background:"#2c7be5", color:"white", border:"none", fontFamily:"inherit", fontSize:12, fontWeight:700, letterSpacing:"0.04em", cursor:"pointer", borderRadius:32, transition:"background 0.2s" }} onMouseEnter={e=>e.currentTarget.style.background="#1a5ec4"} onMouseLeave={e=>e.currentTarget.style.background="#2c7be5"}>Preview with my photo</button>
-            </div>
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:32 }}>
-              {[{label:"Custom (Fit to your design)",viewed:true},{label:"Custom (Two-Sided Photo)"},{label:"Custom (Sawtooth)",trending:true},{label:"Custom"}].map((t,i)=>(
-                <div key={i} style={{ animation:`slideUp 0.5s ease ${i*0.1}s both` }}><UploadCard {...t}/></div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ════ ANNOUNCEMENTS ════ */}
-      <section id="announcements" ref={el=>refs.current["announcements"]=el} style={{ padding:"80px" }}>
-        <div id="ann-inner" ref={el=>refs.current["ann-inner"]=el} style={rev("ann-inner")}>
-          <div style={{ display:"flex", alignItems:"flex-end", justifyContent:"space-between", marginBottom:48 }}>
-            <div>
-              <div style={{ fontSize:10, fontWeight:700, letterSpacing:"0.14em", textTransform:"uppercase", color:"#b8a99a", marginBottom:10 }}>Life's Big Moments</div>
-              <h2 style={{ fontFamily:"'Playfair Display',serif", fontSize:"clamp(28px,4vw,48px)", fontWeight:700, letterSpacing:"-1.5px" }}><em style={{ color:"#c98b8b" }}>Announcements</em></h2>
-            </div>
-            <button onClick={()=>showToast("Viewing all announcements...")} style={{ fontSize:11, fontWeight:700, letterSpacing:"0.08em", textTransform:"uppercase", background:"none", border:"none", borderBottom:"1.5px solid #1a1714", paddingBottom:2, cursor:"pointer", fontFamily:"inherit" }}>View all</button>
-          </div>
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:24 }}>
-            {[
-              { bg:"linear-gradient(135deg,#3a3020,#6a5530)", text:"CLASS OF 2025", color:"#f0d880", label:"Graduation" },
-              { bg:"linear-gradient(135deg,#c0dce8,#7ab0c8)", text:"Hello,<br/>World!",  color:"white",   label:"Birth"      },
-              { bg:"linear-gradient(135deg,#f0c0a0,#c07840)", text:"We<br/>Moved!",      color:"white",   label:"Moving"     },
-              { bg:"linear-gradient(135deg,#f5f0e8,#d4c0a0)", text:"Save<br/>the<br/>Date", color:"#3a2a18", label:"Wedding" },
-            ].map((a,i)=>(
-              <div key={a.label} onMouseEnter={()=>setHovAnn(i)} onMouseLeave={()=>setHovAnn(null)} onClick={()=>showToast(`Browsing ${a.label} announcements...`)} style={{ cursor:"pointer", transform:hovAnn===i?"translateY(-6px)":"translateY(0)", boxShadow:hovAnn===i?"0 20px 50px rgba(0,0,0,0.18)":"0 6px 20px rgba(0,0,0,0.1)", transition:"all 0.35s ease", borderRadius:2, overflow:"hidden" }}>
-                <div style={{ background:a.bg, aspectRatio:"3/4", display:"flex", alignItems:"center", justifyContent:"center" }}>
-                  <div style={{ fontFamily:"'Playfair Display',serif", fontSize:24, fontWeight:700, color:a.color, textAlign:"center", lineHeight:1.2 }} dangerouslySetInnerHTML={{__html:a.text}}/>
-                </div>
-                <div style={{ padding:"12px 0", textAlign:"center", fontSize:10, fontWeight:700, letterSpacing:"0.1em", textTransform:"uppercase", color:"#1a1714" }}>{a.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* ════ HOW IT WORKS ════ */}
       <section style={{ padding:"80px", background:"#f5f1e8" }}>
@@ -945,31 +797,17 @@ export default function PostcardStudio() {
       </section>
 
       {/* ════ FOOTER ════ */}
-      <footer style={{ background:"#1a1714", color:"rgba(255,255,255,0.55)", padding:"64px 80px 40px" }}>
-        <div style={{ display:"grid", gridTemplateColumns:"2fr 1fr 1fr 1fr", gap:48, marginBottom:48 }}>
-          <div>
-            <div style={{ fontFamily:"'Playfair Display',serif", fontSize:24, fontWeight:700, color:"white", marginBottom:16 }}>Post<span style={{ color:"#c98b8b" }}>card</span> Studio</div>
-            <p style={{ fontSize:13, lineHeight:1.7, maxWidth:220 }}>Send beautiful, customizable digital cards for every occasion — instantly via email or text.</p>
-          </div>
-          {[
-            { title:"Help",    links:["FAQ","Contact us","Return policy","Sitemap"]                           },
-            { title:"Company", links:["About","Pricing","Promo codes","Careers"]                              },
-            { title:"Learn",   links:["Blog","Online invitations","Designer collections","Product features"]  },
-          ].map(col=>(
-            <div key={col.title}>
-              <div style={{ fontSize:10, fontWeight:700, letterSpacing:"0.12em", textTransform:"uppercase", color:"rgba(255,255,255,0.35)", marginBottom:16 }}>{col.title}</div>
-              {col.links.map(l=>(
-                <div key={l} style={{ fontSize:13, marginBottom:10, cursor:"pointer", transition:"color 0.2s" }} onMouseEnter={e=>e.target.style.color="white"} onMouseLeave={e=>e.target.style.color="rgba(255,255,255,0.55)"}>{l}</div>
+      <footer style={{ background:"#1a1714", color:"rgba(255,255,255,0.55)", padding:"36px 48px" }}>
+        <div style={{ maxWidth:640, margin:"0 auto", display:"flex", flexDirection:"column", alignItems:"center", gap:16, textAlign:"center" }}>
+          <div style={{ fontFamily:"'Playfair Display',serif", fontSize:22, fontWeight:700, color:"white" }}>Post<span style={{ color:"#c98b8b" }}>card</span> Studio</div>
+          <p style={{ fontSize:13, lineHeight:1.7, color:"rgba(255,255,255,0.45)", maxWidth:360 }}>Send beautiful, customizable digital cards for every occasion — instantly via email or text.</p>
+          <div style={{ borderTop:"1px solid rgba(255,255,255,0.08)", paddingTop:20, width:"100%", display:"flex", justifyContent:"space-between", alignItems:"center", fontSize:12 }}>
+            <span>© 2025 Postcard Studio. All rights reserved.</span>
+            <div style={{ display:"flex", gap:20 }}>
+              {["Privacy Policy","Terms of Service"].map(l=>(
+                <span key={l} style={{ cursor:"pointer", color:"rgba(255,255,255,0.35)", transition:"color 0.2s" }} onMouseEnter={e=>e.target.style.color="white"} onMouseLeave={e=>e.target.style.color="rgba(255,255,255,0.35)"}>{l}</span>
               ))}
             </div>
-          ))}
-        </div>
-        <div style={{ borderTop:"1px solid rgba(255,255,255,0.08)", paddingTop:32, display:"flex", justifyContent:"space-between", alignItems:"center", fontSize:12 }}>
-          <span>© 2025 Postcard Studio. All rights reserved.</span>
-          <div style={{ display:"flex", gap:20 }}>
-            {["Privacy Policy","Terms of Service"].map(l=>(
-              <span key={l} style={{ cursor:"pointer", color:"rgba(255,255,255,0.35)", transition:"color 0.2s" }} onMouseEnter={e=>e.target.style.color="white"} onMouseLeave={e=>e.target.style.color="rgba(255,255,255,0.35)"}>{l}</span>
-            ))}
           </div>
         </div>
       </footer>
