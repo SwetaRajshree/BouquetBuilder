@@ -806,6 +806,7 @@ function HandloomSection() {
   },[]);
 
   const allCategories=[...new Set(handloomItems.map(p=>p.category).filter(Boolean))];
+  const filtered = active===0 ? handloomItems : handloomItems.filter(p=>p.category===allCategories[active-1]);
 
   return (
     <section className="section"><div className="section-inner" ref={ref}>
@@ -815,8 +816,11 @@ function HandloomSection() {
       </div>
       {loading && <p style={{color:"var(--text-muted)",fontSize:"0.9rem"}}>Loading handloom...</p>}
       <div className={`fade-up fade-up-delay-1${visible?" visible":""}`}>
-        <ProductCarousel products={handloomItems.map(p=>({...p, image:p.images?.[0], artist:p.artisan, region:p.location}))}/>
-        <div className="pill-row">{allCategories.map((c,i)=><button key={c} className={`pill${i===active?" active":""}`} onClick={()=>setActive(i)}>{c}</button>)}</div>
+        <ProductCarousel products={filtered.map(p=>({...p, image:p.images?.[0], artist:p.artisan, region:p.location}))}/>
+        <div className="pill-row">
+          <button className={`pill${active===0?" active":""}`} onClick={()=>setActive(0)}>All</button>
+          {allCategories.map((c,i)=><button key={c} className={`pill${active===i+1?" active":""}`} onClick={()=>setActive(i+1)}>{c}</button>)}
+        </div>
       </div>
     </div></section>
   );
