@@ -29,6 +29,7 @@ import BouquetCustomizePage from './pages/BouquetCustomizePage';
 import PostcardPage           from './pages/PostcardPage';
 import DigitalPostcardPage    from './pages/DigitalPostcardPage';
 import HandcraftPage          from './pages/HandcraftPage';
+import KeepsakePage           from './pages/KeepsakePage';
 import ArtistApplyPage        from './pages/ArtistApplyPage';
 import CollectionPage         from './pages/CollectionPage';
 import ForeverFlowersPage     from './pages/ForeverFlowersPage';
@@ -64,10 +65,13 @@ function PrivateRoute({ children }) {
 const NO_FOOTER_PAGES = ['/handcraft', '/artist-apply'];
 const NO_NAVBAR_PAGES = ['/handcraft', '/artist-apply'];
 
+// keepsake pages are fullscreen — hide nav/footer for any /keepsake/* path
+const isKeepsakePath = (p) => p.startsWith('/keepsake/');
+
 export default function App() {
   const { pathname } = useLocation();
-  const showFooter = !NO_FOOTER_PAGES.includes(pathname);
-  const showNavbar  = !NO_NAVBAR_PAGES.includes(pathname);
+  const showFooter = !NO_FOOTER_PAGES.includes(pathname) && !isKeepsakePath(pathname);
+  const showNavbar  = !NO_NAVBAR_PAGES.includes(pathname) && !isKeepsakePath(pathname);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -110,6 +114,7 @@ export default function App() {
           <Route path="/view-bouquet/:id" element={<ViewBouquetPage />}  />
           <Route path="/shared-garden/:id"   element={<SharedGardenPage />} />
           <Route path="/shared-polaroid/:id"  element={<SharedPolaroidPage />} />
+          <Route path="/keepsake/:id"           element={<KeepsakePage />} />
           <Route path="/story"        element={<OurStoryPage />}     />
           <Route path="/admin-login"   element={<AdminLoginPage />}   />
           <Route path="/admin"         element={<AdminPage />}        />
