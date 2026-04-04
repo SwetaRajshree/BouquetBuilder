@@ -832,7 +832,7 @@ function PaintingsSection() {
   const ref=useRef(null);const visible=useIntersection(ref);
   const [paintingItems,setPaintingItems]=useState([]);
   const [loading,setLoading]=useState(true);
-  const [active,setActive]=useState(0);
+  const [activeTag,setActiveTag]=useState('All');
 
   useEffect(()=>{
     fetch(`${API_URL}/api/paintings`)
@@ -842,18 +842,24 @@ function PaintingsSection() {
       .finally(()=>setLoading(false));
   },[]);
 
-  const allTags=[...new Set(paintingItems.flatMap(p=>p.tags||[]))];
+  const allTags=['All',...new Set(paintingItems.flatMap(p=>p.tags||[]))];
+  const filtered = activeTag==='All' ? paintingItems : paintingItems.filter(p=>(p.tags||[]).includes(activeTag));
 
   return (
     <section className="section paintings-section"><div className="section-inner" ref={ref}>
       <div className={`section-header fade-up${visible?" visible":""}`}>
         <div><div className="section-label">Fine Arts</div><h2 className="section-title">Paintings</h2></div>
-        <button className="btn-explore">Explore All →</button>
+        <button className="btn-explore" onClick={()=>setActiveTag('All')}>Explore All →</button>
       </div>
       {loading && <p style={{color:"var(--text-muted)",fontSize:"0.9rem"}}>Loading paintings...</p>}
+      {!loading && paintingItems.length===0 && <p style={{color:"var(--text-muted)",fontSize:"0.9rem"}}>No paintings found.</p>}
       <div className={`fade-up fade-up-delay-1${visible?" visible":""}`}>
-        <ProductCarousel products={paintingItems}/>
-        <div className="pill-row">{allTags.slice(0,8).map((t,i)=><button key={t} className={`pill${i===active?" active":""}`} onClick={()=>setActive(i)}>{t}</button>)}</div>
+        <ProductCarousel products={filtered}/>
+        <div className="pill-row">
+          {allTags.slice(0,9).map(t=>(
+            <button key={t} className={`pill${t===activeTag?" active":""}`} onClick={()=>setActiveTag(t)}>{t}</button>
+          ))}
+        </div>
       </div>
     </div></section>
   );
@@ -863,7 +869,7 @@ function PotterySection() {
   const ref=useRef(null);const visible=useIntersection(ref);
   const [potteryItems,setPotteryItems]=useState([]);
   const [loading,setLoading]=useState(true);
-  const [active,setActive]=useState(0);
+  const [activeTag,setActiveTag]=useState('All');
 
   useEffect(()=>{
     fetch(`${API_URL}/api/pottery`)
@@ -873,18 +879,24 @@ function PotterySection() {
       .finally(()=>setLoading(false));
   },[]);
 
-  const allTags=[...new Set(potteryItems.flatMap(p=>p.tags||[]))];
+  const allTags=['All',...new Set(potteryItems.flatMap(p=>p.tags||[]))];
+  const filtered = activeTag==='All' ? potteryItems : potteryItems.filter(p=>(p.tags||[]).includes(activeTag));
 
   return (
     <section className="section" style={{background:"var(--bg2)"}}><div className="section-inner" ref={ref}>
       <div className={`section-header fade-up${visible?" visible":""}`}>
         <div><div className="section-label">Earth &amp; Fire</div><h2 className="section-title">Pottery</h2></div>
-        <button className="btn-explore">Explore All →</button>
+        <button className="btn-explore" onClick={()=>setActiveTag('All')}>Explore All →</button>
       </div>
       {loading && <p style={{color:"var(--text-muted)",fontSize:"0.9rem"}}>Loading pottery...</p>}
+      {!loading && potteryItems.length===0 && <p style={{color:"var(--text-muted)",fontSize:"0.9rem"}}>No pottery found.</p>}
       <div className={`fade-up fade-up-delay-1${visible?" visible":""}`}>
-        <ProductCarousel products={potteryItems}/>
-        <div className="pill-row">{allTags.slice(0,8).map((t,i)=><button key={t} className={`pill${i===active?" active":""}`} onClick={()=>setActive(i)}>{t}</button>)}</div>
+        <ProductCarousel products={filtered}/>
+        <div className="pill-row">
+          {allTags.slice(0,9).map(t=>(
+            <button key={t} className={`pill${t===activeTag?" active":""}`} onClick={()=>setActiveTag(t)}>{t}</button>
+          ))}
+        </div>
       </div>
     </div></section>
   );
