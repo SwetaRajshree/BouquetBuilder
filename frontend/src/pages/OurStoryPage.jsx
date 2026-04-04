@@ -143,8 +143,15 @@ export default function OurStoryPage() {
             </p>
           </Reveal>
           <Reveal delay={150}>
-            <div className="bg-gradient-to-br from-[#ffe8ed] to-[#eadcf7] rounded-lg p-14 text-center text-[6rem] shadow-soft-s hover:scale-105 transition-transform duration-500">
-              🌹
+            <div className="rounded-lg overflow-hidden shadow-soft-m aspect-video w-full">
+              <iframe
+                src="https://www.youtube.com/embed/wjgxF7OzUBM?rel=0&modestbranding=1"
+                title="Our Story"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full"
+                style={{ border: 'none', display: 'block' }}
+              />
             </div>
           </Reveal>
         </div>
