@@ -7,9 +7,17 @@ const API_URL = import.meta.env.VITE_API_URL;
 const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap');
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  .artisan-page {
+    font-family: 'DM Sans', sans-serif;
+    background: #fdf8f5;
+    color: #3a2530;
+    line-height: 1.6;
+  }
 
-  :root {
+  .artisan-page *, .artisan-page *::before, .artisan-page *::after { box-sizing: border-box; }
+
+  .artisan-page :root,
+  .artisan-page {
     --bg:          #fdf8f5;
     --bg2:         #faf3ee;
     --rose:        #c9748a;
@@ -33,17 +41,10 @@ const styles = `
     --transition:  all 0.35s cubic-bezier(0.4,0,0.2,1);
   }
 
-  html { scroll-behavior: smooth; }
-  body {
-    font-family: var(--font-body);
-    background: var(--bg);
-    color: var(--text);
-    overflow-x: hidden;
-    line-height: 1.6;
-  }
+  .artisan-page { scroll-behavior: smooth; overflow-x: hidden; }
 
   /* ── NAVBAR ── */
-  .navbar {
+  .artisan-page .navbar {
     position: fixed; top: 0; left: 0; right: 0; z-index: 999;
     display: flex; align-items: center; justify-content: space-between;
     padding: 0 48px; height: 70px;
@@ -51,61 +52,60 @@ const styles = `
     backdrop-filter: blur(18px);
     border-bottom: 1px solid var(--border);
     transition: var(--transition);
-    position: relative;
   }
-  .navbar.scrolled {
+  .artisan-page .navbar.scrolled {
     height: 58px;
     background: rgba(253,248,245,0.97);
     box-shadow: 0 4px 20px rgba(150,90,110,0.08);
   }
-  .nav-logo {
+  .artisan-page .nav-logo {
     display: flex; align-items: center; gap: 10px;
     font-family: var(--font-display); font-size: 1.5rem; font-weight: 600;
     color: var(--rose-deep); text-decoration: none; white-space: nowrap;
     letter-spacing: 0.01em;
   }
-  .nav-links { display: flex; align-items: center; gap: 2px; list-style: none; }
-  .nav-links a {
+  .artisan-page .nav-links { display: flex; align-items: center; gap: 2px; list-style: none; }
+  .artisan-page .nav-links a {
     padding: 6px 14px; border-radius: 8px;
     font-size: 0.875rem; font-weight: 500;
     color: var(--text); text-decoration: none; transition: var(--transition);
   }
-  .nav-links a:hover { background: var(--rose-light); color: var(--rose-deep); }
-  .nav-right { display: flex; align-items: center; gap: 12px; }
-  .nav-search {
+  .artisan-page .nav-links a:hover { background: var(--rose-light); color: var(--rose-deep); }
+  .artisan-page .nav-right { display: flex; align-items: center; gap: 12px; }
+  .artisan-page .nav-search {
     display: flex; align-items: center;
     background: var(--rose-light); border-radius: 10px;
     padding: 6px 14px; gap: 8px;
     border: 1.5px solid transparent; transition: var(--transition);
   }
-  .nav-search:focus-within { border-color: var(--rose); background: white; }
-  .nav-search input {
+  .artisan-page .nav-search:focus-within { border-color: var(--rose); background: white; }
+  .artisan-page .nav-search input {
     border: none; background: transparent; outline: none;
     font-family: var(--font-body); font-size: 0.85rem; color: var(--text); width: 150px;
   }
-  .nav-search input::placeholder { color: var(--text-muted); }
-  .btn-icon {
+  .artisan-page .nav-search input::placeholder { color: var(--text-muted); }
+  .artisan-page .btn-icon {
     width: 40px; height: 40px; border-radius: 10px;
     display: flex; align-items: center; justify-content: center;
     border: 1.5px solid var(--rose-mid); background: transparent;
     cursor: pointer; color: var(--rose); transition: var(--transition); position: relative;
   }
-  .btn-icon:hover { background: var(--rose-light); border-color: var(--rose); }
-  .cart-badge {
+  .artisan-page .btn-icon:hover { background: var(--rose-light); border-color: var(--rose); }
+  .artisan-page .cart-badge {
     position: absolute; top: -5px; right: -5px;
     width: 18px; height: 18px; border-radius: 50%;
     background: var(--rose); color: white;
     font-size: 0.65rem; font-weight: 700;
     display: flex; align-items: center; justify-content: center;
   }
-  .btn-artist {
+  .artisan-page .btn-artist {
     padding: 8px 20px; border-radius: 10px;
     background: var(--rose); color: white; border: none;
     font-family: var(--font-body); font-size: 0.875rem; font-weight: 600;
     cursor: pointer; transition: var(--transition);
     animation: softPulse 2.8s ease-in-out infinite;
   }
-  .btn-artist:hover { background: var(--rose-deep); transform: translateY(-1px); animation: none; }
+  .artisan-page .btn-artist:hover { background: var(--rose-deep); transform: translateY(-1px); animation: none; }
   @keyframes softPulse {
     0%,100% { box-shadow: 0 0 0 0 rgba(201,116,138,0.35); }
     50%      { box-shadow: 0 0 0 8px rgba(201,116,138,0); }
@@ -1176,9 +1176,15 @@ function Footer() {
 
 export default function HandcraftPage() {
   const navigate = useNavigate();
+  useEffect(() => {
+    const tag = document.createElement('style');
+    tag.id = 'artisan-styles';
+    tag.textContent = styles;
+    document.head.appendChild(tag);
+    return () => { document.getElementById('artisan-styles')?.remove(); };
+  }, []);
   return (
     <>
-      <style>{styles}</style>
       <Navbar/>
       <button
         onClick={() => window.history.back()}
