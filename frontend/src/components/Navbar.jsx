@@ -106,7 +106,7 @@ export default function Navbar() {
             key={l.to}
             to={l.to}
             className={`text-[.82rem] font-medium px-3 py-1.5 rounded-full transition-all whitespace-nowrap
-              ${pathname === l.to ? 'bg-blush text-roseDD font-semibold' : 'text-textM hover:bg-blushL hover:text-roseDD'}`}
+              ${pathname === l.to ? 'bg-blush text-roseDD font-semibold' : 'text-roseDD hover:bg-blushL hover:text-roseDD'}`}
           >
             {l.label}
           </Link>

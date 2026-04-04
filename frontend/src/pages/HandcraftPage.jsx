@@ -678,14 +678,6 @@ function Navbar() {
         <FlowerIcon size={28}/>
         ArtisanWorld
       </a>
-      {/* Desktop links */}
-      <ul className="nav-links">
-        {NAV_LINKS.map(l=>(
-          <li key={l.label}>
-            <a href="#" onClick={e=>{ e.preventDefault(); scrollTo(l.id); }}>{l.label}</a>
-          </li>
-        ))}
-      </ul>
       {/* Right side */}
       <div className="nav-right">
         <button className="btn-artist" onClick={() => navigate('/artist-apply')}>Join as Artist</button>
