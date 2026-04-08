@@ -17,7 +17,7 @@ const corsOptions = {
 
 app.use(express.json({ limit: '20mb' }));
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
+app.options('*', cors());
 
 // ======================
 // Routes
